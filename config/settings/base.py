@@ -14,15 +14,15 @@ ROOT_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 APPS_DIR = ROOT_DIR / "andr_omeda"
 env = environ.Env()
 if not ME_STILL_DEVELOPING:
-    READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=True)
-else:
     READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
+else:
+    READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=True)
 if READ_DOT_ENV_FILE:
     # OS environment variables take precedence over variables from .env
     if not ME_STILL_DEVELOPING:
         env.read_env(str(ROOT_DIR / ".env"))
     else:
-        env.read_env(str(ROOT_DIR / ".envs" / ".base"))
+        env.read_env(str(ROOT_DIR / ".envs" / ".local" / ".base"))
 
 
 # GENERAL
