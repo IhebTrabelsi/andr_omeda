@@ -1,19 +1,29 @@
+import environ
+from pathlib import Path
+# [IHEB] use to change behaviour prefered in production but not as
+# long as i'm f** developing the shishi
+ME_STILL_DEVELOPING = True
+
 """
 Base settings to build other settings files upon.
 """
-from pathlib import Path
 
-import environ
 
 ROOT_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 # andr_omeda/
 APPS_DIR = ROOT_DIR / "andr_omeda"
 env = environ.Env()
-
-READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
+if not ME_STILL_DEVELOPING:
+    READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=True)
+else:
+    READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
 if READ_DOT_ENV_FILE:
     # OS environment variables take precedence over variables from .env
-    env.read_env(str(ROOT_DIR / ".env"))
+    if not ME_STILL_DEVELOPING:
+        env.read_env(str(ROOT_DIR / ".env"))
+    else:
+        env.read_env(str(ROOT_DIR / ".envs" / ".base"))
+
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -40,7 +50,12 @@ LOCALE_PATHS = [str(ROOT_DIR / "locale")]
 # DATABASES
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
-DATABASES = {"default": env.db("DATABASE_URL")}
+DATABASES = {"default": env.db("DATABASE_URL") if not ME_STILL_DEVELOPING else
+             {
+    "ENGINE": "django.db.backends.sqlite3",
+    "NAME": "db.sqlite3",
+}
+}
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
 # URLS
