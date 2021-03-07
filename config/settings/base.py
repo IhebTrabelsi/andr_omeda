@@ -67,6 +67,8 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 # APPS
 # ------------------------------------------------------------------------------
+
+
 DJANGO_APPS = [
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -78,6 +80,7 @@ DJANGO_APPS = [
     "django.contrib.admin",
     "django.forms",
 ]
+
 THIRD_PARTY_APPS = [
     "crispy_forms",
     "allauth",
@@ -90,6 +93,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "andr_omeda.users.apps.UsersConfig",
+    "andr_omeda.andr_bot.apps.AndrBotConfig",
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -164,7 +168,6 @@ STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 ]
-
 # MEDIA
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#media-root
@@ -298,3 +301,13 @@ REST_FRAMEWORK = {
 CORS_URLS_REGEX = r"^/api/.*$"
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+
+# Webhook
+# ------------------------------------------------------------------------------
+
+# Bot
+# ------------------------------------------------------------------------------
+BOT_API_BASE_URL = 'https://api.telegram.org/bot'
+BOT_TOKEN = '1616191667:AAFTcCNQSnt1ZDnDDCdbwVPSUxNSNtLT5uE'
+NGROK_TUNNEL_URL = 'https://caf6805f06c6.ngrok.io/'
