@@ -94,6 +94,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     "andr_omeda.users.apps.UsersConfig",
     "andr_omeda.andr_bot.apps.AndrBotConfig",
+    "andr_omeda.andr_update.apps.AndrUpdateConfig",
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
