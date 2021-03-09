@@ -1,7 +1,9 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-from andr_omeda.andr_update.models import Message, ProximityAlertTriggered
+from andr_omeda.andr_update.models import Message, ProximityAlertTriggered, \
+    InlineQuery, ChosenInlineResult, CallbackQuery, ShippingQuery, \
+    PreCheckoutQuery
 
 
 class AndrUser(models.Model):
@@ -51,6 +53,36 @@ class AndrUser(models.Model):
         ProximityAlertTriggered,
         on_delete=models.CASCADE,
         related_name="watcher",
+        blank=False
+    )
+    inline_query = models.OneToOneField(
+        InlineQuery,
+        on_delete=models.CASCADE,
+        related_name="from",
+        blank=False
+    )
+    chosen_inline_result = models.OneToOneField(
+        ChosenInlineResult,
+        on_delete=models.CASCADE,
+        related_name="from",
+        blank=False
+    )
+    callback_query = models.OneToOneField(
+        CallbackQuery,
+        on_delete=models.CASCADE,
+        related_name="from",
+        blank=False
+    )
+    shipping_query = models.OneToOneField(
+        ShippingQuery,
+        on_delete=models.CASCADE,
+        related_name="from",
+        blank=False
+    )
+    pre_checkout_query = models.OneToOneField(
+        PreCheckoutQuery,
+        on_delete=models.CASCADE,
+        related_name="from",
         blank=False
     )
 

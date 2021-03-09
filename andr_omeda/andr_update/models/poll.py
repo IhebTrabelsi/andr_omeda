@@ -1,12 +1,18 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-from andr_omeda.andr_update.models import Message
+from andr_omeda.andr_update.models import Message, Update
 
 
 class Poll(models.Model):
     message = models.OneToOneField(
         Message,
+        on_delete=models.CASCADE,
+        related_name="poll",
+        blank=True
+    )
+    update = models.OneToOneField(
+        Update,
         on_delete=models.CASCADE,
         related_name="poll",
         blank=True

@@ -1,7 +1,8 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-from andr_omeda.andr_update.models import AndrUser, Chat
+from andr_omeda.andr_update.models import AndrUser, Chat, Update, \
+    CallbackQuery
 
 
 class Message(models.Model):
@@ -20,6 +21,36 @@ class Message(models.Model):
     pinned_message = models.OneToOneField(
         "self",
         on_delete=models.DO_NOTHING,
+        blank=True
+    )
+    update = models.OneToOneField(
+        Update,
+        on_delete=models.CASCADE,
+        related_name="message",
+        blank=True
+    )
+    update_for_this_edited_message = models.OneToOneField(
+        Update,
+        on_delete=models.CASCADE,
+        related_name="edited_message",
+        blank=True
+    )
+    update_for_this_channel_post = models.OneToOneField(
+        Update,
+        on_delete=models.CASCADE,
+        related_name="channel_post",
+        blank=True
+    )
+    update_for_this_edited_channel_post = models.OneToOneField(
+        Update,
+        on_delete=models.CASCADE,
+        related_name="edited_channel_post",
+        blank=True
+    )
+    callbackquery = models.OneToOneField(
+        CallbackQuery,
+        on_delete=models.CASCADE,
+        related_name="message",
         blank=True
     )
 

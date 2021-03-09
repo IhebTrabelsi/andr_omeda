@@ -2,12 +2,18 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
+from andr_omeda.andr_update.models import Update
+
 # TODO switch to custom serializer/model field when possible
 
 
 class Andrid(models.Model):
     """presents a way for sequencing gathered updates"""
-
+    update = models.OneToOneField(
+        Update,
+        on_delete=models.DO_NOTHING,
+        related_name="update_id"
+    )
     week_order = models.IntegerField(_("week_order"))
     update_id = models.CharField(_("update_id"), default="undef")
     created = models.DateTimeField(_("created"), default=timezone.now())

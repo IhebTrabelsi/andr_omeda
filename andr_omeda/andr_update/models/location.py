@@ -1,7 +1,8 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-from andr_omeda.andr_update.models import Message, ChatLocation, Venue
+from andr_omeda.andr_update.models import Message, ChatLocation, Venue, \
+    InlineQuery, ChosenInlineResult
 
 
 class Location(models.Model):
@@ -19,6 +20,18 @@ class Location(models.Model):
     )
     venue = models.OneToOneField(
         Venue,
+        on_delete=models.CASCADE,
+        related_name="location",
+        blank=True
+    )
+    inlinequery = models.OneToOneField(
+        InlineQuery,
+        on_delete=models.CASCADE,
+        related_name="location",
+        blank=True
+    )
+    choseninlineresult = models.OneToOneField(
+        ChosenInlineResult,
         on_delete=models.CASCADE,
         related_name="location",
         blank=True

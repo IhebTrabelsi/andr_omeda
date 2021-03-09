@@ -35,3 +35,9 @@ from .passportfile import PassportFile
 from .inlinekeyboardbutton import InlineKeyboardButton
 from .loginurl import LoginUrl
 from .callbackgame import CallbackGame
+from .inlinequery import InlineQuery
+from .choseninlineresult import ChosenInlineResult
+from .callbackquery import CallbackQuery
+from .shippingquery import ShippingQuery
+from .precheckoutquery import PreCheckoutQuery
+from .pollanswer import PollAnswer
