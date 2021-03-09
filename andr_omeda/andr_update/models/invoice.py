@@ -11,8 +11,8 @@ class Invoice(models.Model):
         related_name="invoice",
         blank=True
     )
-    title = models.CharField(_("title"), blank=False)
-    description = models.CharField(_("description"), blank=False)
-    start_parameter = models.CharField(_("start_parameter"), blank=False)
-    currency = models.CharField(_("currency"), blank=False)
+    title = models.TextField(_("title"), blank=False)
+    description = models.TextField(_("description"), blank=False)
+    start_parameter = models.TextField(_("start_parameter"), blank=False)
+    currency = models.TextField(_("currency"), blank=False)
     total_amount = models.IntegerField(_("total_amount"), blank=False)

@@ -11,8 +11,8 @@ class Voice(models.Model):
         related_name="voice",
         blank=True
     )
-    file_id = models.CharField(_("file_id"), blank=False)
-    file_unique_id = models.CharField(_("file_unique_id"), blank=False)
+    file_id = models.TextField(_("file_id"), blank=False)
+    file_unique_id = models.TextField(_("file_unique_id"), blank=False)
     duration = models.IntegerField(_("duration"), blank=False)
-    mime_type = models.CharField(_("mime_type"), blank=True)
+    mime_type = models.TextField(_("mime_type"), blank=True)
     file_size = models.IntegerField(_("file_size"), blank=True)

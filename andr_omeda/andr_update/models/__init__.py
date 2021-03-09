@@ -26,7 +26,7 @@ from .successfulpayment import SuccessfulPayment
 from .passportdata import PassportData
 from .proximityalerttriggered import ProximityAlertTriggered
 from .inlinekeyboardmarkup import InlineKeyboardMarkup
-from .maskposition import MaskPosition.
+from .maskposition import MaskPosition
 from .orderinfo import OrderInfo
 from .shippingaddress import ShippingAddress
 from .encryptedpassportelement import EncryptedPassportElement

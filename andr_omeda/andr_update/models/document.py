@@ -11,8 +11,8 @@ class Document(models.Model):
         related_name="document",
         blank=True
     )
-    file_id = models.CharField(_("file_id"), blank=False)
-    file_unique_id = models.CharField(_("file_unique_id"), blank=False)
-    file_name = models.CharField(_("file_name"), blank=True)
-    mime_type = models.CharField(_("mime_type"), blank=True)
+    file_id = models.TextField(_("file_id"), blank=False)
+    file_unique_id = models.TextField(_("file_unique_id"), blank=False)
+    file_name = models.TextField(_("file_name"), blank=True)
+    mime_type = models.TextField(_("mime_type"), blank=True)
     file_size = models.IntegerField(_("file_size"), blank=True)

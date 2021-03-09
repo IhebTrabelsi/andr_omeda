@@ -11,8 +11,8 @@ class EncryptedPassportElement(models.Model):
         related_name="data",
         blank=True
     )
-    type = models.CharField(_("type"), blank=False)
-    data = models.CharField(_("data"), blank=True)
-    phone_number = models.CharField(_("phone_number"), blank=True)
-    email = models.CharField(_("email"), blank=True)
-    hash = models.CharField(_("hash"), blank=False)
+    type = models.TextField(_("type"), blank=False)
+    data = models.TextField(_("data"), blank=True)
+    phone_number = models.TextField(_("phone_number"), blank=True)
+    email = models.TextField(_("email"), blank=True)
+    hash = models.TextField(_("hash"), blank=False)

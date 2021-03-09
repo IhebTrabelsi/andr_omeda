@@ -9,7 +9,7 @@ class InlineKeyboardButton(models.Model):
     # an array to array in django relationships
     markup = models.ManyToManyField(
         InlineKeyboardMarkup,
-        related_name="inline_keyboard"
+        related_name="inline_keyboard",
         blank=False
     )
     buttons = models.ManyToManyField(
@@ -17,9 +17,9 @@ class InlineKeyboardButton(models.Model):
         related_name="buttons",
         blank=True
     )
-    text = models.CharField(_("text"), blank=False)
-    url = models.CharField(_("url"), blank=True)
+    text = models.TextField(_("text"), blank=False)
+    url = models.TextField(_("url"), blank=True)
     callback_data = models.CharField(_("callback_data"), max_length=64, blank=True)
-    switch_inline_query = models.CharField(_("switch_inline_query"), blank=True)
-    switch_inline_query_current_chat = models.CharField(_("switch_inline_query_current_chat"), blank=True)
+    switch_inline_query = models.TextField(_("switch_inline_query"), blank=True)
+    switch_inline_query_current_chat = models.TextField(_("switch_inline_query_current_chat"), blank=True)
     pay = models.BooleanField(_("pay"), blank=True)

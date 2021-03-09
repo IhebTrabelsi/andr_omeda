@@ -11,11 +11,11 @@ class Audio(models.Model):
         related_name="audio",
         blank=True
     )
-    file_id = models.CharField(_("file_id"), blank=False)
-    file_unique_id = models.CharField(_("file_unique_id"), blank=False)
+    file_id = models.TextField(_("file_id"), blank=False)
+    file_unique_id = models.TextField(_("file_unique_id"), blank=False)
     duration = models.IntegerField(_("duration"), blank=False)
-    performer = models.CharField(_("performer"), blank=True)
-    title = models.CharField(_("title"), blank=True)
-    file_name = models.CharField(_("file_name"), blank=True)
-    mime_type = models.CharField(_("mime_type"), blank=True)
+    performer = models.TextField(_("performer"), blank=True)
+    title = models.TextField(_("title"), blank=True)
+    file_name = models.TextField(_("file_name"), blank=True)
+    mime_type = models.TextField(_("mime_type"), blank=True)
     file_size = models.IntegerField(_("duration"), blank=True)

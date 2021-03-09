@@ -7,12 +7,12 @@ from andr_omeda.andr_update.models import Update
 class CallbackQuery(models.Model):
     update = models.OneToOneField(
         Update,
-        on_delete=models.CASCADE
-        related_name="callback_query"
+        on_delete=models.CASCADE,
+        related_name="callback_query",
         blank=True
     )
-    id = models.CharField(_("id"), blank=False)
-    inline_message_id = models.CharField(_("inline_message_id"), blank=True)
-    chat_instance = models.CharField(_("chat_instance"), blank=True)
-    data = models.CharField(_("data"), blank=True)
-    game_short_name = models.CharField(_("game_short_name"), blank=True)
+    callback_query_id = models.TextField(_("callback_query_id"), blank=False)
+    inline_message_id = models.TextField(_("inline_message_id"), blank=True)
+    chat_instance = models.TextField(_("chat_instance"), blank=True)
+    data = models.TextField(_("data"), blank=True)
+    game_short_name = models.TextField(_("game_short_name"), blank=True)

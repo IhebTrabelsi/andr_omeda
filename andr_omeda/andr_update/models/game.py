@@ -8,9 +8,9 @@ class Game(models.Model):
     message = models.OneToOneField(
         Message,
         on_delete=models.CASCADE,
-        related_name="contact",
+        related_name="game",
         blank=True
     )
-    title = models.CharField(_("title"), blank=False)
-    description = models.CharField(_("description"), blank=False)
+    title = models.TextField(_("title"), blank=False)
+    description = models.TextField(_("description"), blank=False)
     text = models.CharField(_("text"), max_length=4096, blank=True)

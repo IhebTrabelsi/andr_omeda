@@ -14,6 +14,9 @@ defined_types = [f[:-3] for f in defined_types]
 for file in defined_types:
     path = views_dir / file
     if os.path.isdir(path):
+        if not len(os.listdir(path)) == 0:
+            print("skipping directory %s \n DIRECTORY NOT EMPTY \n" % path.absolute())
+            continue
         os.rmdir(path)
     else:
         os.mkdir(path)

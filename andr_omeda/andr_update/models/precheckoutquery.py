@@ -7,12 +7,12 @@ from andr_omeda.andr_update.models import Update
 class PreCheckoutQuery(models.Model):
     update = models.OneToOneField(
         Update,
-        on_delete=models.CASCADE
-        related_name="pre_checkout_query"
+        on_delete=models.CASCADE,
+        related_name="pre_checkout_query",
         blank=True
     )
-    id = models.CharField(_("id"), blank=False)
+    pre_checkout_query_id = models.TextField(_("pre_checkout_query_id"), blank=False)
     total_amount = models.IntegerField(_("total_amount"), blank=False)
-    currency = models.CharField(_("currency"), blank=False)
-    invoice_payload = models.CharField(_("invoice_payload"), blank=False)
-    shipping_option_id = models.CharField(_("shipping_option_id"), blank=True)
+    currency = models.TextField(_("currency"), blank=False)
+    invoice_payload = models.TextField(_("invoice_payload"), blank=False)
+    shipping_option_id = models.TextField(_("shipping_option_id"), blank=True)

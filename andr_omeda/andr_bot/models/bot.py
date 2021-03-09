@@ -10,7 +10,7 @@ class Bot(models.Model):
     name = models.CharField(_('name'), max_length=255, blank=False, null=True)
     is_webhook_active = models.BooleanField(_('is_active'), default=False)
     created = models.DateTimeField(editable=False, null=False, blank=False, auto_now_add=True)
-    token = models.CharField(
+    token = models.TextField(
         _('token'),
         max_length=46,
         default=settings.BOT_TOKEN,

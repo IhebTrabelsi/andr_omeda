@@ -11,8 +11,8 @@ class Contact(models.Model):
         related_name="contact",
         blank=True
     )
-    phone_number = models.CharField(_("phone_number"), blank=False)
-    first_name = models.CharField(_("first_name"), blank=False)
-    last_name = models.CharField(_("last_name"), blank=True)
+    phone_number = models.TextField(_("phone_number"), blank=False)
+    first_name = models.TextField(_("first_name"), blank=False)
+    last_name = models.TextField(_("last_name"), blank=True)
     user_id = models.IntegerField(_("user_id"), blank=True)
-    vcard = models.CharField(_("vcard"), blank=True)
+    vcard = models.TextField(_("vcard"), blank=True)

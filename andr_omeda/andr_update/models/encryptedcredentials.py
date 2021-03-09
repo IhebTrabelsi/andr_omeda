@@ -11,6 +11,6 @@ class EncryptedCredentials(models.Model):
         related_name="credentials",
         blank=True
     )
-    data = models.CharField(_("data"), blank=False)
-    hash = models.CharField(_("hash"), blank=False)
-    secret = models.CharField(_("secret"), blank=False)
+    data = models.TextField(_("data"), blank=False)
+    hash = models.TextField(_("hash"), blank=False)
+    secret = models.TextField(_("secret"), blank=False)

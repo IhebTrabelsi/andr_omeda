@@ -8,8 +8,8 @@ class Dice(models.Model):
     message = models.OneToOneField(
         Message,
         on_delete=models.CASCADE,
-        related_name="contact",
+        related_name="dice",
         blank=True
     )
-    emoji = models.CharField(_("emoji"), blank=False)
+    emoji = models.TextField(_("emoji"), blank=False)
     value = models.IntegerField(_("value"), blank=False)

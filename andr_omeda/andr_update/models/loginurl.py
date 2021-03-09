@@ -11,7 +11,7 @@ class LoginUrl(models.Model):
         related_name="login_url",
         blank=False
     )
-    url = models.CharField(_("url"), blank=False)
-    forward_text = models.CharField(_("forward_text"), blank=True)
-    bot_username = models.CharField(_("bot_username"), blank=True)
+    url = models.TextField(_("url"), blank=False)
+    forward_text = models.TextField(_("forward_text"), blank=True)
+    bot_username = models.TextField(_("bot_username"), blank=True)
     request_write_access = models.BooleanField(_("request_write_access"), blank=True)

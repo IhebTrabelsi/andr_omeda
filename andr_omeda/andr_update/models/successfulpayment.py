@@ -11,9 +11,9 @@ class SuccessfulPayment(models.Model):
         related_name="successful_payment",
         blank=True
     )
-    currency = models.CharField(_("currency"), blank=False)
+    currency = models.TextField(_("currency"), blank=False)
     total_amount = models.IntegerField(_("total_amount"), blank=False)
-    invoice_payload = models.CharField(_("invoice_payload"), blank=False)
-    shipping_option_id = models.CharField(_("invoice_payload"), blank=True)
-    telegram_payment_charge_id = models.CharField(_("telegram_payment_charge_id"), blank=False)
-    provider_payment_charge_id = models.CharField(_("provider_payment_charge_id"), blank=False)
+    invoice_payload = models.TextField(_("invoice_payload"), blank=False)
+    shipping_option_id = models.TextField(_("invoice_payload"), blank=True)
+    telegram_payment_charge_id = models.TextField(_("telegram_payment_charge_id"), blank=False)
+    provider_payment_charge_id = models.TextField(_("provider_payment_charge_id"), blank=False)

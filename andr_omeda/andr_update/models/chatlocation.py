@@ -11,4 +11,4 @@ class ChatLocation(models.Model):
         related_name="location",
         blank=True
     )
-    address = models.CharField(_("address"), max_length=64, blank=Flase)
+    address = models.CharField(_("address"), max_length=64, blank=False)

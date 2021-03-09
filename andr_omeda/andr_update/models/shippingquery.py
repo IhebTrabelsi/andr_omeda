@@ -7,9 +7,9 @@ from andr_omeda.andr_update.models import Update
 class ShippingQuery(models.Model):
     update = models.OneToOneField(
         Update,
-        on_delete=models.CASCADE
-        related_name="shipping_query"
+        on_delete=models.CASCADE,
+        related_name="shipping_query",
         blank=True
     )
-    id = models.CharField(_("id"), blank=False)
-    invoice_payload = models.CharField(_("invoice_payload"), blank=False)
+    shipping_query_id = models.TextField(_("id"), blank=False)
+    invoice_payload = models.TextField(_("invoice_payload"), blank=False)

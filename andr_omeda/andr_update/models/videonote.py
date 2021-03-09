@@ -11,8 +11,8 @@ class VideoNote(models.Model):
         related_name="video_note",
         blank=True
     )
-    file_id = models.CharField(_("file_id"), blank=False)
-    file_unique_id = models.CharField(_("file_unique_id"), blank=False)
+    file_id = models.TextField(_("file_id"), blank=False)
+    file_unique_id = models.TextField(_("file_unique_id"), blank=False)
     length = models.IntegerField(_("length"), blank=False)
     duration = models.IntegerField(_("duration"), blank=False)
     file_size = models.IntegerField(_("file_size"), blank=True)

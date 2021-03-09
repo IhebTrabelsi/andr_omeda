@@ -1,97 +1,98 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-from andr_omeda.andr_update.models import Message, ProximityAlertTriggered, \
+"""from andr_omeda.andr_update.models import Message, ProximityAlertTriggered, \
     InlineQuery, ChosenInlineResult, CallbackQuery, ShippingQuery, \
     PreCheckoutQuery
+"""
 
 
 class AndrUser(models.Model):
     message = models.OneToOneField(
-        Message,
+        "Message",
         on_delete=models.CASCADE,
-        related_name="from",
+        related_name="message_from",
         blank=True
     )
     forwarder = models.OneToOneField(
-        Message,
+        "Message",
         on_delete=models.CASCADE,
         related_name="forward_from",
         blank=True
     )
     bot_sender = models.OneToOneField(
-        Message,
+        "Message",
         on_delete=models.CASCADE,
         related_name="via_bot",
         blank=True
     )
     entity_mention = models.OneToOneField(
-        Message,
+        "Message",
         on_delete=models.CASCADE,
         related_name="user",
         blank=True
     )
     chat_members_message = models.ForeignKey(
-        Message,
+        "Message",
         on_delete=models.CASCADE,
         related_name="new_chat_members",
         blank=True
     )
     chat_leaving_member_message = models.OneToOneField(
-        Message,
+        "Message",
         on_delete=models.CASCADE,
         related_name="left_chat_member",
         blank=True
     )
     proximity_alert_for_traveler = models.OneToOneField(
-        ProximityAlertTriggered,
+        "ProximityAlertTriggered",
         on_delete=models.CASCADE,
         related_name="traveler",
         blank=False
     )
     proximity_alert_for_watcher = models.OneToOneField(
-        ProximityAlertTriggered,
+        "ProximityAlertTriggered",
         on_delete=models.CASCADE,
         related_name="watcher",
         blank=False
     )
     inline_query = models.OneToOneField(
-        InlineQuery,
+        "InlineQuery",
         on_delete=models.CASCADE,
-        related_name="from",
+        related_name="inline_query_from",
         blank=False
     )
     chosen_inline_result = models.OneToOneField(
-        ChosenInlineResult,
+        "ChosenInlineResult",
         on_delete=models.CASCADE,
-        related_name="from",
+        related_name="chosen_inline_result_from",
         blank=False
     )
     callback_query = models.OneToOneField(
-        CallbackQuery,
+        "CallbackQuery",
         on_delete=models.CASCADE,
-        related_name="from",
+        related_name="callback_query_from",
         blank=False
     )
     shipping_query = models.OneToOneField(
-        ShippingQuery,
+        "ShippingQuery",
         on_delete=models.CASCADE,
-        related_name="from",
+        related_name="shipping_query_from",
         blank=False
     )
     pre_checkout_query = models.OneToOneField(
-        PreCheckoutQuery,
+        "PreCheckoutQuery",
         on_delete=models.CASCADE,
-        related_name="from",
+        related_name="pre_checkout_query_from",
         blank=False
     )
 
     user_id = models.IntegerField(_("user_id"), blank=False)
     is_bot = models.BooleanField(_("is_bot"), blank=False)
-    first_name = models.CharField(_("first_name"), blank=False)
-    last_name = models.CharField(_("last_name"), blank=True)
-    username = models.CharField(_("username"), blank=True)
-    language_code = models.CharField(_("language_code"), blank=True)
+    first_name = models.TextField(_("first_name"), blank=False)
+    last_name = models.TextField(_("last_name"), blank=True)
+    username = models.TextField(_("username"), blank=True)
+    language_code = models.TextField(_("language_code"), blank=True)
     can_join_groups = models.BooleanField(_("can_join_groups"), blank=True)
     can_read_all_group_messages = models.BooleanField(_("can_read_all_group_messages"), blank=True)
     supports_inline_queries = models.BooleanField(_("supports_inline_queries"), blank=True)

@@ -11,7 +11,7 @@ class MaskPosition(models.Model):
         related_name="mask_position",
         blank=True
     )
-    point = models.CharField(_("point"), blank=False)
+    point = models.TextField(_("point"), blank=False)
     x_shift = models.FloatField(_("x_shift"), blank=False)
     y_shift = models.FloatField(_("y_shift"), blank=False)
     scale = models.FloatField(_("scale"), blank=False)

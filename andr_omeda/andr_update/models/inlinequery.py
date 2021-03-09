@@ -8,10 +8,10 @@ from andr_omeda.andr_update.models import Update
 class InlineQuery(models.Model):
     update = models.OneToOneField(
         Update,
-        on_delete=models.CASCADE
-        related_name="inline_query"
+        on_delete=models.CASCADE,
+        related_name="inline_query",
         blank=True
     )
-    id = models.CharField(_("id"), blank=False)
-    query = models.CharField(_("query"), blank=False)
-    offset = models.CharField(_("offset"), blank=False)
+    inline_query_id = models.TextField(_("inline_query_id"), blank=False)
+    query = models.TextField(_("query"), blank=False)
+    offset = models.TextField(_("offset"), blank=False)

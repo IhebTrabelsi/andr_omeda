@@ -6,14 +6,14 @@ from andr_omeda.andr_update.models import Message
 
 class Chat(models.Model):
     chat_id = models.BigIntegerField(_("chat_id"), blank=False)
-    type = models.CharField(_("type"), blank=False)
-    title = models.CharField(_("type"), blank=True)
-    username = models.CharField(_("username"), blank=True)
-    first_name = models.CharField(_("first_name"), blank=True)
-    last_name = models.CharField(_("last_name"), blank=True)
-    bio = models.CharField(_("bio"), blank=True)
-    description = models.CharField(_("description"), blank=True)
-    invite_link = models.CharField(_("invite_link"), blank=True)
+    type = models.TextField(_("type"), blank=False)
+    title = models.TextField(_("type"), blank=True)
+    username = models.TextField(_("username"), blank=True)
+    first_name = models.TextField(_("first_name"), blank=True)
+    last_name = models.TextField(_("last_name"), blank=True)
+    bio = models.TextField(_("bio"), blank=True)
+    description = models.TextField(_("description"), blank=True)
+    invite_link = models.TextField(_("invite_link"), blank=True)
     message = models.OneToOneField(
         Message,
         on_delete=models.CASCADE,
@@ -34,6 +34,6 @@ class Chat(models.Model):
     )
 
     slow_mode_delay = models.IntegerField(_("slow_mode_delay"), blank=True)
-    sticker_set_name = models.CharField(_("sticker_set_name"), blank=True)
+    sticker_set_name = models.TextField(_("sticker_set_name"), blank=True)
     can_set_sticker_set = models.BooleanField(_("can_set_sticker_set"), blank=True)
     linked_chat_id = models.BigIntegerField(_("linked_chat_id"), blank=True)
