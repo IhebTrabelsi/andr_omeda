@@ -50,11 +50,15 @@ LOCALE_PATHS = [str(ROOT_DIR / "locale")]
 # DATABASES
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
-DATABASES = {"default": env.db("DATABASE_URL") if not ME_STILL_DEVELOPING else
-             {
-    "ENGINE": "django.db.backends.sqlite3",
-    "NAME": "db.sqlite3",
-}
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'andr_omeda',
+        'USER': 'postgres',
+        'PASSWORD': 'nht5432',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
+    }
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 

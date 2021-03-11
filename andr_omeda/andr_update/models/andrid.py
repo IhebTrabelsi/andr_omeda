@@ -8,27 +8,35 @@ from django.utils import timezone
 
 class Andrid(models.Model):
     """presents a way for sequencing gathered updates"""
-    update = models.OneToOneField(
-        "Update",
-        on_delete=models.DO_NOTHING,
-        related_name="update_id"
-    )
-    week_order = models.IntegerField(_("week_order"))
-    _id = models.TextField(_("_id"), default="undef")
+    week_order = models.IntegerField(_("week_order"), default=0, blank=False)
+    _id = models.TextField(_("_id"), default="DEAD", blank=False)
     created = models.DateTimeField(_("created"), editable=False, db_index=True)
 
     def save(self, *args, **kwargs):
         if not self.id and not self.created:
             self.created = timezone.now()
+        super().save(*args, **kwargs)
+
+    def get_id(self):
+        """only used with populated Andrid object"""
+        return self._id
 
     # NOTE update_id will be rechosen randomly after one week without
     # new updates
 
     @classmethod
-    def create_andrid(cls, _id):
+    def create_andrid(cls, *args, **kwargs):
+        _id = kwargs.get('_id')
+        if not list(cls.objects.all()):
+            andrid = Andrid(
+                week_order=1,
+                _id=_id
+            )
+            andrid.save()
+            return andrid
         last_andrid = cls.objects.order_by('-pk')[0]
         if last_andrid:
-            if int(last_andrid._id) == int(_id) - 1:
+            if int(last_andrid.get_id()) == int(_id) - 1:
                 andrid = Andrid(
                     week_order=last_andrid.week_order,
                     _id=_id
@@ -44,9 +52,4 @@ class Andrid(models.Model):
                 andrid.save()
                 return andrid
         else:
-            andrid = Andrid(
-                week_order=0,
-                _id=_id
-            )
-            andrid.save()
-            return andrid
+            raise Exception('can\'t access andrid in db')

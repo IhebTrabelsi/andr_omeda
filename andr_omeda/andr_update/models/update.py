@@ -4,4 +4,9 @@ from django.utils import timezone
 
 
 class Update(models.Model):
-    pass
+    andr_id = models.OneToOneField(
+        "Andrid",
+        on_delete=models.RESTRICT,
+        primary_key=True,
+        related_name="update"
+    )
