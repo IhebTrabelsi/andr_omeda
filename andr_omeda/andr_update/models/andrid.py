@@ -9,7 +9,7 @@ from django.utils import timezone
 class Andrid(models.Model):
     """presents a way for sequencing gathered updates"""
     week_order = models.IntegerField(_("week_order"), default=0, blank=False)
-    _id = models.TextField(_("_id"), default="DEAD", blank=False)
+    _id = models.BigIntegerField(_("_id"), default=-1, blank=False)
     created = models.DateTimeField(_("created"), editable=False, db_index=True)
 
     def save(self, *args, **kwargs):
