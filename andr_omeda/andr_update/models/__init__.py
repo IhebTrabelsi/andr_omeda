@@ -41,3 +41,8 @@ from .callbackquery import CallbackQuery
 from .shippingquery import ShippingQuery
 from .precheckoutquery import PreCheckoutQuery
 from .pollanswer import PollAnswer
+from .pollansweroptionsid import PollAnswerOptionsId
+from .polloption import PollOption
+from .chatmemberupdated import ChatMemberUpdated
+from .chatmember import ChatMember
+from .chatinvitelink import ChatInviteLink

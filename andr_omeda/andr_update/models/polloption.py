@@ -11,5 +11,5 @@ class PollOption(models.Model):
         related_name="options",
         blank=True
     )
-    text = models.CharField(_("text"), max_length=100 blank=False)
+    text = models.CharField(_("text"), max_length=100, blank=False)
     voter_count = models.IntegerField(_("voter_count"), blank=False)
