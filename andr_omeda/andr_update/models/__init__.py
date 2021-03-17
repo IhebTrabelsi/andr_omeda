@@ -1,5 +1,5 @@
 from .andrid import Andrid
-from .andruser import AndrUser
+from .andruser import Andruser
 from .message import Message
 from .update import Update
 from .chat import Chat

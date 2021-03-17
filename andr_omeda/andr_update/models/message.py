@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-"""from andr_omeda.andr_update.models import AndrUser, Chat, Update, \
+"""from andr_omeda.andr_update.models import Andruser, Chat, Update, \
     CallbackQuery
 """
 
@@ -56,6 +56,22 @@ class Message(models.Model):
         related_name="message",
         blank=True
     )
+    chat = models.ForeignKey(
+        "Chat",
+        on_delete=models.RESTRICT,
+        related_name="message",
+        blank=False
+    )
+    sender_chat = models.ForeignKey(
+        "Chat",
+        on_delete=models.RESTRICT,
+        blank=True
+    )
+    forward_from_chat = models.ForeignKey(
+        "Chat",
+        on_delete=models.RESTRICT,
+        blank=True
+    )
 
     date = models.IntegerField(_("date"), blank=False)
     forward_from_message_id = models.IntegerField(_("forward_from_message_id"), blank=True)
@@ -83,3 +99,7 @@ class Message(models.Model):
     migrate_to_chat_id = models.BigIntegerField(_("migrate_to_chat_id"), blank=True)
     migrate_from_chat_id = models.BigIntegerField(_("migrate_from_chat_id"), blank=True)
     connected_website = models.TextField(_("connected_website"), blank=True)
+
+    @classmethod
+    def get_message_with_message_id_list(cls, message_id):
+        return list(cls.objects.get(message_id=message_id))

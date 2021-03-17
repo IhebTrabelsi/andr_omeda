@@ -8,3 +8,11 @@ class DocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
         fields = '__all__'
+
+    def create(self, validated_data):
+        photo_size_serializer = self.fields['thumb']
+        thumb_instance = photo_size_serializer(**validated_data.pop('thumb')).is_valid().save()
+        document_instance = Document(**validated_data)
+        document_instance.thumb = thumb_instance
+        
+        return document_instance.save()

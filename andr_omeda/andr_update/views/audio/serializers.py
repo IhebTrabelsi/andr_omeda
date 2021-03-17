@@ -8,3 +8,11 @@ class AudioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Audio
         fields = '__all__'
+
+    def create(self, validated_data):
+        photo_size_serializer = self.fields['thumb']
+        thumb_instance = photo_size_serializer(**validated_data.pop('thumb')).is_valid().save()
+        audio_instance = Audio(**validated_data)
+        audio_instance.thumb = thumb_instance
+        
+        return audio_instance.save()

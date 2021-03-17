@@ -549,7 +549,7 @@ class Migration(migrations.Migration):
             field=models.OneToOneField(blank=True, on_delete=django.db.models.deletion.CASCADE, related_name='animation', to='andr_update.message'),
         ),
         migrations.CreateModel(
-            name='AndrUser',
+            name='Andruser',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('user_id', models.IntegerField(verbose_name='user_id')),

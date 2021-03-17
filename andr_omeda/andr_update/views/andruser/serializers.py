@@ -1,6 +1,7 @@
 # automatically created
 from rest_framework import serializers
-from andr_omeda.andr_update.models import AndrUser
+from andr_omeda.andr_update.models import Andruser
+
 
 class AndruserSerializer(serializers.Serializer):
     user_id = serializers.IntegerField(required=True)
@@ -14,7 +15,7 @@ class AndruserSerializer(serializers.Serializer):
     supports_inline_queries = serializers.BooleanField(required=False)
 
     def to_internal_value(self, data):
-        
+
         _id = data.get('id')
         is_bot = data.get('is_bot')
         first_name = data.get('first_name')
@@ -28,12 +29,12 @@ class AndruserSerializer(serializers.Serializer):
             raise serializers.ValidationError({
                 'id': 'This field is required.'
             })
-        
+
         if not isinstance(update_id, int):
             raise serializers.ValidationError({
                 'id': 'This field is not in int form.'
             })
-        
+
         return {
             'user_id': _id
             'is_bot': is_bot
@@ -47,4 +48,4 @@ class AndruserSerializer(serializers.Serializer):
         }
 
     def create(self, validated_data):
-        return AndrUser.create_andrid(**validated_data)
+        return Andruser.objects.create(**validated_data)

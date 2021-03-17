@@ -7,7 +7,7 @@ from django.utils import timezone
 """
 
 
-class AndrUser(models.Model):
+class Andruser(models.Model):
     message = models.OneToOneField(
         "Message",
         on_delete=models.CASCADE,
@@ -32,16 +32,16 @@ class AndrUser(models.Model):
         related_name="user",
         blank=True
     )
-    chat_members_message = models.ForeignKey(
+    user_members_message = models.ForeignKey(
         "Message",
         on_delete=models.CASCADE,
-        related_name="new_chat_members",
+        related_name="new_user_members",
         blank=True
     )
-    chat_leaving_member_message = models.OneToOneField(
+    user_leaving_member_message = models.OneToOneField(
         "Message",
         on_delete=models.CASCADE,
-        related_name="left_chat_member",
+        related_name="left_user_member",
         blank=True
     )
     proximity_alert_for_traveler = models.OneToOneField(
@@ -87,7 +87,7 @@ class AndrUser(models.Model):
         blank=False
     )
 
-    user_id = models.IntegerField(_("user_id"), blank=False)
+    user_id = models.BigIntegerField(_("user_id"), blank=False, primary_key=True)
     is_bot = models.BooleanField(_("is_bot"), blank=False)
     first_name = models.TextField(_("first_name"), blank=False)
     last_name = models.TextField(_("last_name"), blank=True)
@@ -96,3 +96,20 @@ class AndrUser(models.Model):
     can_join_groups = models.BooleanField(_("can_join_groups"), blank=True)
     can_read_all_group_messages = models.BooleanField(_("can_read_all_group_messages"), blank=True)
     supports_inline_queries = models.BooleanField(_("supports_inline_queries"), blank=True)
+
+    @classmethod
+    def get_user_with_id_and_first_name(cls, user_id, first_name):
+        try:
+            obj = Person.objects.get(user_id=user_id, first_name=first_name)
+            return obj
+        except cls.DoesNotExist:
+            raise cls.DoesNotExist
+
+    @classmethod
+    def user_with_id_exists(cls, user_id):
+        return cls.objects.filter(pk=user_id).exists()
+
+    @classmethod
+    def get_user_with_id(cls, user_id):
+        if cls.user_with_id_exists(user_id)
+        return cls.objects.get(pk=user_id)
