@@ -65,11 +65,13 @@ class Message(models.Model):
     sender_chat = models.ForeignKey(
         "Chat",
         on_delete=models.RESTRICT,
+        related_name="sended_messages",
         blank=True
     )
     forward_from_chat = models.ForeignKey(
         "Chat",
         on_delete=models.RESTRICT,
+        related_name="forwarded_messages",
         blank=True
     )
 

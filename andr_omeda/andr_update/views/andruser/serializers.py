@@ -3,7 +3,7 @@ from rest_framework import serializers
 from andr_omeda.andr_update.models import Andruser
 
 
-class AndruserSerializer(serializers.Serializer):
+"""class AndruserSerializer(serializers.Serializer):
     user_id = serializers.IntegerField(required=True)
     is_bot = serializers.BooleanField(required=True)
     first_name = serializers.CharField(required=True)
@@ -48,4 +48,9 @@ class AndruserSerializer(serializers.Serializer):
         }
 
     def create(self, validated_data):
-        return Andruser.objects.create(**validated_data)
+        return Andruser.objects.create(**validated_data)"""
+
+class AndruserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Andruser
+        fields='__all__'

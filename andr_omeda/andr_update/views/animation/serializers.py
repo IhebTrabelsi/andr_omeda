@@ -10,10 +10,13 @@ class AnimationSerializer(serializers.ModelSerializer):
         fields = '__all__'
     
     def create(self, validated_data):
-        photo_size_serializer = self.fields['thumb']
-        thumb_instance = photo_size_serializer(**validated_data.pop('thumb')).is_valid().save()
-        animation_instance = Animation(**validated_data)
-        animation_instance.thumb = thumb_instance
+        thumb_data = validated_data.pop('thumb', None)
+        animation = Animation(**validated_data)
+        if thumb_data:
+            thumb_ser = self.fields['thumb']
+            thumb = thumb_ser(**thumb_data)
+            thumb = thumb.is_valid().save()
+            animation.thumb = thumb
         
-        return animation_instance.save()
+        return animation.save()
         

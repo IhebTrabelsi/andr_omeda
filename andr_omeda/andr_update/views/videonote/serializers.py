@@ -8,3 +8,14 @@ class VideoNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = VideoNote
         fields = '__all__'
+
+    def create(self, validated_data):
+        thumb_data = validated_data.pop('thumb', None)
+        video_note = VideoNote(**validated_data)
+        if thumb_data:
+            thumb_ser = self.fields['thumb']
+            thumb = thumb_ser(**thumb_data)
+            thumb = thumb.is_valid().save()
+            video_note.thumb = thumb
+        
+        return video_note.save()

@@ -12,10 +12,10 @@ class ChosenInlineResultSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        user = Andruser.get_user_with_id(user_id= validated_data.pop('from').get('user_id'))
+        user = Andruser.get_user_with_id(user_id= validated_data.pop('from', None).get('user_id', None))
         if 'location' in validated_data:
             location_ser = self.fields['location']
-            location = location_ser(**validated_data.pop('location'))
+            location = location_ser(**validated_data.pop('location', None))
             location = location.is_valid()
             location = location.save()
         

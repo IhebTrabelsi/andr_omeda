@@ -14,10 +14,10 @@ class CallbackQuerySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        user = validated_data.pop('from')
+        user = validated_data.pop('from', None)
         callback_query_from = Andruser.get_user_with_id_and_first_name(user.get('user_id'), user.get('first_name'))
         try:
-            message = validated_data.pop('message')
+            message = validated_data.pop('message', None)
             if message.get('chat'):
                 chat_id = message.get('chat').get('id')
                 chat = Chat.objects.get(chat_id=chat_id)

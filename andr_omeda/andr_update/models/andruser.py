@@ -86,6 +86,12 @@ class Andruser(models.Model):
         related_name="pre_checkout_query_from",
         blank=False
     )
+    voice_chat_participant_invitation = models.ForeignKey(
+        "VoiceChatParticipantsInvited",
+        on_delete=models.RESTRICT,
+        related_name="users",
+        blank=True
+    )
 
     user_id = models.BigIntegerField(_("user_id"), blank=False, primary_key=True)
     is_bot = models.BooleanField(_("is_bot"), blank=False)
@@ -111,5 +117,5 @@ class Andruser(models.Model):
 
     @classmethod
     def get_user_with_id(cls, user_id):
-        if cls.user_with_id_exists(user_id)
-        return cls.objects.get(pk=user_id)
+        if cls.user_with_id_exists(user_id):
+            return cls.objects.get(pk=user_id)

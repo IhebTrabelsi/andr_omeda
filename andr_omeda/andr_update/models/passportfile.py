@@ -5,7 +5,7 @@ from andr_omeda.andr_update.models import Message, EncryptedPassportElement
 
 
 class PassportFile(models.Model):
-    encrypted_passport_element = models.ManyToManyField(
+    encrypted_passport_element = models.ForeignKey(
         EncryptedPassportElement,
         on_delete=models.CASCADE,
         related_name="files",
@@ -29,7 +29,7 @@ class PassportFile(models.Model):
         related_name="selfie",
         blank=True
     )
-    encrypted_passport_element_translation = models.ManyToManyField(
+    encrypted_passport_element_translation = models.ForeignKey(
         EncryptedPassportElement,
         on_delete=models.CASCADE,
         related_name="translation",

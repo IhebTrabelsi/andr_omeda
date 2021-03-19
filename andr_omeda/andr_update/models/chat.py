@@ -23,9 +23,9 @@ class Chat(models.Model):
         return self.message
 
     @classmethod
-    def get_message_with_id_in chat_with_id(cls, chat_id, message_id):
+    def get_message_with_id_in_chat_with_id(cls, chat_id, message_id):
         try:
-            chat = cls.objects.get(chat_id=chat_id):
+            chat = cls.objects.get(chat_id=chat_id)
             message = chat.message
             return chat
         except cls.DoesNotExist:
@@ -37,5 +37,5 @@ class Chat(models.Model):
 
     @classmethod
     def get_chat_with_id(cls, chat_id):
-        if cls.chat_with_id_exists(chat_id)
-        return cls.objects.get(pk=chat_id)
+        if cls.chat_with_id_exists(chat_id):
+            return cls.objects.get(pk=chat_id)

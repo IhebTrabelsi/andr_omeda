@@ -12,23 +12,23 @@ class ChatMemberUpdatedSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        chat_id = validated_data.pop('chat').get('chat_id')
-        user_id = validated_data.pop('from').get('chat_id')
+        chat_id = validated_data.pop('chat', None).get('chat_id', None)
+        user_id = validated_data.pop('from', None).get('chat_id', None)
         chat = Chat.get_chat_with_id(chat_id=chat_id)
         user = Andruser.get_user_with_id(user_id=user_id)
 
         old_chat_member_ser = self.fields['old_chat_member'] 
-        old_chat_member = old_chat_member_ser(**validated_data.pop('old_chat_member'))
+        old_chat_member = old_chat_member_ser(**validated_data.pop('old_chat_member', None))
         old_chat_member = old_chat_member.is_valid()
         old_chat_member = old_chat_member.save()
 
         new_chat_member_ser = self.fields['new_chat_member'] 
-        new_chat_member = new_chat_member_ser(**validated_data.pop('new_chat_member'))
+        new_chat_member = new_chat_member_ser(**validated_data.pop('new_chat_member', None))
         new_chat_member = new_chat_member.is_valid()
         new_chat_member = new_chat_member.save()
 
         invite_link_ser = self.fields['invite_link']
-        invite_link = invite_link_ser(**validated_data.pop('invite_link'))
+        invite_link = invite_link_ser(**validated_data.pop('invite_link', None))
         invite_link = invite_link.is_valid()
         invite_link = invite_link.save()
 

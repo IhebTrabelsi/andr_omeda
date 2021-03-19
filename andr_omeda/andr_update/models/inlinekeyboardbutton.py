@@ -4,16 +4,26 @@ from django.utils import timezone
 from andr_omeda.andr_update.models import Message, InlineKeyboardMarkup
 
 
-class InlineKeyboardButton(models.Model):
-    # TODO see if there is a better solution to repr
-    # an array to array in django relationships
-    markup = models.ManyToManyField(
+class InlineKeyboardButtonList(models.Model):
+    markup = models.ForeignKey(
         InlineKeyboardMarkup,
-        related_name="inline_keyboard",
+        on_delete=models.CASCADE,
+        related_name="inline_keyboard_button_lists",
         blank=False
     )
-    buttons = models.ManyToManyField(
+
+
+class InlineKeyboardButton(models.Model):
+    list = models.ForeignKey(
+        InlineKeyboardButtonList,
+        on_delete=models.CASCADE,
+        related_name="inline_keyboard_buttons",
+        blank=False
+    )
+
+    button = models.ForeignKey(
         "self",
+        on_delete=models.CASCADE,
         related_name="buttons",
         blank=True
     )

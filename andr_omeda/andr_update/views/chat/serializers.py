@@ -25,19 +25,19 @@ class ChatSerializer(serializers.ModelSerializer):
         pinned_message_ser = self.fields['pinned_message']
 
         if validated_data.get('location'):
-            loc = loc_ser(**validated_data.pop('location'))
+            loc = loc_ser(**validated_data.pop('location', None))
             loc = loc.is_valid().save()
 
         if validated_data.get('permissions'):
-            perm = perm_ser(**validated_data.pop('permissions'))
+            perm = perm_ser(**validated_data.pop('permissions', None))
             perm = perm.is_valid().save()
 
         if validated_data.get('photo'):
-            photo = photo_ser(**validated_data.pop('permissions'))
+            photo = photo_ser(**validated_data.pop('permissions', None))
             photo = photo.is_valid().save()
 
         if validated_data.get('pinned_message'):
-            pinned_message = pinned_message_ser(**validated_data.pop('permissions'))
+            pinned_message = pinned_message_ser(**validated_data.pop('permissions', None))
             pinned_message = pinned_message.is_valid().save()
         
         chat = Chat(**validated_data)

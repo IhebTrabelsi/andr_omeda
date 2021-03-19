@@ -32,7 +32,7 @@ from .shippingaddress import ShippingAddress
 from .encryptedpassportelement import EncryptedPassportElement
 from .encryptedcredentials import EncryptedCredentials
 from .passportfile import PassportFile
-from .inlinekeyboardbutton import InlineKeyboardButton
+from .inlinekeyboardbutton import InlineKeyboardButton, InlineKeyboardButtonList
 from .loginurl import LoginUrl
 from .callbackgame import CallbackGame
 from .inlinequery import InlineQuery
@@ -46,3 +46,6 @@ from .polloption import PollOption
 from .chatmemberupdated import ChatMemberUpdated
 from .chatmember import ChatMember
 from .chatinvitelink import ChatInviteLink
+from .voicechatended import VoiceChatEnded
+from .voicechatstarted import VoiceChatStarted
+from .voicechatparticipantsinvited import VoiceChatParticipantsInvited

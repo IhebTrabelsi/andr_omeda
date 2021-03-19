@@ -10,7 +10,7 @@ class ChatLocationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         loc_ser = self.fields['location']
-        loc = loc_ser(**validated_data.pop('location')).is_valid().save()
+        loc = loc_ser(**validated_data.pop('location', None)).is_valid().save()
         chat_location = ChatLocation(**validated_data)
         chat_location.location = loc
         chat_location.save()
