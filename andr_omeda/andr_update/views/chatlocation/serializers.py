@@ -1,7 +1,7 @@
 # automatically created
 from rest_framework import serializers
 from andr_omeda.andr_update.models import ChatLocation, Location
-from andr_omeda.andr_update.views.location.serializers import LocationSerializer()
+from andr_omeda.andr_update.views.location.serializers import LocationSerializer
 class ChatLocationSerializer(serializers.ModelSerializer):
     location = LocationSerializer()
     class Meta:

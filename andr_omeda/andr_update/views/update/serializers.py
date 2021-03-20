@@ -1,16 +1,16 @@
 # automatically created
 from rest_framework import serializers
 from andr_omeda.andr_update.views.andrid.serializers import AndridSerializer
-from andr_omeda.andr_update.views.andruser.serializers import AndruserSerializer()
-from andr_omeda.andr_update.views.message.serializers import MessageSerializer()
-from andr_omeda.andr_update.views.inlinequery.serializers import InlineQuerySerializer()
-from andr_omeda.andr_update.views.choseninlineresult.serializers import ChosenInlineResultSerializer()
-from andr_omeda.andr_update.views.callbackquery.serializers import CallbackQuerySerializer()
-from andr_omeda.andr_update.views.shippingquery.serializers import ShippingQuerySerializer()
-from andr_omeda.andr_update.views.precheckoutquery.serializers import PreCheckoutQuerySerializer()
-from andr_omeda.andr_update.views.poll.serializers import PollSerializer()
-from andr_omeda.andr_update.views.pollanswer.serializers import PollAnswerSerializer()
-from andr_omeda.andr_update.views.chatmemberupdated.serializers import ChatMemberUpdatedSerializer()
+from andr_omeda.andr_update.views.andruser.serializers import AndruserSerializer
+from andr_omeda.andr_update.views.message.serializers import MessageSerializer
+from andr_omeda.andr_update.views.inlinequery.serializers import InlineQuerySerializer
+from andr_omeda.andr_update.views.choseninlineresult.serializers import ChosenInlineResultSerializer
+from andr_omeda.andr_update.views.callbackquery.serializers import CallbackQuerySerializer
+from andr_omeda.andr_update.views.shippingquery.serializers import ShippingQuerySerializer
+from andr_omeda.andr_update.views.precheckoutquery.serializers import PreCheckoutQuerySerializer
+from andr_omeda.andr_update.views.poll.serializers import PollSerializer
+from andr_omeda.andr_update.views.pollanswer.serializers import PollAnswerSerializer
+from andr_omeda.andr_update.views.chatmemberupdated.serializers import ChatMemberUpdatedSerializer
 
 
 class UpdateSerializer(serializers.Serializer):
