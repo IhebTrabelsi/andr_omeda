@@ -5,7 +5,7 @@ from andr_omeda.andr_update.models import Message
 
 
 class Chat(models.Model):
-    chat_id = models.BigIntegerField(_("chat_id"), blank=False, primary_key=True)
+    id = models.BigIntegerField(_("id"), blank=False, primary_key=True, default=0)
     type = models.TextField(_("type"), blank=False)
     title = models.TextField(_("type"), blank=True)
     username = models.TextField(_("username"), blank=True)
@@ -18,6 +18,8 @@ class Chat(models.Model):
     sticker_set_name = models.TextField(_("sticker_set_name"), blank=True)
     can_set_sticker_set = models.BooleanField(_("can_set_sticker_set"), blank=True)
     linked_chat_id = models.BigIntegerField(_("linked_chat_id"), blank=True)
+    # TODO [WORKAROUND20032208]
+    pinned_message = models.JSONField(_("pinned_message"), default=dict, blank=True)
 
     def geet_message(self):
         return self.message

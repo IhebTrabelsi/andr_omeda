@@ -10,40 +10,41 @@ class ChatSerializer(serializers.ModelSerializer):
     location = ChatLocationSerializer()
     permissions = ChatPermissionsSerializer()
     photo = ChatPhotoSerializer()
-    pinned_message = MessageSerializer()
     class Meta:
         model = Chat
         fields = '__all__'
 
     def create(self, validated_data):
-        chat_id = validated_data.get('chat_id')
-        if Chat.chat_with_id_exists(chat_id=chat_id):
-            return Chat.objects.get(pk=chat_id)
-        loc_ser = self.fields['location']
-        perm_ser = self.fields['permissions']
-        photo_ser = self.fields['photo']
-        pinned_message_ser = self.fields['pinned_message']
+        chat_id_data = validated_data.pop('chat_id', None)
+        location_data = validated_data.pop('location', None)
+        permissions_data = validated_data.pop('permissions', None)
+        photo_data = validated_data.pop('photo', None)
 
-        if validated_data.get('location'):
-            loc = loc_ser(**validated_data.pop('location', None))
+        if Chat.chat_with_id_exists(chat_id=chat_id_data):
+            return Chat.objects.get(pk=chat_id_data)
+        else:
+            if chat_id_data:
+                validated_data['id'] = chat_id_data
+        
+        if location_data:
+            loc_ser = self.fields['location']
+            loc = loc_ser(**location_data)
             loc = loc.is_valid().save()
+            validated_data['location'] = loc
 
-        if validated_data.get('permissions'):
-            perm = perm_ser(**validated_data.pop('permissions', None))
+        if permissions_data:
+            perm_ser = self.fields['permissions']
+            perm = perm_ser(**permissions_data)
             perm = perm.is_valid().save()
+            validated_data['permissions'] = perm
 
-        if validated_data.get('photo'):
-            photo = photo_ser(**validated_data.pop('permissions', None))
+        if photo_data:
+            photo_ser = self.fields['photo']
+            photo = photo_ser(**photo_data)
             photo = photo.is_valid().save()
+            validated_data['photo'] = photo
 
-        if validated_data.get('pinned_message'):
-            pinned_message = pinned_message_ser(**validated_data.pop('permissions', None))
-            pinned_message = pinned_message.is_valid().save()
         
         chat = Chat(**validated_data)
-        chat.location = loc
-        chat.permissions = perm 
-        chat.photo = photo 
-        chat.pinned_message = pinned_message
-        chat.save()
-        return chat 
+        
+        return chat.save()

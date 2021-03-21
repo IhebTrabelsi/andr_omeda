@@ -1,8 +1,8 @@
 # automatically created
 from rest_framework import serializers
 from andr_omeda.andr_update.models import ChosenInlineResult, Andruser
-from andr_omeda.andr_update.views.andruser.serializers import AndruserSerializer()
-from andr_omeda.andr_update.views.location.serializers import LocationSerializer()
+from andr_omeda.andr_update.views.andruser.serializers import AndruserSerializer
+from andr_omeda.andr_update.views.location.serializers import LocationSerializer
 
 class ChosenInlineResultSerializer(serializers.ModelSerializer):
     chosen_inline_result_from = AndruserSerializer()

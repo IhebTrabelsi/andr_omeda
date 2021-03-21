@@ -1,8 +1,8 @@
 # automatically created
 from rest_framework import serializers
 from andr_omeda.andr_update.models import InlineKeyboardButton, InlineKeyboardButtonList
-from andr_omeda.andr_update.views.callbackgame.serializers import CallbackGameSerializer()
-from andr_omeda.andr_update.views.loginurl.serializers import LoginUrlSerializer()
+from andr_omeda.andr_update.views.callbackgame.serializers import CallbackGameSerializer
+from andr_omeda.andr_update.views.loginurl.serializers import LoginUrlSerializer
 
 class InlineKeyboardButtonSerializer(serializers.ModelSerializer):
     callback_game = CallbackGameSerializer()
@@ -29,6 +29,7 @@ class InlineKeyboardButtonSerializer(serializers.ModelSerializer):
         return inline_keyboard_button.save()
 
 class InlineKeyboardButtonListSerializer(serializers.ListSerializer):
+    child = InlineKeyboardButtonSerializer()
     def create(self, validated_data):
         inline_keyboard_buttons_lists = [InlineKeyboardButtonList(**button_data) for button_list_data in validated_data]
         for inline_keyboard_buttons_list in inline_keyboard_buttons_lists:

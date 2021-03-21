@@ -26,7 +26,9 @@ class Andrid(models.Model):
 
     @classmethod
     def create_andrid(cls, *args, **kwargs):
-        _id = kwargs.get('_id')
+        _id = kwargs.get('_id', None)
+        if not _id:
+            _id = args[0]
         if not list(cls.objects.all()):
             andrid = Andrid(
                 week_order=1,

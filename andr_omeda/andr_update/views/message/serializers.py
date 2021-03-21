@@ -6,7 +6,6 @@ from andr_omeda.andr_update.views.location.serializers import LocationSerializer
 from andr_omeda.andr_update.views.messageentity.serializers import MessageEntitySerializer
 from andr_omeda.andr_update.views.photosize.serializers import PhotoSizeSerializer
 from andr_omeda.andr_update.views.audio.serializers import AudioSerializer
-from andr_omeda.andr_update.views.chat.serializers import ChatSerializer
 from andr_omeda.andr_update.views.contact.serializers import ContactSerializer
 from andr_omeda.andr_update.views.dice.serializers import DiceSerializer
 from andr_omeda.andr_update.views.document.serializers import DocumentSerializer
@@ -26,41 +25,87 @@ from andr_omeda.andr_update.views.voicechatended.serializers import VoiceChatEnd
 from andr_omeda.andr_update.views.voicechatstarted.serializers import VoiceChatStartedSerializer
 from andr_omeda.andr_update.views.voicechatparticipantsinvited.serializers import VoiceChatParticipantsInvitedSerializer
 
+from rest_framework import serializers
+from andr_omeda.andr_update.models import Chat
+from andr_omeda.andr_update.views.chatlocation.serializers import ChatLocationSerializer
+from andr_omeda.andr_update.views.chatpermissions.serializers import ChatPermissionsSerializer
+from andr_omeda.andr_update.views.chatphoto.serializers import ChatPhotoSerializer
+from andr_omeda.andr_update.views.animation.serializers import AnimationSerializer
+
+
+class ChatSerializer(serializers.ModelSerializer):
+    location = ChatLocationSerializer(required=False)
+    permissions = ChatPermissionsSerializer(required=False)
+    photo = ChatPhotoSerializer(required=False)
+    
+    class Meta:
+        model = Chat
+        fields = '__all__'
+
+    def create(self, validated_data):
+        chat_id = validated_data.get('id')
+        if Chat.chat_with_id_exists(chat_id=chat_id):
+            return Chat.objects.get(pk=chat_id)
+        loc_ser = self.fields['location']
+        perm_ser = self.fields['permissions']
+        photo_ser = self.fields['photo']
+        pinned_message_ser = self.fields['pinned_message']
+
+        if validated_data.get('location'):
+            loc = loc_ser(**validated_data.pop('location', None))
+            loc = loc.is_valid().save()
+
+        if validated_data.get('permissions'):
+            perm = perm_ser(**validated_data.pop('permissions', None))
+            perm = perm.is_valid().save()
+
+        if validated_data.get('photo'):
+            photo = photo_ser(**validated_data.pop('permissions', None))
+            photo = photo.is_valid().save()
+
+        
+        chat = Chat(**validated_data)
+        chat.location = loc
+        chat.permissions = perm 
+        chat.photo = photo 
+        chat.save()
+        return chat
+
 class MessageSerializer(serializers.ModelSerializer):
-    message_from = AndruserSerializer()
-    forward_from = AndruserSerializer()
-    via_bot = AndruserSerializer()
-    user = AndruserSerializer()
-    new_chat_members = AndruserSerializer(many=True)
-    left_chat_member = AndruserSerializer()
-    animation = AnimationSerializer()
-    location = LocationSerializer()
-    entities = MessageEntitySerializer(many=True)
-    caption_entities = MessageEntitySerializer(many=True)
-    photo = PhotoSizeSerializer(many=True)
-    new_chat_photo = PhotoSizeSerializer(many=True)
-    audio = AudioSerializer()
+    message_from = AndruserSerializer(required=False)
+    forward_from = AndruserSerializer(required=False)
+    via_bot = AndruserSerializer(required=False)
+    user = AndruserSerializer(required=False)
     chat = ChatSerializer()
-    sender_chat = ChatSerializer()
-    forward_from_chat = ChatSerializer()
-    contact = ContactSerializer()
-    dice = DiceSerializer()
-    document = DocumentSerializer()
-    game = GameSerializer()
-    reply_markup = InlineKeyboardMarkupSerializer()
-    invoice = InvoiceSerializer()
-    passport_data = PassportDataSerializer()
-    poll = PollSerializer()
-    proximity_alert_triggered = ProximityAlertTriggeredSerializer()
-    sticker = StickerSerializer()
-    successful_payment = SuccessfulPaymentSerializer()
-    venue = VenueSerializer()
-    video = VideoSerializer()
-    video_note = VideoNoteSerializer()
-    voice = VoiceSerializer()
-    voice_chat_ended = VoiceChatEndedSerializer()
-    voice_chat_started = VoiceChatStartedSerializer()
-    voice_chat_participants_invited = VoiceChatParticipantsInvitedSerializer()
+    sender_chat = ChatSerializer(required=False)
+    forward_from_chat = ChatSerializer(required=False)
+    new_chat_members = AndruserSerializer(many=True, required=False)
+    left_chat_member = AndruserSerializer(required=False)
+    animation = AnimationSerializer(required=False)
+    location = LocationSerializer(required=False)
+    entities = MessageEntitySerializer(many=True, required=False)
+    caption_entities = MessageEntitySerializer(many=True, required=False)
+    photo = PhotoSizeSerializer(many=True, required=False)
+    new_chat_photo = PhotoSizeSerializer(many=True, required=False)
+    audio = AudioSerializer(required=False)
+    contact = ContactSerializer(required=False)
+    dice = DiceSerializer(required=False)
+    document = DocumentSerializer(required=False)
+    game = GameSerializer(required=False)
+    reply_markup = InlineKeyboardMarkupSerializer(required=False)
+    invoice = InvoiceSerializer(required=False)
+    passport_data = PassportDataSerializer(required=False)
+    poll = PollSerializer(required=False)
+    proximity_alert_triggered = ProximityAlertTriggeredSerializer(required=False)
+    sticker = StickerSerializer(required=False)
+    successful_payment = SuccessfulPaymentSerializer(required=False)
+    venue = VenueSerializer(required=False)
+    video = VideoSerializer(required=False)
+    video_note = VideoNoteSerializer(required=False)
+    voice = VoiceSerializer(required=False)
+    voice_chat_ended = VoiceChatEndedSerializer(required=False)
+    voice_chat_started = VoiceChatStartedSerializer(required=False)
+    voice_chat_participants_invited = VoiceChatParticipantsInvitedSerializer(required=False)
 
     class Meta:
         model = Message
@@ -105,190 +150,188 @@ class MessageSerializer(serializers.ModelSerializer):
         voice_chat_ended_data = validated_data.pop('voice_chat_ended', None)
         voice_chat_participants_invited_data = validated_data.pop('voice_chat_participants_invited', None)
         reply_markup_data = validated_data.pop('reply_markup', None)
-
-        message = Message(**validated_data)
+        print("?"*10)
 
         if user_data:
-            user_ser = self.field['message_from']
+            user_ser = self.fields['message_from']
             message_from = user_ser(**user_data)
             message_from = message_from.is_valid().save()
-            message.message_from = message_from 
+            validated_data['message_from'] = message_from
         if sender_chat_data:
-            sender_chat_ser = self.field['sender_chat']
+            sender_chat_ser = self.fields['sender_chat']
             sender_chat = sender_chat_ser(**sender_chat_data)
             sender_chat = sender_chat.is_valid().save()
-            message.sender_chat = sender_chat
+            validated_data['sender_chat'] = sender_chat
         if chat_data:
-            chat_ser = self.field['chat']
+            chat_ser = self.fields['chat']
             chat = chat_ser(**chat_data)
+            print("?"*10)
+            print(chat.is_valid())
+            print("-"*10)
+            print()
             chat = chat.is_valid().save()
-            message.chat = chat 
+            validated_data['chat'] = chat
         if forward_from_data:
-            forward_from_ser = self.field['forward_from']
+            forward_from_ser = self.fields['forward_from']
             forward_from = forward_from_ser(**forward_from_data)
             forward_from = forward_from.is_valid().save()
-            message.forward_from = forward_from 
+            validated_data['forward_from'] = forward_from
         if forward_from_chat_data:
-            forward_from_chat_ser = self.field['forward_from_chat']
+            forward_from_chat_ser = self.fields['forward_from_chat']
             forward_from_chat = forward_from_chat_ser(**forward_from_chat_data)
             forward_from_chat = forward_from_chat.is_valid().save()
-            message.forward_from_chat = forward_from_chat 
+            validated_data['forward_from_chat'] = forward_from_chat 
         if via_bot_data:
-            via_bot_ser = self.field['via_bot']
+            via_bot_ser = self.fields['via_bot']
             via_bot = via_bot_ser(**via_bot_data)
             via_bot = via_bot.is_valid().save()
-            message.via_bot = via_bot 
+            validated_data['via_bot'] = via_bot  
         if sender_chat_data:
-            sender_chat_ser = self.field['sender_chat']
+            sender_chat_ser = self.fields['sender_chat']
             sender_chat = sender_chat_ser(**sender_chat_data)
             sender_chat = sender_chat.is_valid().save()
-            message.sender_chat = sender_chat
+            validated_data['sender_chat'] = sender_chat 
         if entities_data:
-            entities_ser = self.field['entities']
+            entities_ser = self.fields['entities']
             entities = entities_ser(**chat_data)
             entities = entities.is_valid().save()
-            message.entities = entities 
+            validated_data['entities'] = entities 
         if animation_data:
-            animation_ser = self.field['animation']
+            animation_ser = self.fields['animation']
             animation = animation_ser(**animation_data)
             animation = animation.is_valid().save()
-            message.animation = animation 
+            validated_data['animation'] = animation 
         if audio_data:
-            audio_ser = self.field['audio']
+            audio_ser = self.fields['audio']
             audio = audio_ser(**audio_data)
             audio = audio.is_valid().save()
-            message.audio = audio 
+            validated_data['audio'] = audio
         if document_data:
-            document_ser = self.field['document']
+            document_ser = self.fields['document']
             document = document_ser(**document_data)
             document = document.is_valid().save()
-            message.document = document 
+            validated_data['document'] = document
         if photo_data:
-            photo_ser = self.field['photo']
+            photo_ser = self.fields['photo']
             photo = photo_ser(**photo_data)
             photo = photo.is_valid().save()
-            message.photo = photo 
+            validated_data['photo'] = photo 
         if sticker_data:
-            sticker_ser = self.field['sticker']
+            sticker_ser = self.fields['sticker']
             sticker = sticker_ser(**sticker_data)
             sticker = sticker.is_valid().save()
-            message.sticker = sticker 
+            validated_data['sticker'] = sticker  
         if video_data:
-            video_ser = self.field['video']
+            video_ser = self.fields['video']
             video = video_ser(**video_data)
             video = video.is_valid().save()
-            message.video = video 
+            validated_data['video'] = video 
         if video_note_data:
-            video_note_ser = self.field['video_note']
+            video_note_ser = self.fields['video_note']
             video_note = video_note_ser(**video_note_data)
             video_note = video_note.is_valid().save()
-            message.video_note = video_note 
+            validated_data['video_note'] = video_note 
         if voice_data:
-            voice_ser = self.field['voice']
+            voice_ser = self.fields['voice']
             voice = voice_ser(**voice_data)
             voice = voice.is_valid().save()
-            message.voice = voice 
+            validated_data['voice'] = voice 
         if caption_entities_data:
-            caption_entities_ser = self.field['caption_entities']
+            caption_entities_ser = self.fields['caption_entities']
             caption_entities = caption_entities_ser(**caption_entities_data)
             caption_entities = caption_entities.is_valid().save()
-            message.caption_entities = caption_entities 
+            validated_data['caption_entities'] = caption_entities 
         if contact_data:
-            contact_ser = self.field['contact']
+            contact_ser = self.fields['contact']
             contact = contact_ser(**contact_data)
             contact = contact.is_valid().save()
-            message.contact = contact 
+            validated_data['contact'] = contact 
         if dice_data:
-            dice_ser = self.field['dice']
+            dice_ser = self.fields['dice']
             dice = dice_ser(**dice_data)
             dice = dice.is_valid().save()
-            message.dice = dice 
+            validated_data['dice'] = dice 
         if game_data:
-            game_ser = self.field['game']
+            game_ser = self.fields['game']
             game = game_ser(**game_data)
             game = game.is_valid().save()
-            message.game = game 
+            validated_data['game'] = game 
         if poll_data:
-            poll_ser = self.field['poll']
+            poll_ser = self.fields['poll']
             poll = poll_ser(**poll_data)
             poll = poll.is_valid().save()
-            message.poll = poll 
+            validated_data['poll'] = poll 
         if venue_data:
-            venue_ser = self.field['venue']
+            venue_ser = self.fields['venue']
             venue = venue_ser(**venue_data)
             venue = venue.is_valid().save()
-            message.venue = venue 
+            validated_data['venue'] = venue 
         if location_data:
-            location_ser = self.field['location']
+            location_ser = self.fields['location']
             location = location_ser(**location_data)
             location = location.is_valid().save()
-            message.location = location 
+            validated_data['location'] = location 
         if new_chat_members_data:
-            new_chat_members_ser = self.field['new_chat_members']
+            new_chat_members_ser = self.fields['new_chat_members']
             new_chat_members = new_chat_members_ser(**new_chat_members_data)
             new_chat_members = new_chat_members.is_valid().save()
-            message.new_chat_members = new_chat_members 
+            validated_data['new_chat_members'] = new_chat_members 
         if left_chat_member_data:
-            left_chat_member_ser = self.field['left_chat_member']
+            left_chat_member_ser = self.fields['left_chat_member']
             left_chat_member = left_chat_member_ser(**left_chat_member_data)
             left_chat_member = left_chat_member.is_valid().save()
-            message.left_chat_member = left_chat_member 
+            validated_data['left_chat_member'] = left_chat_member 
         if new_chat_photo_data:
-            new_chat_photo_ser = self.field['new_chat_photo']
+            new_chat_photo_ser = self.fields['new_chat_photo']
             new_chat_photo = new_chat_photo_ser(**new_chat_photo_data)
             new_chat_photo = new_chat_photo.is_valid().save()
-            message.new_chat_photo = new_chat_photo 
+            validated_data['new_chat_photo'] = new_chat_photo  
         if message_auto_delete_timer_changed_data:
-            message_auto_delete_timer_changed_ser = self.field['message_auto_delete_timer_changed']
+            message_auto_delete_timer_changed_ser = self.fields['message_auto_delete_timer_changed']
             message_auto_delete_timer_changed = message_auto_delete_timer_changed_ser(**message_auto_delete_timer_changed_data)
             message_auto_delete_timer_changed = message_auto_delete_timer_changed.is_valid().save()
-            message.message_auto_delete_timer_changed = message_auto_delete_timer_changed 
-        if pinned_message_data:
-            pinned_message_ser = self.field['pinned_message']
-            pinned_message = pinned_message_ser(**pinned_message_data)
-            pinned_message = pinned_message.is_valid().save()
-            message.pinned_message = pinned_message 
+            validated_data['message_auto_delete_timer_changed'] = message_auto_delete_timer_changed  
         if invoice_data:
-            invoice_ser = self.field['invoice']
+            invoice_ser = self.fields['invoice']
             invoice = invoice_ser(**invoice_data)
             invoice = invoice.is_valid().save()
-            message.invoice = invoice  
+            validated_data['invoice'] = invoice  
         if successful_payment_data:
-            successful_payment_ser = self.field['successful_payment']
+            successful_payment_ser = self.fields['successful_payment']
             successful_payment = successful_payment_ser(**successful_payment_data)
             successful_payment = successful_payment.is_valid().save()
-            message.successful_payment = successful_payment 
+            validated_data['successful_payment'] = successful_payment  
         if passport_data_data:
-            passport_data_ser = self.field['passport_data']
+            passport_data_ser = self.fields['passport_data']
             passport_data = passport_data_ser(**passport_data_data)
             passport_data = passport_data.is_valid().save()
-            message.passport_data = passport_data 
+            validated_data['passport_data'] = passport_data  
         if proximity_alert_triggered_data:
-            proximity_alert_triggered_ser = self.field['proximity_alert_triggered']
+            proximity_alert_triggered_ser = self.fields['proximity_alert_triggered']
             proximity_alert_triggered = proximity_alert_triggered_ser(**proximity_alert_triggered_data)
             proximity_alert_triggered = proximity_alert_triggered.is_valid().save()
-            message.proximity_alert_triggered = proximity_alert_triggered 
+            validated_data['proximity_alert_triggered'] = proximity_alert_triggered 
         if voice_chat_started_data:
-            voice_chat_started_ser = self.field['voice_chat_started']
+            voice_chat_started_ser = self.fields['voice_chat_started']
             voice_chat_started = voice_chat_started_ser(**voice_chat_started_data)
             voice_chat_started = voice_chat_started.is_valid().save()
-            message.voice_chat_started = voice_chat_started 
+            validated_data['voice_chat_started'] = voice_chat_started  
         if voice_chat_ended_data:
-            voice_chat_ended_ser = self.field['voice_chat_ended']
+            voice_chat_ended_ser = self.fields['voice_chat_ended']
             voice_chat_ended = voice_chat_ended_ser(**voice_chat_ended_data)
             voice_chat_ended = voice_chat_ended.is_valid().save()
-            message.voice_chat_ended = voice_chat_ended 
+            validated_data['voice_chat_ended'] = voice_chat_ended   
         if voice_chat_participants_invited_data:
-            voice_chat_participants_invited_ser = self.field['voice_chat_participants_invited']
+            voice_chat_participants_invited_ser = self.fields['voice_chat_participants_invited']
             voice_chat_participants_invited = voice_chat_participants_invited_ser(**voice_chat_participants_invited_data)
             voice_chat_participants_invited = voice_chat_participants_invited.is_valid().save()
-            message.voice_chat_participants_invited = voice_chat_participants_invited 
+            validated_data['voice_chat_participants_invited'] = voice_chat_participants_invited  
         if reply_markup_data:
-            reply_markup_ser = self.field['reply_markup']
+            reply_markup_ser = self.fields['reply_markup']
             reply_markup = reply_markup_ser(**reply_markup_data)
             reply_markup = reply_markup.is_valid().save()
-            message.reply_markup = reply_markup 
-
+            validated_data['reply_markup'] = reply_markup 
+        message = Message(**validated_data)
         return message.save()
         
         

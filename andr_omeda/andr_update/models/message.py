@@ -8,12 +8,16 @@ from django.utils import timezone
 
 class Message(models.Model):
     message_id = models.IntegerField(_("message_id"), blank=False)
+    """
     this_pinned_message_chat = models.OneToOneField(
         "Chat",
         on_delete=models.CASCADE,
         related_name="pinned_message",
         blank=True
-    )
+    )"""
+    # TODO [WORKAROUND20032208] for the present time just get pinned_message
+    # of Chat model as JSON field.
+
     reply_to_message = models.OneToOneField(
         "self",
         on_delete=models.DO_NOTHING,

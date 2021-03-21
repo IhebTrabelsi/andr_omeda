@@ -5,7 +5,7 @@ from andr_omeda.andr_update.views.andruser.serializers import AndruserSerializer
 class VoiceChatParticipantsInvitedSerializer(serializers.ModelSerializer):
     users = AndruserSerializer(many=True)
     class Meta:
-        model = VoiceChatStarted
+        model = VoiceChatParticipantsInvited
         fields = '__all__'
 
     def create(self, validated_data):
