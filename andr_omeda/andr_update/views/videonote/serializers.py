@@ -11,11 +11,12 @@ class VideoNoteSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         thumb_data = validated_data.pop('thumb', None)
-        video_note = VideoNote(**validated_data)
-        if thumb_data:
-            thumb_ser = self.fields['thumb']
-            thumb = thumb_ser(**thumb_data)
-            thumb = thumb.is_valid().save()
-            video_note.thumb = thumb
         
+        if thumb_data:
+            thumb = PhotoSizeSerializer(**thumb_data)
+            thumb = thumb.is_valid()
+            thumb = thumb.save()
+            validated_data['thumb'] = thumb
+        
+        video_note = VideoNote(**validated_data)
         return video_note.save()

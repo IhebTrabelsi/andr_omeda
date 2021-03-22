@@ -11,5 +11,11 @@ class ShippingQuery(models.Model):
         related_name="shipping_query",
         blank=True
     )
+
+    shipping_query_from = models.ForeignKey(
+        "Andruser",
+        on_delete=models.CASCADE,
+        blank=False
+    )
     shipping_query_id = models.TextField(_("id"), blank=False)
     invoice_payload = models.TextField(_("invoice_payload"), blank=False)

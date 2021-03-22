@@ -17,24 +17,25 @@ class GameSerializer(serializers.ModelSerializer):
         animation_data = validated_data.pop('animation', None)
         text_entities_data = validated_data.pop('text_entities', None)
         photo_data = validated_data.pop('photo', None)
-        game = Game(**validated_data)
+        
 
         if animation_data:
-            animation_ser = self.fields['animation']
-            animation = animation_ser(**animation_data)
-            animation = animation.is_valid().save()
-            game.animation = animation
+            animation = AnimationSerializer(**animation_data)
+            animation = animation.is_valid()
+            animation = animation.save()
+            validated_data['animation'] = animation
         if text_entities_data:
-            text_entities_ser = self.fields['text_entities']
-            text_entities = text_entities_ser(**text_entities_data)
-            text_entities = text_entities.is_valid().save()
-            game.text_entities = text_entities
+            text_entities = MessageEntitySerializer(**text_entities_data)
+            text_entities = text_entities.is_valid()
+            text_entities = text_entities.save()
+            validated_data['text_entities'] = text_entities
         if photo_data:
-            photo_ser = self.fields['photo']
-            photo = photo_ser(**photo_data)
-            photo = photo.is_valid().save()
-            game.photo_data = photo_data
+            photo = PhotoSizeSerializer(**photo_data)
+            photo = photo.is_valid()
+            photo = photo.save()
+            validated_data['photo'] = photo
 
+        game = Game(**validated_data)
         return game.save()
         
         

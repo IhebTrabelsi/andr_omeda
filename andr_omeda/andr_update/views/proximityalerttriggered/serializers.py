@@ -11,18 +11,26 @@ class ProximityAlertTriggeredSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        traveler_data = validated_data.pop('traveler', None)
-        watcher_data = validated_data.pop('watcher', None)
-        proximity_alert_triggered = ProximityAlertTriggered(**validated_data)
-        if traveler_data:
-            traveler_ser = self.fields['traveler']
-            traveler = traveler_ser(**traveler_data)
-            traveler = traveler.is_valid().save()
-            proximity_alert_triggered.traveler = traveler
-        if watcher_data:
-            watcher_ser = self.fields['watcher']
-            watcher = watcher_ser(**watcher_data)
-            watcher = watcher.is_valid().save()
-            proximity_alert_triggered.watcher = watcher
+        traveler_data = validated_data.pop('traveler')
+        watcher_data = validated_data.pop('watcher')
+        
+        if Andruser.user_with_id_exists(user_id=traveler_data.get('id')):
+            traveler = Andruser.objects.get(pk=traveler_data.get('id'))
+            validated_data['traveler'] = traveler
+        else:
+            traveler = AndruserSerializer(**traveler_data)
+            traveler = traveler.is_valid()
+            traveler = traveler.save()
+            validated_data['traveler'] = traveler
 
+        if Andruser.user_with_id_exists(user_id=watcher_data.get('id')):
+            watcher = Andruser.objects.get(pk=watcher_data.get('id'))
+            validated_data['watcher'] = watcher
+        else:
+            watcher = AndruserSerializer(**watcher_data)
+            watcher = watcher.is_valid()
+            watcher = watcher.save()
+            validated_data['watcher'] = watcher
+
+        proximity_alert_triggered = ProximityAlertTriggered(**validated_data)
         return proximity_alert_triggered.save()

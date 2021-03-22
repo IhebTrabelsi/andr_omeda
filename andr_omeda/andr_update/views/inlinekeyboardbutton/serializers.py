@@ -14,18 +14,19 @@ class InlineKeyboardButtonSerializer(serializers.ModelSerializer):
     def create(seelf, validated_data):
         login_url_data = validated_data.pop('login_url', None)
         callback_game_data = validated_data.pop('callback_game', None)
-        inline_keyboard_button = InlineKeyboardButton(**validated_data)
+        
         if login_url_data:
-            login_url_ser = seelf.fields['login_url']
-            login_url = login_url_ser(**login_url_data)
-            login_url = login_url.is_valid().save()
-            inline_keyboard_button.login_url = login_url
+            login_url = LoginUrlSerializer(**login_url_data)
+            login_url = login_url.is_valid()
+            login_url = login_url.save()
+            validated_data['login_url'] = login_url
         if callback_game_data:
-            callback_game_ser = seelf.fields['callback_game']
-            callback_game = callback_game_ser(**login_url_data)
-            callback_game = callback_game.is_valid().save()
-            inline_keyboard_button.callback_game = callback_game
+            callback_game = CallbackGameSerializer(**login_url_data)
+            callback_game = callback_game.is_valid()
+            callback_game = callback_game.save()
+            validated_data['callback_game'] = callback_game
 
+        inline_keyboard_button = InlineKeyboardButton(**validated_data)
         return inline_keyboard_button.save()
 
 class InlineKeyboardButtonListSerializer(serializers.ListSerializer):

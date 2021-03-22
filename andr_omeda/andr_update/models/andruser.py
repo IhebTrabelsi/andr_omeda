@@ -44,28 +44,10 @@ class Andruser(models.Model):
         related_name="left_user_member",
         blank=True
     )
-    proximity_alert_for_traveler = models.OneToOneField(
-        "ProximityAlertTriggered",
-        on_delete=models.CASCADE,
-        related_name="traveler",
-        blank=False
-    )
-    proximity_alert_for_watcher = models.OneToOneField(
-        "ProximityAlertTriggered",
-        on_delete=models.CASCADE,
-        related_name="watcher",
-        blank=False
-    )
     inline_query = models.OneToOneField(
         "InlineQuery",
         on_delete=models.CASCADE,
         related_name="inline_query_from",
-        blank=False
-    )
-    chosen_inline_result = models.OneToOneField(
-        "ChosenInlineResult",
-        on_delete=models.CASCADE,
-        related_name="chosen_inline_result_from",
         blank=False
     )
     callback_query = models.OneToOneField(
@@ -73,24 +55,6 @@ class Andruser(models.Model):
         on_delete=models.CASCADE,
         related_name="callback_query_from",
         blank=False
-    )
-    shipping_query = models.OneToOneField(
-        "ShippingQuery",
-        on_delete=models.CASCADE,
-        related_name="shipping_query_from",
-        blank=False
-    )
-    pre_checkout_query = models.OneToOneField(
-        "PreCheckoutQuery",
-        on_delete=models.CASCADE,
-        related_name="pre_checkout_query_from",
-        blank=False
-    )
-    voice_chat_participant_invitation = models.ForeignKey(
-        "VoiceChatParticipantsInvited",
-        on_delete=models.RESTRICT,
-        related_name="users",
-        blank=True
     )
 
     user_id = models.BigIntegerField(_("user_id"), blank=False, primary_key=True)

@@ -13,12 +13,6 @@ class OrderInfo(models.Model):
         related_name="order_info",
         blank=True
     )
-    pre_checkout_query = models.OneToOneField(
-        "PreCheckoutQuery",
-        on_delete=models.CASCADE,
-        related_name="order_info",
-        blank=True
-    )
     name = models.TextField(_("name"), blank=False)
     phone_number = models.TextField(_("phone_number"), blank=False)
     email = models.TextField(_("email"), blank=False)

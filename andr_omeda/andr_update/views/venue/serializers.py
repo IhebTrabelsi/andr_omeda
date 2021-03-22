@@ -11,11 +11,12 @@ class VenueSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         location_data = validated_data.pop('location', None)
-        venue = Venue(**validated_data)
+        
         if location_data:
-            location_ser = self.fields['location']
-            location = location_ser(**location_data)
-            location = location.is_valid().save()
-            venue.location = location 
+            location = LocationSerializer(**location_data)
+            location = location.is_valid()
+            location = location.save()
+            validated_data['location'] = location
 
+        venue = Venue(**validated_data)
         return venue.save()

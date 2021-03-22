@@ -11,6 +11,16 @@ class PreCheckoutQuery(models.Model):
         related_name="pre_checkout_query",
         blank=True
     )
+    order_info = models.OneToOneField(
+        "OrderInfo",
+        on_delete=models.CASCADE,
+        blank=True
+    )
+    from_user = models.ForeignKey(
+        "Andruser",
+        on_delete=models.CASCADE,
+        blank=False
+    )
     pre_checkout_query_id = models.TextField(_("pre_checkout_query_id"), blank=False)
     total_amount = models.IntegerField(_("total_amount"), blank=False)
     currency = models.TextField(_("currency"), blank=False)

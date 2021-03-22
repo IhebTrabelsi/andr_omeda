@@ -5,19 +5,20 @@ from andr_omeda.andr_update.views.andruser.serializers import AndruserSerializer
 
 class MessageEntityListSerializer(serializers.ListSerializer):
     def create(self, validated_data):
-        users = []
         entities = []
         for entity in validated_data:
             if entity.get('user'):
                 if Andruser.user_with_id_exists(entity.get('user').get('id')):
-                    users.append(Andruser.objects.get(pk=entity.pop('user').get('id')))
+                    user = Andruser.objects.get(pk=entity.pop('user').get('id'))
+                    entity['user'] = user
                 else:
-                    user = AndruserSerializer(**entity.pop('user')).is_valid().save()
-                    users.append(user)
+                    user = AndruserSerializer(**entity.pop('user'))
+                    user = user.is_valid()
+                    user = user.save()
+                    entity['user'] = user
             entities.append(MessageEntity(**entity))
-        for entity, user in zip(entities, users):
-            entity.user = user 
-        return entities
+        
+        return MessageEntity.objects.bulk_create(entities)
 
 
 

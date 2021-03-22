@@ -14,16 +14,17 @@ class PassportDataSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         credentials_data = validated_data.pop('credentials', None)
         data_data = validated_data.pop('data', None)
-        passport_data = PassportData(**validated_data)
-        if credentials_data:
-            credentials_ser = self.fields['credentials']
-            credentials = credentials_ser(**credentials_data)
-            credentials = credentials.is_valid().save()
-            passport_data.credentials = credentials
-        if data_data:
-            data_ser = self.fields['data']
-            data = data_ser(**data_data)
-            data = data.is_valid().save()
-            passport_data.data = data
         
+        if credentials_data:
+            credentials = EncryptedCredentialsSerializer(**credentials_data)
+            credentials = credentials.is_valid()
+            credentials = credentials.save()
+            validated_data['credentials'] = credentials
+        if data_data:
+            data = EncryptedPassportElementSerializer(**data_data)
+            data = data.is_valid()
+            data = data.save()
+            validated_data['data'] = data
+        
+        passport_data = PassportData(**validated_data)
         return passport_data.save()

@@ -14,19 +14,23 @@ class CallbackQuerySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        user = validated_data.pop('from', None)
-        callback_query_from = Andruser.get_user_with_id_and_first_name(user.get('user_id'), user.get('first_name'))
-        try:
-            message = validated_data.pop('message', None)
-            if message.get('chat'):
-                chat_id = message.get('chat').get('id')
-                chat = Chat.objects.get(chat_id=chat_id)
-                message = chat.get_message()
-            else:
-                message = Message.get_message_with_message_id_list(message_id=message.get('message_id'))[0]
-            callback_query = CallbackQuery(**validated_data)
-            callback_query.callback_query_from = user
-            callback_query.messaage = message
-            callback_query.save()
-        except:
-            raise Exception("CallbackQuery serializer Exception !!")
+        user_data = validated_data.pop('from', None)
+        message_data = validated_data.pop('message', None)
+        if Andruser.user_with_id_exists(user_id=user_data.get('id')):
+            user = Andruser.objects.get(pk=user_data.get('id'))
+            validated_data['callback_query_from'] = user
+        else:
+            user = AndruserSerializer(**user_data)
+            user = user.is_valid()
+            user = user.save()
+            validated_data['callback_query_from'] = user
+        if message_data:
+            message = MessageSerializer(**message_data)
+            message = message.is_valid()
+            message = message.save()
+            validated_data['message'] = message
+        
+        callback_query = CallbackQuery(**validated_data)
+        return callback_query.save()
+
+        

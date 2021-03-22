@@ -11,11 +11,12 @@ class SuccessfulPaymentSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         order_info_data = validated_data.pop('order_info', None)
-        successful_payment = SuccessfulPayment(**validated_data)
+        
         if order_info_data:
-            order_info_ser = self.fields['order_info']
-            order_info = order_info_ser(**order_info_data)
-            order_info = order_info.is_valid().save()
-            successful_payment.order_info = order_info
+            order_info = OrderInfoSerializer(**order_info_data)
+            order_info = order_info.is_valid()
+            order_info = order_info.save()
+            validated_data['order_info'] = order_info
 
+        successful_payment = SuccessfulPayment(**validated_data)
         return successful_payment.save()

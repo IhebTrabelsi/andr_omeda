@@ -20,43 +20,39 @@ class EncryptedPassportElementSerializer(serializers.ModelSerializer):
         reverse_side_data = validated_data.pop('reverse_side', None)
         selfie_data = validated_data.pop('selfie', None)
         translation = validated_data.pop('translation', None)
-        encrypted_passport_element = EncryptedPassportElement(**validated_data)
+       
 
         if validated_data.get('files'):
-            files_ser = self.fields['files']
-            files = files_ser(**files_data)
+            files = PassportFileSerializer(**files_data)
             files = files.is_valid()
             files = files.save()
-            encrypted_passport_element.files = files
+            validated_data['files'] = files
 
         if validated_data.get('front_side'):
-            front_side_ser = self.fields['front_side']
-            front_side = front_side_ser(**front_side_data)
+            front_side = PassportFileSerializer(**front_side_data)
             front_side = front_side.is_valid()
             front_side = front_side.save()
-            encrypted_passport_element.front_side = front_side
+            validated_data['front_side'] = files
 
         if validated_data.get('reverse_side'):
-            reverse_side_ser = self.fields['reverse_side']
-            reverse_side = reverse_side_ser(**reverse_side_data)
+            reverse_side = PassportFileSerializer(**reverse_side_data)
             reverse_side = reverse_side.is_valid()
             reverse_side = reverse_side.save()
-            encrypted_passport_element.reverse_side = reverse_side
+            validated_data['reverse_side'] = files
 
 
         if validated_data.get('selfie'):
-            selfie_ser = self.fields['selfie']
-            selfie = selfie_ser(**selfie_data)
+            selfie = PassportFileSerializer(**selfie_data)
             selfie = selfie.is_valid()
             selfie = selfie.save()
-            encrypted_passport_element.selfie = selfie
+            validated_data['selfie'] = files
 
 
         if validated_data.get('translation'):
-            translation_ser = self.fields['translation']
-            translation = translation_ser(**translation)
+            translation = PassportFileSerializer(**translation)
             translation = translation.is_valid()
             translation = translation.save()
-            encrypted_passport_element.translation = translation
+            validated_data['translation'] = files
         
+        encrypted_passport_element = EncryptedPassportElement(**validated_data)
         return encrypted_passport_element.save()
