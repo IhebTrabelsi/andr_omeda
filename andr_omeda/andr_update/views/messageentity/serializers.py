@@ -12,8 +12,8 @@ class MessageEntityListSerializer(serializers.ListSerializer):
                     user = Andruser.objects.get(pk=entity.pop('user').get('id'))
                     entity['user'] = user
                 else:
-                    user = AndruserSerializer(**entity.pop('user'))
-                    user = user.is_valid()
+                    user = AndruserSerializer(data=entity.pop('user'))
+                    user_is_valid = user.is_valid()
                     user = user.save()
                     entity['user'] = user
             entities.append(MessageEntity(**entity))

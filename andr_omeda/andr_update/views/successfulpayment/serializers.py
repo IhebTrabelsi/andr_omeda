@@ -13,8 +13,8 @@ class SuccessfulPaymentSerializer(serializers.ModelSerializer):
         order_info_data = validated_data.pop('order_info', None)
         
         if order_info_data:
-            order_info = OrderInfoSerializer(**order_info_data)
-            order_info = order_info.is_valid()
+            order_info = OrderInfoSerializer(data=order_info_data)
+            order_info_is_valid = order_info.is_valid()
             order_info = order_info.save()
             validated_data['order_info'] = order_info
 

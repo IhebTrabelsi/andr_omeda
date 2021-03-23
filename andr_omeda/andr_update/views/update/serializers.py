@@ -16,10 +16,9 @@ from andr_omeda.andr_update.models import Update, Andrid, Message, InlineQuery, 
 import json
 
 
-
 class UpdateSerializer(serializers.ModelSerializer):
-    
-    update_id = AndridSerializer(required=True)
+
+    andr_id = AndridSerializer(required=True)
     message = MessageSerializer(required=False)
     edited_message = MessageSerializer(required=False)
     channel_post = MessageSerializer(required=False)
@@ -35,17 +34,20 @@ class UpdateSerializer(serializers.ModelSerializer):
     chat_member = ChatMemberUpdatedSerializer(required=False)
 
     class Meta:
-        model = Update 
+        model = Update
         fields = '__all__'
-    
+
     def create(self, validated_data):
         request = self.context['request']
         validated_data = request.data
-        
+
         print("*\n"*5)
         print(validated_data)
         print("*\n"*5)
-        update_id_data = validated_data.get('update_id', None)
+        andr_id_data = validated_data.get('update_id', None)
+        print("-------->")
+        print(andr_id_data)
+        print("*\n"*5)
         print(validated_data.get('message', None))
         message_data = validated_data.get('message', None)
         edited_message_data = validated_data.get('edited_message', None)
@@ -60,83 +62,83 @@ class UpdateSerializer(serializers.ModelSerializer):
         poll_answer_data = validated_data.get('poll_answer', None)
         my_chat_member_data = validated_data.get('my_chat_member', None)
         chat_member_data = validated_data.get('chat_member', None)
-        
 
-        if update_id_data:
-            print(update_id_data)
-            update_id = AndridSerializer(data=update_id_data)
-            update_id_is_valid = update_id.is_valid()
-            print(update_id_is_valid)
-            #update_id = update_id.save()
+        if andr_id_data:
+            print(andr_id_data)
+            andr_id = AndridSerializer(data=andr_id_data)
+            andr_id_is_valid = andr_id.is_valid()
+            print(andr_id.errors)
             print("//**"*10)
-            validated_data['update_id'] = update_id
+            andr_id = update_id.save()
+            
+            validated_data['andr_id'] = andr_id
         if message_data:
-            #print(validated_data.get('message', None)
-            message = MessageSerializer(**message_data)
+            # print(validated_data.get('message', None)
+            message = MessageSerializer(data=message_data)
             message_is_valid = message.is_valid()
             message = message.save()
             validated_data['message'] = message
         if edited_message_data:
-            edited_message = MessageSerializer(**edited_message_data)
+            edited_message = MessageSerializer(data=edited_message_data)
             edited_message_is_valid = edited_message.is_valid()
             edited_message = edited_message.save()
             validated_data['edited_message'] = edited_message
         if channel_post_data:
-            channel_post = MessageSerializer(**channel_post_data)
+            channel_post = MessageSerializer(data=channel_post_data)
             channel_post_is_valid = channel_post.is_valid()
             channel_post = channel_post.save()
             validated_data['channel_post'] = channel_post
         if edited_channel_post_data:
-            edited_channel_post = MessageSerializer(**edited_channel_post_data)
+            edited_channel_post = MessageSerializer(data=edited_channel_post_data)
             edited_channel_post_is_valid = edited_channel_post.is_valid()
             edited_channel_post = edited_channel_post.save()
-            validated_data['edited_channel_post'] = edited_channel_post 
+            validated_data['edited_channel_post'] = edited_channel_post
         if inline_query_data:
-            inline_query = InlineQuerySerializer(**inline_query_data)
+            inline_query = InlineQuerySerializer(data=inline_query_data)
             inline_query_is_valid = inline_query.is_valid()
             inline_query = inline_query.save()
-            validated_data['inline_query'] = inline_query 
+            validated_data['inline_query'] = inline_query
         if chosen_inline_result_data:
-            chosen_inline_result = ChosenInlineResultSerializer(**chosen_inline_result_data)
+            chosen_inline_result = ChosenInlineResultSerializer(data=chosen_inline_result_data)
             chosen_inline_result_is_valid = chosen_inline_result.is_valid()
             chosen_inline_result = chosen_inline_result.save()
-            validated_data['chosen_inline_result'] = chosen_inline_result 
+            validated_data['chosen_inline_result'] = chosen_inline_result
         if callback_query_data:
-            callback_query = CallbackQuerySerializer(**callback_query_data)
+            callback_query = CallbackQuerySerializer(data=callback_query_data)
             callback_query_is_valid = callback_query.is_valid()
             callback_query = callback_query.save()
-            validated_data['callback_query'] = callback_query 
+            validated_data['callback_query'] = callback_query
         if shipping_query_data:
-            shipping_query = ShippingQuerySerializer(**shipping_query_data)
+            shipping_query = ShippingQuerySerializer(data=shipping_query_data)
             shipping_query_is_valid = shipping_query.is_valid()
             shipping_query = shipping_query.save()
-            validated_data['shipping_query'] = shipping_query 
+            validated_data['shipping_query'] = shipping_query
         if pre_checkout_query_data:
-            pre_checkout_query = PreCheckoutQuerySerializer(**pre_checkout_query_data)
+            pre_checkout_query = PreCheckoutQuerySerializer(data=pre_checkout_query_data)
             pre_checkout_query_is_valid = pre_checkout_query.is_valid()
             pre_checkout_query = pre_checkout_query.save()
-            validated_data['pre_checkout_query'] = pre_checkout_query 
+            validated_data['pre_checkout_query'] = pre_checkout_query
         if poll_data:
-            poll = PollSerializer(**poll_data)
+            poll = PollSerializer(data=poll_data)
             poll_is_valid = poll.is_valid()
             poll = poll.save()
-            validated_data['poll'] = poll  
+            validated_data['poll'] = poll
         if poll_answer_data:
-            poll_answer = PollAnswerSerializer(**poll_answer_data)
+            poll_answer = PollAnswerSerializer(data=poll_answer_data)
             poll_answer_is_valid = poll_answer.is_valid()
             poll_answer = poll_answer.save()
-            validated_data['poll_answer'] = poll_answer 
+            validated_data['poll_answer'] = poll_answer
         if my_chat_member_data:
-            my_chat_member = ChatMemberUpdatedSerializer(**my_chat_member_data)
+            my_chat_member = ChatMemberUpdatedSerializer(data=my_chat_member_data)
             my_chat_member_is_valid = my_chat_member.is_valid()
             my_chat_member = my_chat_member.save()
-            validated_data['my_chat_member'] = my_chat_member 
+            validated_data['my_chat_member'] = my_chat_member
         if chat_member_data:
-            chat_member = ChatMemberUpdatedSerializer(**chat_member_data)
+            chat_member = ChatMemberUpdatedSerializer(data=chat_member_data)
             chat_member_is_valid = chat_member.is_valid()
             chat_member = chat_member.save()
-            validated_data['chat_member'] = chat_member 
+            validated_data['chat_member'] = chat_member
         print("?**"*10)
         print(validated_data)
-        update = Update(**validated_data)
-        return update.save()
+        update = Update.objects.create(**validated_data)
+        return update

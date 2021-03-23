@@ -18,8 +18,8 @@ class ProximityAlertTriggeredSerializer(serializers.ModelSerializer):
             traveler = Andruser.objects.get(pk=traveler_data.get('id'))
             validated_data['traveler'] = traveler
         else:
-            traveler = AndruserSerializer(**traveler_data)
-            traveler = traveler.is_valid()
+            traveler = AndruserSerializer(data=traveler_data)
+            traveler_is_valid = traveler.is_valid()
             traveler = traveler.save()
             validated_data['traveler'] = traveler
 
@@ -27,8 +27,8 @@ class ProximityAlertTriggeredSerializer(serializers.ModelSerializer):
             watcher = Andruser.objects.get(pk=watcher_data.get('id'))
             validated_data['watcher'] = watcher
         else:
-            watcher = AndruserSerializer(**watcher_data)
-            watcher = watcher.is_valid()
+            watcher = AndruserSerializer(data=watcher_data)
+            watcher_is_valid = watcher.is_valid()
             watcher = watcher.save()
             validated_data['watcher'] = watcher
 

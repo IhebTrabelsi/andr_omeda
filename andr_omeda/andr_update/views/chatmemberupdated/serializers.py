@@ -26,8 +26,8 @@ class ChatMemberUpdatedSerializer(serializers.ModelSerializer):
             user = Andruser.objects.get(pk=from_user_data.get('id'))
             validated_data['from'] = user
         else:
-            user = AndruserSerializer(**from_user_data)
-            user = user.is_valid()
+            user = AndruserSerializer(data=from_user_data)
+            user_is_valid = user.is_valid()
             user = user.save()
             validated_data['from'] = user
         
@@ -35,26 +35,26 @@ class ChatMemberUpdatedSerializer(serializers.ModelSerializer):
             chat = Chat.objects.get(pk=chat_data.get('id'))
             validated_data['chat'] = chat
         else:
-            chat = ChatSerializer(**chat_data)
-            chat = chat.is_valid()
+            chat = ChatSerializer(data=chat_data)
+            chat_is_valid = chat.is_valid()
             chat = chat.save()
             validated_data['chat'] = chat
 
         if old_chat_member_data:
-            old_chat_member = ChatMemberSerializer(**old_chat_member_data)
-            old_chat_member = old_chat_member.is_valid()
+            old_chat_member = ChatMemberSerializer(data=old_chat_member_data)
+            old_chat_member_is_valid = old_chat_member.is_valid()
             old_chat_member = old_chat_member.save()
             validated_data['old_chat_member'] = old_chat_member
         
         if new_chat_member_data:
-            new_chat_member = ChatMemberSerializer(**new_chat_member_data)
-            new_chat_member = new_chat_member.is_valid()
+            new_chat_member = ChatMemberSerializer(data=new_chat_member_data)
+            new_chat_member_is_valid = new_chat_member.is_valid()
             new_chat_member = new_chat_member.save()
             validated_data['new_chat_member'] = new_chat_member
 
         if invite_link_data:
-            invite_link = ChatInviteLinkSerializer(**invite_link_data)
-            invite_link = invite_link.is_valid()
+            invite_link = ChatInviteLinkSerializer(data=invite_link_data)
+            invite_link_is_valid = invite_link.is_valid()
             invite_link = invite_link.save()
             validated_data['invite_link'] = invite_link
         

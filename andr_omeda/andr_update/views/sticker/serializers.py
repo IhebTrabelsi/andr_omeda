@@ -16,13 +16,13 @@ class StickerSerializer(serializers.ModelSerializer):
         thumb_data = validated_data.pop('thumb', None)
         
         if mask_position_data:
-            mask_position = MaskPositionSerializer(**mask_position_data)
-            mask_position = mask_position.is_valid()
+            mask_position = MaskPositionSerializer(data=mask_position_data)
+            mask_position_is_valid = mask_position.is_valid()
             mask_position = mask_position.save()
             validated_data['mask_position'] = mask_position
         if thumb_data:
-            thumb = PhotoSizeSerializer(**thumb_data)
-            thumb = thumb.is_valid()
+            thumb = PhotoSizeSerializer(data=thumb_data)
+            thumb_is_valid = thumb.is_valid()
             thumb = thumb.save()
             validated_data['thumb'] = thumb
 

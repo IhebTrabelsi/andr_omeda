@@ -13,8 +13,8 @@ class VenueSerializer(serializers.ModelSerializer):
         location_data = validated_data.pop('location', None)
         
         if location_data:
-            location = LocationSerializer(**location_data)
-            location = location.is_valid()
+            location = LocationSerializer(data=location_data)
+            location_is_valid = location.is_valid()
             location = location.save()
             validated_data['location'] = location
 

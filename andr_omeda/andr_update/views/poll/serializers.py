@@ -16,13 +16,13 @@ class PollSerializer(serializers.ModelSerializer):
         explanation_entities_data = validated_data.pop('explanation_entities', None)
         
         if options_data:
-            options = PollOptionSerializer(**options_data)
-            options = options.is_valid()
+            options = PollOptionSerializer(data=options_data)
+            options_is_valid = options.is_valid()
             options = options.save()
             validated_data['options'] = options
         if explanation_entities_data:
-            explanation_entities = MessageEntitySerializer(**data_data)
-            explanation_entities = explanation_entities.is_valid()
+            explanation_entities = MessageEntitySerializer(data=data_data)
+            explanation_entities_is_valid = explanation_entities.is_valid()
             explanation_entities = explanation_entities.save()
             validated_data['explanation_entities'] = explanation_entities
 

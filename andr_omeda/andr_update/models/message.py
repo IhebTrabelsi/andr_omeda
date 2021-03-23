@@ -22,42 +22,49 @@ class Message(models.Model):
         "self",
         on_delete=models.DO_NOTHING,
         related_name="+",
+        null=True,
         blank=True
     )
     pinned_message = models.OneToOneField(
         "self",
         on_delete=models.DO_NOTHING,
         related_name="+",
+        null=True,
         blank=True
     )
     update = models.OneToOneField(
         "Update",
         on_delete=models.CASCADE,
         related_name="message",
+        null=True,
         blank=True
     )
     update_for_this_edited_message = models.OneToOneField(
         "Update",
         on_delete=models.CASCADE,
         related_name="edited_message",
+        null=True,
         blank=True
     )
     update_for_this_channel_post = models.OneToOneField(
         "Update",
         on_delete=models.CASCADE,
         related_name="channel_post",
+        null=True,
         blank=True
     )
     update_for_this_edited_channel_post = models.OneToOneField(
         "Update",
         on_delete=models.CASCADE,
         related_name="edited_channel_post",
+        null=True,
         blank=True
     )
     callbackquery = models.OneToOneField(
         "CallbackQuery",
         on_delete=models.CASCADE,
         related_name="message",
+        null=True,
         blank=True
     )
     chat = models.ForeignKey(
@@ -70,21 +77,23 @@ class Message(models.Model):
         "Chat",
         on_delete=models.RESTRICT,
         related_name="sended_messages",
+        null=True,
         blank=True
     )
     forward_from_chat = models.ForeignKey(
         "Chat",
         on_delete=models.RESTRICT,
         related_name="forwarded_messages",
+        null=True,
         blank=True
     )
 
     date = models.IntegerField(_("date"), blank=False)
-    forward_from_message_id = models.IntegerField(_("forward_from_message_id"), blank=True)
+    forward_from_message_id = models.IntegerField(_("forward_from_message_id"), blank=True, null=True)
     forward_signature = models.TextField(_("forward_signature"), blank=True)
     forward_sender_name = models.TextField(_("forward_sender_name"), blank=True)
-    forward_date = models.IntegerField(_("forward_date"), blank=True)
-    edit_date = models.IntegerField(_("edit_date"), blank=True)
+    forward_date = models.IntegerField(_("forward_date"), blank=True, null=True)
+    edit_date = models.IntegerField(_("edit_date"), blank=True, null=True)
     media_group_id = models.TextField(_("media_group_id"), blank=True)
     author_signature = models.TextField(_("author_signature"), blank=True)
     text = models.CharField(
@@ -98,12 +107,12 @@ class Message(models.Model):
         blank=True
     )
     new_chat_title = models.TextField(_("new_chat_title"), blank=True)
-    delete_chat_photo = models.BooleanField(_("delete_chat_photo"), blank=True)
-    group_chat_created = models.BooleanField(_("group_chat_created"), blank=True)
-    supergroup_chat_created = models.BooleanField(_("supergroup_chat_created"), blank=True)
-    channel_chat_created = models.BooleanField(_("channel_chat_created"), blank=True)
-    migrate_to_chat_id = models.BigIntegerField(_("migrate_to_chat_id"), blank=True)
-    migrate_from_chat_id = models.BigIntegerField(_("migrate_from_chat_id"), blank=True)
+    delete_chat_photo = models.BooleanField(_("delete_chat_photo"), blank=True, null=True)
+    group_chat_created = models.BooleanField(_("group_chat_created"), blank=True, null=True)
+    supergroup_chat_created = models.BooleanField(_("supergroup_chat_created"), blank=True, null=True)
+    channel_chat_created = models.BooleanField(_("channel_chat_created"), blank=True, null=True)
+    migrate_to_chat_id = models.BigIntegerField(_("migrate_to_chat_id"), blank=True, null=True)
+    migrate_from_chat_id = models.BigIntegerField(_("migrate_from_chat_id"), blank=True, null=True)
     connected_website = models.TextField(_("connected_website"), blank=True)
 
     @classmethod

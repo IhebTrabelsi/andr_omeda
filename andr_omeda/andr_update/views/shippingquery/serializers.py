@@ -20,14 +20,14 @@ class ShippingQuerySerializer(serializers.ModelSerializer):
             user = Andruser.objects.get(pk=shipping_query_from_data.get('id'))
             validated_data['shipping_query_from'] = user
         else:
-            user = AndruserSerializer(**shipping_query_from_data)
-            user = user.is_valid()
+            user = AndruserSerializer(data=shipping_query_from_data)
+            user_is_valid = user.is_valid()
             user = user.save()
             validated_data['shipping_query_from'] = user
 
         if shipping_address_data:
-            shipping_address = ShippingAddressSerializer(**shipping_address_data)
-            shipping_address = shipping_address.is_valid()
+            shipping_address = ShippingAddressSerializer(data=shipping_address_data)
+            shipping_address_is_valid = shipping_address.is_valid()
             shipping_address = shipping_address.save()
             validated_data['shipping_address'] = shipping_address
 

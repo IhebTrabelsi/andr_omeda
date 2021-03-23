@@ -60,8 +60,8 @@ class AndruserListSerializer(serializers.ListSerializer):
                 user = Andruser.objects.get(pk=user.get('id'))
                 users.append(user)
             else:
-                user = AndruserSerializer(**user)
-                user = user.is_valid()
+                user = AndruserSerializer(data=user)
+                user_is_valid = user.is_valid()
                 user = user.save()
                 users.append(user)
         

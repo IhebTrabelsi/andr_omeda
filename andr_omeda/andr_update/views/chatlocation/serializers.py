@@ -11,8 +11,8 @@ class ChatLocationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         loc_data = validated_data.pop('location', None)
         if loc_data:
-            loc = LocationSerializer(**loc_data)
-            loc = loc.is_valid()
+            loc = LocationSerializer(data=loc_data)
+            loc_is_valid = loc.is_valid()
             loc = loc.save()
             validated_data['location'] = loc
         

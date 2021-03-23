@@ -16,13 +16,13 @@ class PassportDataSerializer(serializers.ModelSerializer):
         data_data = validated_data.pop('data', None)
         
         if credentials_data:
-            credentials = EncryptedCredentialsSerializer(**credentials_data)
-            credentials = credentials.is_valid()
+            credentials = EncryptedCredentialsSerializer(data=credentials_data)
+            credentials_is_valid = credentials.is_valid()
             credentials = credentials.save()
             validated_data['credentials'] = credentials
         if data_data:
-            data = EncryptedPassportElementSerializer(**data_data)
-            data = data.is_valid()
+            data = EncryptedPassportElementSerializer(data=data_data)
+            data_is_valid = data.is_valid()
             data = data.save()
             validated_data['data'] = data
         

@@ -14,10 +14,10 @@ class Chat(models.Model):
     bio = models.TextField(_("bio"), blank=True)
     description = models.TextField(_("description"), blank=True)
     invite_link = models.TextField(_("invite_link"), blank=True)
-    slow_mode_delay = models.IntegerField(_("slow_mode_delay"), blank=True)
+    slow_mode_delay = models.IntegerField(_("slow_mode_delay"), blank=True, null=True)
     sticker_set_name = models.TextField(_("sticker_set_name"), blank=True)
-    can_set_sticker_set = models.BooleanField(_("can_set_sticker_set"), blank=True)
-    linked_chat_id = models.BigIntegerField(_("linked_chat_id"), blank=True)
+    can_set_sticker_set = models.BooleanField(_("can_set_sticker_set"), blank=True, null=True)
+    linked_chat_id = models.BigIntegerField(_("linked_chat_id"), blank=True, null=True)
     # TODO [WORKAROUND20032208]
     pinned_message = models.JSONField(_("pinned_message"), default=dict, blank=True)
 

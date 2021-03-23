@@ -19,15 +19,15 @@ class PreCheckoutQuerySerializer(serializers.ModelSerializer):
             user = Andruser.objects.get(pk=user_data.get('id'))
             validated_data['from_user'] = user
         else:
-            user = AndruserSerializer(**user_data)
-            user = user.is_valid()
+            user = AndruserSerializer(data=user_data)
+            user_is_valid = user.is_valid()
             user = user.save()
             validated_data['from_user'] = user
 
         if order_info_data:
             order_info_ser = self.fields['order_info']
-            order_info = OrderInfoSerializer(**order_info_data)
-            order_info = order_info.is_valid()
+            order_info = OrderInfoSerializer(data=order_info_data)
+            order_info_is_valid = order_info.is_valid()
             order_info = order_info.save()
             validated_data['order_info'] = order_info
 

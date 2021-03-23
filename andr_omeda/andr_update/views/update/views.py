@@ -33,5 +33,4 @@ class TutorialBotView(APIView):
         serializer.is_valid(raise_exception=False)
         print(serializer.errors)
         print("°"*60)
-        serializer.save()
         return JsonResponse({"ok": "POST request processed"})

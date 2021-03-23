@@ -20,13 +20,13 @@ class CallbackQuerySerializer(serializers.ModelSerializer):
             user = Andruser.objects.get(pk=user_data.get('id'))
             validated_data['callback_query_from'] = user
         else:
-            user = AndruserSerializer(**user_data)
-            user = user.is_valid()
+            user = AndruserSerializer(data=user_data)
+            user_is_valid = user.is_valid()
             user = user.save()
             validated_data['callback_query_from'] = user
         if message_data:
-            message = MessageSerializer(**message_data)
-            message = message.is_valid()
+            message = MessageSerializer(data=message_data)
+            message_is_valid = message.is_valid()
             message = message.save()
             validated_data['message'] = message
         

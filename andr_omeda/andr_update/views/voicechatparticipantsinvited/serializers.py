@@ -11,8 +11,8 @@ class VoiceChatParticipantsInvitedSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         users_data = validated_data.pop('users', None)
         if users_data:
-            users = AndruserSerializer(**users_data)
-            users = users.is_valid()
+            users = AndruserSerializer(data=users_data)
+            users_is_valid = users.is_valid()
             users = users.save()
             validated_data['users'] = users
         voice_chat_participants_invited = VoiceChatParticipantsInvited(**validated_data)
