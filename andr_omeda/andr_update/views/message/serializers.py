@@ -269,10 +269,10 @@ class MessageSerializer(serializers.ModelSerializer):
             voice = voice.save()
             validated_data['voice'] = voice 
         if caption_entities_data:
-            caption_entities = MessageEntitySerializer(data=caption_entities_data)
+            caption_entities = MessageEntitySerializer(data=caption_entities_data, many=True)
             caption_entities_is_valid = caption_entities.is_valid()
             caption_entities = caption_entities.save()
-            validated_data['caption_entities'] = caption_entities 
+
         if contact_data:
             contact = ContactSerializer(data=contact_data)
             contact_is_valid = contact.is_valid()
@@ -367,9 +367,14 @@ class MessageSerializer(serializers.ModelSerializer):
         message = Message.objects.create(**validated_data)
         print("oOo"*15)
         print(entities)
-        for entity in entities:
-            entity.message = message
-            entity.save()
+        if entities_data:
+            for entity in entities:
+                entity.message = message
+                entity.save()
+        if caption_entities_data:
+            for caption_entity in caption_entities:
+                caption_entity.message = message
+                caption_entity.save()
         return message
 
         
