@@ -54,7 +54,16 @@ class ChatSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chat
         fields = '__all__'
+        extra_kwargs = {
+            'chat_id': {'validators': []},
+        }
 
+    """def __init__(self, *args, **kwargs):
+        chat_id = kwargs.get('chat_id', None)
+        if chat_id and Chat.chat_with_id_exists(chat_id=chat_id):
+            return Chat.objects.get(pk=chat_id)
+        super(ChatSerializer, self).__init__(*args, **kwargs)
+"""
     def create(self, validated_data):
         chat_id = validated_data.get('id')
         if Chat.chat_with_id_exists(chat_id=chat_id):

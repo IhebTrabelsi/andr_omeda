@@ -12,43 +12,50 @@ class Andruser(models.Model):
         "Message",
         on_delete=models.CASCADE,
         related_name="message_from",
-        blank=True
+        blank=True,
+        null=True
     )
     forwarder = models.OneToOneField(
         "Message",
         on_delete=models.CASCADE,
         related_name="forward_from",
-        blank=True
+        blank=True,
+        null=True
     )
     bot_sender = models.OneToOneField(
         "Message",
         on_delete=models.CASCADE,
         related_name="via_bot",
-        blank=True
+        blank=True,
+        null=True
     )
     user_members_message = models.ForeignKey(
         "Message",
         on_delete=models.CASCADE,
         related_name="new_user_members",
-        blank=True
+        blank=True,
+        null=True
     )
     user_leaving_member_message = models.OneToOneField(
         "Message",
         on_delete=models.CASCADE,
         related_name="left_user_member",
-        blank=True
+        blank=True,
+        null=True
     )
     inline_query = models.OneToOneField(
         "InlineQuery",
         on_delete=models.CASCADE,
         related_name="inline_query_from",
-        blank=False
+        blank=True,
+        null=True
     )
     callback_query = models.OneToOneField(
         "CallbackQuery",
         on_delete=models.CASCADE,
         related_name="callback_query_from",
-        blank=False
+        blank=True,
+        null=True
     )
 
     user_id = models.BigIntegerField(_("user_id"), blank=False, primary_key=True)
@@ -57,9 +64,9 @@ class Andruser(models.Model):
     last_name = models.TextField(_("last_name"), blank=True)
     username = models.TextField(_("username"), blank=True)
     language_code = models.TextField(_("language_code"), blank=True)
-    can_join_groups = models.BooleanField(_("can_join_groups"), blank=True)
-    can_read_all_group_messages = models.BooleanField(_("can_read_all_group_messages"), blank=True)
-    supports_inline_queries = models.BooleanField(_("supports_inline_queries"), blank=True)
+    can_join_groups = models.BooleanField(_("can_join_groups"), blank=True, null=True)
+    can_read_all_group_messages = models.BooleanField(_("can_read_all_group_messages"), blank=True, null=True)
+    supports_inline_queries = models.BooleanField(_("supports_inline_queries"), blank=True, null=True)
 
     @classmethod
     def get_user_with_id_and_first_name(cls, user_id, first_name):

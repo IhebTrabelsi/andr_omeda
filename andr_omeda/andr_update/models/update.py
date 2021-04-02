@@ -12,3 +12,7 @@ class Update(models.Model):
         blank=False,
         null=True
     )
+
+    def __str__(self):
+        if self.id:
+            return "Update with pgId: %i" % self.id

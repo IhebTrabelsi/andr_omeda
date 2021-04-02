@@ -8,12 +8,25 @@ class ChatMemberUpdated(models.Model):
     chat = models.ForeignKey(
         "Chat",
         on_delete=models.CASCADE,
-        blank=False
+        blank=True,
+        null=True
     )
     from_user = models.ForeignKey(
         "Andruser",
         on_delete=models.CASCADE,
-        blank=False
+        blank=True,
     )
     date = models.IntegerField(_("date"), blank=False)
+    update = models.ForeignKey(
+        "Update",
+        on_delete=models.CASCADE,
+        related_name="my_chat_member",
+        blank=True,
+        null=True
+    )
+    
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  # Call the "real" save() method.
+        return self
+
     

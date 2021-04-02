@@ -14,8 +14,9 @@ class ChatInviteLink(models.Model):
     chat_member_update = models.OneToOneField(
         "ChatMemberUpdated",
         on_delete=models.RESTRICT,
+        related_name="invite_link",
         blank=True,
-        related_name="invite_link"
+        null=True
     )
     is_primary = models.BooleanField(_("is_primary"), blank=False)
     is_revoked = models.BooleanField(_("is_revoked"), blank=False)

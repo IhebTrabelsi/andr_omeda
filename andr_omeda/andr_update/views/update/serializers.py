@@ -132,13 +132,18 @@ class UpdateSerializer(serializers.ModelSerializer):
         if  my_chat_member_data != None:
             my_chat_member_data['from_user'] = my_chat_member_data['from']
             del my_chat_member_data['from']
+            my_chat_member_data['from_user']['user_id'] = my_chat_member_data['from_user']['id']
+            del my_chat_member_data['from_user']['id']
+            my_chat_member_data['chat']['chat_id'] = my_chat_member_data['chat']['id']
+            del my_chat_member_data['chat']['id']
+
+
             print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
             print(my_chat_member_data)
             print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
             my_chat_member = ChatMemberUpdatedSerializer(data=my_chat_member_data)
             my_chat_member_is_valid = my_chat_member.is_valid()
             my_chat_member = my_chat_member.save()
-            validated_data['my_chat_member'] = my_chat_member
 
         if  chat_member_data != None:
             chat_member = ChatMemberUpdatedSerializer(data=chat_member_data)
@@ -147,4 +152,11 @@ class UpdateSerializer(serializers.ModelSerializer):
             validated_data['chat_member'] = chat_member
 
         update = Update.objects.create(**validated_data)
+        
+        if  my_chat_member_data:
+            print("X\n"*3)
+            print(update)
+            my_chat_member.update = update 
+            my_chat_member.save()
+
         return update

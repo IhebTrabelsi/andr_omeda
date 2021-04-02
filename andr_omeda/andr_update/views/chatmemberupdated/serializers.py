@@ -6,33 +6,33 @@ from andr_omeda.andr_update.views.chatinvitelink.serializers import ChatInviteLi
 from andr_omeda.andr_update.views.andruser.serializers import AndruserSerializer
 from andr_omeda.andr_update.views.message.serializers import ChatSerializer
 class ChatMemberUpdatedSerializer(serializers.ModelSerializer):
-    from_user = AndruserSerializer()
-    chat = ChatSerializer()
     old_chat_member = ChatMemberSerializer()
     new_chat_member = ChatMemberSerializer()
-    invite_link = ChatInviteLinkSerializer()
+    invite_link = ChatInviteLinkSerializer(required=False)
+    chat = ChatSerializer()
+    from_user = AndruserSerializer(required=False)
     class Meta:
         model = ChatMemberUpdated
         fields = '__all__'
 
     def create(self, validated_data):
-        from_user_data = validated_data.pop('from', None)
+        from_user_data = validated_data.pop('from_user', None)
         chat_data = validated_data.pop('chat', None)
         old_chat_member_data = validated_data.pop('old_chat_member', None)
         new_chat_member_data = validated_data.pop('new_chat_member', None)
         invite_link_data =  validated_data.pop('invite_link_data', None)
-
-        if Andruser.user_with_id_exists(user_id=from_user_data.get('id')):
-            user = Andruser.objects.get(pk=from_user_data.get('id'))
+        if Andruser.user_with_id_exists(user_id=from_user_data.get('user_id')):
+            user = Andruser.objects.get(pk=from_user_data.get('user_id'))
             validated_data['from_user'] = user
         else:
             user = AndruserSerializer(data=from_user_data)
             user_is_valid = user.is_valid()
+            print("§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§")
             user = user.save()
             validated_data['from_user'] = user
         
-        if Chat.chat_with_id_exists(chat_id=chat_data.get('id')):
-            chat = Chat.objects.get(pk=chat_data.get('id'))
+        if Chat.chat_with_id_exists(chat_id=chat_data.get('chat_id')):
+            chat = Chat.objects.get(pk=chat_data.get('chat_id'))
             validated_data['chat'] = chat
         else:
             chat = ChatSerializer(data=chat_data)
