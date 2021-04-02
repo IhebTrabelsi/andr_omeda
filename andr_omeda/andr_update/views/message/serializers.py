@@ -1,4 +1,5 @@
 # automatically created
+import json
 from rest_framework import serializers
 from andr_omeda.andr_update.models import Message
 from andr_omeda.andr_update.views.andruser.serializers import AndruserSerializer
@@ -86,6 +87,9 @@ class ChatSerializer(serializers.ModelSerializer):
         chat = Chat(**validated_data)
         chat.save()
         return chat
+    
+    def validate_chat_id(self, value):
+        return value
 
 class MessageSerializer(serializers.ModelSerializer):
     message_from = AndruserSerializer(required=False)
@@ -99,8 +103,8 @@ class MessageSerializer(serializers.ModelSerializer):
     left_chat_member = AndruserSerializer(required=False)
     animation = AnimationSerializer(required=False)
     location = LocationSerializer(required=False)
-    entities = MessageEntitySerializer(many=True, required=False)
-    caption_entities = MessageEntitySerializer(many=True, required=False)
+    entities = MessageEntitySerializer(required=False, many=True)
+    caption_entities = MessageEntitySerializer(required=False, many=True)
     photo = PhotoSizeSerializer(many=True, required=False)
     new_chat_photo = PhotoSizeSerializer(many=True, required=False)
     audio = AudioSerializer(required=False)
@@ -127,10 +131,19 @@ class MessageSerializer(serializers.ModelSerializer):
         model = Message
         fields = '__all__'
 
+    def save(self, **kwargs):
+        try:
+            return super().save(**kwargs)
+        except Exception as e:
+            print(e)
+    def validate_entities(self, value):
+        if not isinstance(value, list):
+            raise serializers.ValidationError("entities field of message serializer must be a list")
+        return value
+
+
     def create(self, validated_data):
-        print("££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££")
-        print(validated_data)
-        print("££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££")
+        validated_data = json.loads(json.dumps(validated_data))
         user_data = validated_data.pop('from', None)
         sender_chat_data = validated_data.pop('sender_chat', None)
         chat_data = validated_data.pop('chat')
@@ -169,8 +182,7 @@ class MessageSerializer(serializers.ModelSerializer):
         voice_chat_ended_data = validated_data.pop('voice_chat_ended', None)
         voice_chat_participants_invited_data = validated_data.pop('voice_chat_participants_invited', None)
         reply_markup_data = validated_data.pop('reply_markup', None)
-        print("?"*10)
-
+        
         if user_data:
             message_from = AndruserSerializer(data=user_data)
             message_from_is_valid = message_from.is_valid()
@@ -183,10 +195,6 @@ class MessageSerializer(serializers.ModelSerializer):
             validated_data['sender_chat'] = sender_chat
         if chat_data:
             chat = ChatSerializer(data=chat_data)
-            print("?"*10)
-            print(chat.is_valid())
-            print("-"*10)
-            print()
             chat_is_valid = chat.is_valid()
             chat = chat.save()
             validated_data['chat'] = chat
@@ -211,15 +219,20 @@ class MessageSerializer(serializers.ModelSerializer):
             sender_chat = sender_chat.save()
             validated_data['sender_chat'] = sender_chat 
         if entities_data:
-            entities = MessageEntitySerializer(data=chat_data)
+            print()
+            print()
+            print(entities_data)
+            print()
+            print()
+
+            entities = MessageEntitySerializer(data=entities_data, many=True)
             entities_is_valid = entities.is_valid()
             entities = entities.save()
-            validated_data['entities'] = entities 
+
         if animation_data:
             animation = AnimationSerializer(data=animation_data)
             animation_is_valid = animation.is_valid()
             animation = animation.save()
-            validated_data['animation'] = animation 
         if audio_data:
             audio = AudioSerializer(data=audio_data)
             audio_is_valid = audio.is_valid()
@@ -350,10 +363,15 @@ class MessageSerializer(serializers.ModelSerializer):
             reply_markup_is_valid = reply_markup.is_valid()
             reply_markup = reply_markup.save()
             validated_data['reply_markup'] = reply_markup 
-        print("#######uuuuu######")
-        print(validated_data)
+        
         message = Message.objects.create(**validated_data)
+        print("oOo"*15)
+        print(entities)
+        for entity in entities:
+            entity.message = message
+            entity.save()
         return message
+
         
         
 

@@ -5,6 +5,9 @@ from andr_omeda.andr_update.models import Update
 
 
 class ChatMember(models.Model):
+    """
+    This object contains information about one member of a chat.
+    """
     old_member = models.OneToOneField(
         "ChatMemberUpdated",
         on_delete=models.CASCADE,
@@ -17,10 +20,10 @@ class ChatMember(models.Model):
         blank=False,
         related_name="new_chat_member"
     )
-    user = models.OneToOneField(
+    user = models.ForeignKey(
         "Andruser",
         on_delete=models.SET_NULL,
-        blank=False,
+        blank=True,
         null=True
     )
     status = models.CharField(_("status"), max_length=255, blank=False)

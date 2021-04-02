@@ -16,3 +16,4 @@ class ChatMemberUpdated(models.Model):
         blank=False
     )
     date = models.IntegerField(_("date"), blank=False)
+    

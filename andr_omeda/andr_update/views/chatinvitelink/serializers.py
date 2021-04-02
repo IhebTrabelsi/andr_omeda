@@ -9,15 +9,8 @@ class ChatInviteLinkSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        user_data = validated_data.pop('creator', None)
-        if Andruser.user_with_id_exists(user_id=user_data.get('id')):
-            user = Andruser.objects.get(pk=user_data.get('id'))
-            validated_data['creator'] = user
-        else:
-            user = AndruserSerializer(data=user_data)
-            user_is_valid = user.is_valid()
-            user = user.save()
-            validated_data['creator'] = user
-        
+        user = validated_data.pop('creator', None)
         chat_invite_link = ChatInviteLink(**validated_data)
+        if user:
+            chat_invite_link.creator = user
         return chat_invite_link.save()

@@ -1,0 +1,18 @@
+{
+	'my_chat_member': {
+		'chat': {'id': 1305811960, 'first_name': 'Iheb', 'last_name': 'Ben Said', 'type': 'private'}, 
+		'from': {'id': 1305811960, 'is_bot': False, 'first_name': 'Iheb', 'last_name': 'Ben Said', 'language_code': 'fr'}, 
+		'date': 1617372786, 
+		'old_chat_member': {
+			'user': {'id': 1763314382, 'is_bot': True, 'first_name': 'AndreSolution', 'username': 'AndreSolutionBot'}, 			'status': 'member'
+		}
+	}, 
+	'new_chat_member': {
+		'user': {'id': 1763314382, 'is_bot': True, 'first_name': 'AndreSolution', 'username': 'AndreSolutionBot'}, 
+		'status': 'kicked', 
+		'until_date': 0
+		}
+	}, 
+
+	'update_id': {'_id': 69188889}
+}

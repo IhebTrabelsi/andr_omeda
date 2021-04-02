@@ -9,12 +9,12 @@ class ChatInviteLink(models.Model):
     creator = models.ForeignKey(
         "Andruser",
         on_delete=models.CASCADE,
-        blank=False,
+        blank=True,
     )
     chat_member_update = models.OneToOneField(
         "ChatMemberUpdated",
         on_delete=models.RESTRICT,
-        blank=False,
+        blank=True,
         related_name="invite_link"
     )
     is_primary = models.BooleanField(_("is_primary"), blank=False)

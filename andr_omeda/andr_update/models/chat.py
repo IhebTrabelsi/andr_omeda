@@ -5,7 +5,7 @@ from andr_omeda.andr_update.models import Message
 
 
 class Chat(models.Model):
-    id = models.BigIntegerField(_("id"), blank=False, primary_key=True, default=0)
+    chat_id = models.BigIntegerField(_("chat_id"), blank=False, primary_key=True, default=0)
     type = models.TextField(_("type"), blank=False)
     title = models.TextField(_("type"), blank=True)
     username = models.TextField(_("username"), blank=True)

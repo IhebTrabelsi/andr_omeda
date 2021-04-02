@@ -25,12 +25,14 @@ from django.views import View
 class TutorialBotView(APIView):
     permission_classes = (AllowAny,)
     def post(self, request, *args, **kwargs):
-        print("°"*60)
-        print("\n"*10)
-        print(request.data)
-        print("\n"*10)
+        update_id = request.data.pop('update_id', None)
+        request.data['update_id'] = {'_id': update_id}
         serializer = UpdateSerializer(data=request.data, context={'request': request})
-        serializer.is_valid(raise_exception=False)
+        print(request.data)
+        serializer_is_valid = serializer.is_valid(raise_exception=False)
+        print(777)
         print(serializer.errors)
-        print("°"*60)
+        print(serializer_is_valid)
+        print("\n\n\n")
+        serializer.save()
         return JsonResponse({"ok": "POST request processed"})

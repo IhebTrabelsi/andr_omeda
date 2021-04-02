@@ -26,12 +26,6 @@ class Andruser(models.Model):
         related_name="via_bot",
         blank=True
     )
-    entity_mention = models.OneToOneField(
-        "Message",
-        on_delete=models.CASCADE,
-        related_name="user",
-        blank=True
-    )
     user_members_message = models.ForeignKey(
         "Message",
         on_delete=models.CASCADE,
@@ -83,3 +77,6 @@ class Andruser(models.Model):
     def get_user_with_id(cls, user_id):
         if cls.user_with_id_exists(user_id):
             return cls.objects.get(pk=user_id)
+
+    def __str__(self):
+        return "User with id:%i" % self.id

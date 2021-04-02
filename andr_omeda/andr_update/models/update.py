@@ -5,7 +5,7 @@ from andr_omeda.andr_update.models import Andrid
 
 
 class Update(models.Model):
-    andr_id = models.OneToOneField(
+    update_id = models.OneToOneField(
         Andrid,
         on_delete=models.RESTRICT,
         related_name="update",
