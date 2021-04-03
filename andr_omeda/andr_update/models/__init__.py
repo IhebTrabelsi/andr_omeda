@@ -49,3 +49,4 @@ from .chatinvitelink import ChatInviteLink
 from .voicechatended import VoiceChatEnded
 from .voicechatstarted import VoiceChatStarted
 from .voicechatparticipantsinvited import VoiceChatParticipantsInvited
+from .messageautodeletetimerchanged import MessageAutoDeleteTimerChanged

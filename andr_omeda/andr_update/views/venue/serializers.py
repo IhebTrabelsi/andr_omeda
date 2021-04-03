@@ -1,7 +1,7 @@
 # automatically created
 from rest_framework import serializers
 from andr_omeda.andr_update.models import Venue
-from andr_omeda.andr_update.views.location.serializers import LocationSerializer()
+from andr_omeda.andr_update.views.location.serializers import LocationSerializer
 
 class VenueSerializer(serializers.ModelSerializer):
     location = LocationSerializer()
@@ -11,11 +11,12 @@ class VenueSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         location_data = validated_data.pop('location', None)
-        venue = Venue(**validated_data)
+        
         if location_data:
-            location_ser = self.field['location']
-            location = location_ser(**location_data)
-            location = location.is_valid().save()
-            venue.location = location 
+            location = LocationSerializer(data=location_data)
+            location_is_valid = location.is_valid()
+            location = location.save()
+            validated_data['location'] = location
 
+        venue = Venue(**validated_data)
         return venue.save()

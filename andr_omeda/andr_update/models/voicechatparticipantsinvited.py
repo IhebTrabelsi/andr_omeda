@@ -9,3 +9,7 @@ class VoiceChatParticipantsInvited(models.Model):
         related_name="voice_chat_participants_invited",
         blank=True
     )
+    users = models.ManyToManyField(
+        "Andruser",
+        blank=True
+    )

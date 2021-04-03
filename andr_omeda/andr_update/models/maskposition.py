@@ -9,7 +9,8 @@ class MaskPosition(models.Model):
         Sticker,
         on_delete=models.CASCADE,
         related_name="mask_position",
-        blank=True
+        blank=True,
+        null=True
     )
     point = models.TextField(_("point"), blank=False)
     x_shift = models.FloatField(_("x_shift"), blank=False)

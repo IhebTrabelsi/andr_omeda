@@ -9,10 +9,14 @@ class ChatLocationSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        loc_ser = self.fields['location']
-        loc = loc_ser(**validated_data.pop('location', None)).is_valid().save()
+        loc_data = validated_data.pop('location', None)
+        if loc_data:
+            loc = LocationSerializer(data=loc_data)
+            loc_is_valid = loc.is_valid()
+            loc = loc.save()
+            validated_data['location'] = loc
+        
         chat_location = ChatLocation(**validated_data)
-        chat_location.location = loc
-        chat_location.save()
-        return chat_location
+        return chat_location.save()
+        
 

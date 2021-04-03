@@ -1,28 +1,34 @@
 # automatically created
 from rest_framework import serializers
 from andr_omeda.andr_update.models import ChosenInlineResult, Andruser
-from andr_omeda.andr_update.views.andruser.serializers import AndruserSerializer()
-from andr_omeda.andr_update.views.location.serializers import LocationSerializer()
+from andr_omeda.andr_update.views.andruser.serializers import AndruserSerializer
+from andr_omeda.andr_update.views.location.serializers import LocationSerializer
 
 class ChosenInlineResultSerializer(serializers.ModelSerializer):
-    chosen_inline_result_from = AndruserSerializer()
+    from_user = AndruserSerializer()
     location = LocationSerializer()
     class Meta:
         model = ChosenInlineResult
         fields = '__all__'
 
     def create(self, validated_data):
-        user = Andruser.get_user_with_id(user_id= validated_data.pop('from', None).get('user_id', None))
-        if 'location' in validated_data:
-            location_ser = self.fields['location']
-            location = location_ser(**validated_data.pop('location', None))
-            location = location.is_valid()
-            location = location.save()
-        
-        chosen_inline_result = ChosenInlineResult(**validated_data)
-        chosen_inline_result.chosen_inline_result_from = user
+        from_user_data = validated_data.pop('from', None)
+        location_data = validated_data.pop('location', None)
 
-        if 'location' in validated_data:
-            chosen_inline_result.location = location
-        
+        if Andruser.user_with_id_exists(user_id=from_user_data.get('id')):
+            user = Andruser.objects.get(pk=from_user_data.get('id'))
+            validated_data['from'] = user
+        else:
+            user = AndruserSerializer(data=from_user_data)
+            user_is_valid = user.is_valid()
+            user = user.save()
+            validated_data['from'] = user
+
+        if location_data:
+            location = LocationSerializer(data=location_data)
+            location_is_valid = location.is_valid()
+            location = location.save()
+            validated_data['location'] = location
+        chosen_inline_result = ChosenInlineResult(**validated_data)
         return chosen_inline_result.save()
+        

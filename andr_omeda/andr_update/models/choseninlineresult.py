@@ -11,6 +11,11 @@ class ChosenInlineResult(models.Model):
         related_name="chosen_inline_result",
         blank=True
     )
+    from_user = models.OneToOneField(
+        "Andruser",
+        on_delete=models.CASCADE,
+        blank=False
+    )
     result_id = models.TextField(_("result_id"), blank=False)
     query = models.TextField(_("query"), blank=False)
     inline_message_id = models.TextField(_("inline_message_id"), blank=True)

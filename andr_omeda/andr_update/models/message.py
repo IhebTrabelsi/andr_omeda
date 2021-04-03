@@ -8,52 +8,35 @@ from django.utils import timezone
 
 class Message(models.Model):
     message_id = models.IntegerField(_("message_id"), blank=False)
+    """
     this_pinned_message_chat = models.OneToOneField(
         "Chat",
         on_delete=models.CASCADE,
         related_name="pinned_message",
         blank=True
-    )
+    )"""
+    # TODO [WORKAROUND20032208] for the present time just get pinned_message
+    # of Chat model as JSON field.
+
     reply_to_message = models.OneToOneField(
         "self",
         on_delete=models.DO_NOTHING,
         related_name="+",
+        null=True,
         blank=True
     )
     pinned_message = models.OneToOneField(
         "self",
         on_delete=models.DO_NOTHING,
         related_name="+",
-        blank=True
-    )
-    update = models.OneToOneField(
-        "Update",
-        on_delete=models.CASCADE,
-        related_name="message",
-        blank=True
-    )
-    update_for_this_edited_message = models.OneToOneField(
-        "Update",
-        on_delete=models.CASCADE,
-        related_name="edited_message",
-        blank=True
-    )
-    update_for_this_channel_post = models.OneToOneField(
-        "Update",
-        on_delete=models.CASCADE,
-        related_name="channel_post",
-        blank=True
-    )
-    update_for_this_edited_channel_post = models.OneToOneField(
-        "Update",
-        on_delete=models.CASCADE,
-        related_name="edited_channel_post",
+        null=True,
         blank=True
     )
     callbackquery = models.OneToOneField(
         "CallbackQuery",
         on_delete=models.CASCADE,
         related_name="message",
+        null=True,
         blank=True
     )
     chat = models.ForeignKey(
@@ -66,21 +49,30 @@ class Message(models.Model):
         "Chat",
         on_delete=models.RESTRICT,
         related_name="sended_messages",
+        null=True,
         blank=True
+    )
+    forward_from = models.ForeignKey(
+        "Andruser",
+        on_delete=models.CASCADE,
+        related_name="forwarded_messages",
+        blank=True,
+        null=True
     )
     forward_from_chat = models.ForeignKey(
         "Chat",
         on_delete=models.RESTRICT,
         related_name="forwarded_messages",
+        null=True,
         blank=True
     )
 
     date = models.IntegerField(_("date"), blank=False)
-    forward_from_message_id = models.IntegerField(_("forward_from_message_id"), blank=True)
+    forward_from_message_id = models.IntegerField(_("forward_from_message_id"), blank=True, null=True)
     forward_signature = models.TextField(_("forward_signature"), blank=True)
     forward_sender_name = models.TextField(_("forward_sender_name"), blank=True)
-    forward_date = models.IntegerField(_("forward_date"), blank=True)
-    edit_date = models.IntegerField(_("edit_date"), blank=True)
+    forward_date = models.IntegerField(_("forward_date"), blank=True, null=True)
+    edit_date = models.IntegerField(_("edit_date"), blank=True, null=True)
     media_group_id = models.TextField(_("media_group_id"), blank=True)
     author_signature = models.TextField(_("author_signature"), blank=True)
     text = models.CharField(
@@ -94,14 +86,23 @@ class Message(models.Model):
         blank=True
     )
     new_chat_title = models.TextField(_("new_chat_title"), blank=True)
-    delete_chat_photo = models.BooleanField(_("delete_chat_photo"), blank=True)
-    group_chat_created = models.BooleanField(_("group_chat_created"), blank=True)
-    supergroup_chat_created = models.BooleanField(_("supergroup_chat_created"), blank=True)
-    channel_chat_created = models.BooleanField(_("channel_chat_created"), blank=True)
-    migrate_to_chat_id = models.BigIntegerField(_("migrate_to_chat_id"), blank=True)
-    migrate_from_chat_id = models.BigIntegerField(_("migrate_from_chat_id"), blank=True)
+    delete_chat_photo = models.BooleanField(_("delete_chat_photo"), blank=True, null=True)
+    group_chat_created = models.BooleanField(_("group_chat_created"), blank=True, null=True)
+    supergroup_chat_created = models.BooleanField(_("supergroup_chat_created"), blank=True, null=True)
+    channel_chat_created = models.BooleanField(_("channel_chat_created"), blank=True, null=True)
+    migrate_to_chat_id = models.BigIntegerField(_("migrate_to_chat_id"), blank=True, null=True)
+    migrate_from_chat_id = models.BigIntegerField(_("migrate_from_chat_id"), blank=True, null=True)
     connected_website = models.TextField(_("connected_website"), blank=True)
 
     @classmethod
     def get_message_with_message_id_list(cls, message_id):
         return list(cls.objects.get(message_id=message_id))
+
+    @classmethod
+    def get_message_for_message_id_and_chat_id(cls, message_id=None, chat_id=None):
+        if not message_id or not chat_id:
+            return None
+        if cls.objects.filter(chat__chat_id=chat_id).filter(chat__message__id=message_id).exists():
+            return cls.objects.filter(chat__chat_id=chat_id).filter(chat__message__id=message_id)[:1].get()
+        else:
+            return None

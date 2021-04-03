@@ -50,7 +50,35 @@ from andr_omeda.andr_update.models import Andruser
     def create(self, validated_data):
         return Andruser.objects.create(**validated_data)"""
 
+
+
+class AndruserListSerializer(serializers.ListSerializer):
+    def create(self, validated_data):
+        users = []
+        for user in validated_data:
+            if Andruser.user_with_id_exists(user.get('id')):
+                user = Andruser.objects.get(pk=user.get('id'))
+                users.append(user)
+            else:
+                user = AndruserSerializer(data=user)
+                user_is_valid = user.is_valid()
+                user = user.save()
+                users.append(user)
+        
+        return users
+
 class AndruserSerializer(serializers.ModelSerializer):
     class Meta:
         model=Andruser
         fields='__all__'
+        extra_kwargs = {
+            'user_id': {'validators': []},
+        }
+
+    def create(self, validated_data):
+        if Andruser.user_with_id_exists(validated_data.get('user_id')):
+            user = Andruser.objects.get(pk=validated_data.get('user_id'))
+        else:
+            user = Andruser.objects.create(**validated_data)
+        
+        return user

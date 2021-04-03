@@ -1,9 +1,9 @@
 # automatically created
 from rest_framework import serializers
 from andr_omeda.andr_update.models import Game
-from andr_omeda.andr_update.views.animation.serializers import AnimationSerializer()
-from andr_omeda.andr_update.views.messageentity.serializers import MessageEntitySerializer()
-from andr_omeda.andr_update.views.photosize.serializers import PhotoSizeSerializer()
+from andr_omeda.andr_update.views.animation.serializers import AnimationSerializer
+from andr_omeda.andr_update.views.messageentity.serializers import MessageEntitySerializer
+from andr_omeda.andr_update.views.photosize.serializers import PhotoSizeSerializer
 
 class GameSerializer(serializers.ModelSerializer):
     animation = AnimationSerializer()
@@ -17,24 +17,25 @@ class GameSerializer(serializers.ModelSerializer):
         animation_data = validated_data.pop('animation', None)
         text_entities_data = validated_data.pop('text_entities', None)
         photo_data = validated_data.pop('photo', None)
-        game = Game(**validated_data)
+        
 
         if animation_data:
-            animation_ser = self.fields['animation']
-            animation = animation_ser(**animation_data)
-            animation = animation.is_valid().save()
-            game.animation = animation
+            animation = AnimationSerializer(data=animation_data)
+            animation_is_valid = animation.is_valid()
+            animation = animation.save()
+            validated_data['animation'] = animation
         if text_entities_data:
-            text_entities_ser = self.fields['text_entities']
-            text_entities = text_entities_ser(**text_entities_data)
-            text_entities = text_entities.is_valid().save()
-            game.text_entities = text_entities
+            text_entities = MessageEntitySerializer(data=text_entities_data)
+            text_entities_is_valid = text_entities.is_valid()
+            text_entities = text_entities.save()
+            validated_data['text_entities'] = text_entities
         if photo_data:
-            photo_ser = self.fields['photo']
-            photo = photo_ser(**photo_data)
-            photo = photo.is_valid().save()
-            game.photo_data = photo_data
+            photo = PhotoSizeSerializer(data=photo_data)
+            photo_is_valid = photo.is_valid()
+            photo = photo.save()
+            validated_data['photo'] = photo
 
+        game = Game(**validated_data)
         return game.save()
         
         
