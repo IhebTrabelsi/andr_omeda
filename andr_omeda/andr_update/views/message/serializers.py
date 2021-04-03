@@ -66,7 +66,6 @@ class ChatSerializer(serializers.ModelSerializer):
 """
     def create(self, validated_data):
         chat_id = validated_data.get('chat_id',None)
-        print(validated_data)
         _chat = Chat.get_chat_with_id(chat_id=chat_id)
         if _chat:
             return _chat
@@ -154,17 +153,11 @@ class MessageSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
-        print("3++++++++++++++++++++++++++++++++++++++++++++++++++=")
-        print(validated_data)
-        print("3++++++++++++++++++++++++++++++++++++++++++++++++++=")
         validated_data = json.loads(json.dumps(validated_data))
         user_data = validated_data.pop('from', None)
         sender_chat_data = validated_data.pop('sender_chat', None)
         
         chat_data = validated_data.pop('chat')
-        print("4++++++++++++++++++++++++++++++++++++++++++++++++++=")
-        print(chat_data)
-        print("4++++++++++++++++++++++++++++++++++++++++++++++++++=")
         forward_from_data = validated_data.pop('forward_from', None)
         forward_from_chat_data = validated_data.pop('forward_from_chat', None)
         reply_to_message_data = validated_data.pop('reply_to_message', None)
@@ -205,7 +198,6 @@ class MessageSerializer(serializers.ModelSerializer):
             validated_data.get('message_id', None),
             chat_data.get('chat_id', None)
         )
-        print(chat_data.get('chat_id', None))
         if _message and _message.id:
             return _message
         
@@ -222,17 +214,9 @@ class MessageSerializer(serializers.ModelSerializer):
         if chat_data:
             chat = ChatSerializer(data=chat_data)
             chat_is_valid = chat.is_valid()
-            print("++++++++++++++++++++++++++++++++++++++++++++++++++=")
-            print(chat_data)
-            print("++++++++++++++++++++++++++++++++++++++++++++++++++=")
             chat = chat.save()
             validated_data['chat'] = chat
         if forward_from_data:
-            
-            print("4444444444444444444444444444444444444444444444444444444")
-            print(forward_from_data)
-            print("4444444444444444444444444444444444444444444444444444444")
-
             forward_from = AndruserSerializer(data=forward_from_data)
             forward_from_is_valid = forward_from.is_valid()
             forward_from = forward_from.save()
@@ -255,12 +239,6 @@ class MessageSerializer(serializers.ModelSerializer):
             sender_chat = sender_chat.save()
             validated_data['sender_chat'] = sender_chat 
         if entities_data:
-            print()
-            print()
-            print(entities_data)
-            print()
-            print()
-
             entities = MessageEntitySerializer(data=entities_data, many=True)
             entities_is_valid = entities.is_valid()
             entities = entities.save()
@@ -285,14 +263,9 @@ class MessageSerializer(serializers.ModelSerializer):
             photo = photo.save()
             #validated_data['photo'] = photo 
         if sticker_data:
-            print("~~"*10)
-            print(sticker_data)
             sticker = StickerSerializer(data=sticker_data)
             sticker_is_valid = sticker.is_valid()
             sticker = sticker.save()
-            print("~~"*10)
-            print(sticker_is_valid)
-            print(sticker)
             validated_data['sticker'] = sticker  
         if video_data:
             video = VideoSerializer(data=video_data)
@@ -406,7 +379,6 @@ class MessageSerializer(serializers.ModelSerializer):
             validated_data['reply_markup'] = reply_markup 
         
         message = Message.objects.create(**validated_data)
-        print("oOo"*15)
         if entities_data:
             for entity in entities:
                 entity.message = message

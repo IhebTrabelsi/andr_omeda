@@ -11,11 +11,8 @@ class MessageEntitySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        print("xXx"*15)
-        print(validated_data)
         user_data = validated_data.pop('user', None)
         message_entity = MessageEntity(**validated_data)
-        print(message_entity)
         if user_data:
             if Andruser.user_with_id_exists(validated_data.get('user').get('id')):
                 user = Andruser.objects.get(pk=validated_data.pop('user').get('id'))
@@ -24,9 +21,5 @@ class MessageEntitySerializer(serializers.ModelSerializer):
                 user_is_valid = user.is_valid()
                 user = user.save()
             message_entity.user = user 
-        print("|")
-        print("|")
-        print("|")
-        print(message_entity.save())
         return message_entity.save()
         

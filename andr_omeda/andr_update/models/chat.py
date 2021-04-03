@@ -45,17 +45,8 @@ class Chat(models.Model):
     def get_chat_with_id(cls, chat_id=None):
         
         if not chat_id:
-            print("+ + + + + + + + + "*3)
-            print("chat_id None")
-            print("+ + + + + + + + + "*3)
             return None
         if cls.chat_with_id_exists(chat_id):
-            print("+ + + + + + + + + "*3)
-            print(cls.objects.get(pk=chat_id))
-            print("+ + + + + + + + + "*3)
             return cls.objects.get(pk=chat_id)
         else:
-            print("+ + + + + + + + + "*3)
-            print("chat_id Jdid")
-            print("+ + + + + + + + + "*3)
             return None

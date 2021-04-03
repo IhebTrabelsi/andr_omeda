@@ -27,10 +27,11 @@ class TutorialBotView(APIView):
     def post(self, request, *args, **kwargs):
         update_id = request.data.pop('update_id', None)
         request.data['update_id'] = {'_id': update_id}
-        if request.data.get('message').get('forward_from'):
-            request.data['message']['forward_from']['user_id'] = \
-                request.data['message']['forward_from']['id'] 
-            del request.data['message']['forward_from']['id']
+        if request.data.get('message',None):
+            if request.data.get('message').get('forward_from'):
+                request.data['message']['forward_from']['user_id'] = \
+                    request.data['message']['forward_from']['id'] 
+                del request.data['message']['forward_from']['id']
         serializer = UpdateSerializer(data=request.data, context={'request': request})
         print(request.data)
         serializer_is_valid = serializer.is_valid(raise_exception=False)
