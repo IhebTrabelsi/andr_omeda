@@ -23,6 +23,10 @@ class Chat(models.Model):
 
     def geet_message(self):
         return self.message
+    
+    def __str__(self):
+        if self.chat_id:
+            return "Chat with pgId: %i" % self.chat_id
 
     @classmethod
     def get_message_with_id_in_chat_with_id(cls, chat_id, message_id):
@@ -38,6 +42,20 @@ class Chat(models.Model):
         return cls.objects.filter(pk=chat_id).exists()
 
     @classmethod
-    def get_chat_with_id(cls, chat_id):
+    def get_chat_with_id(cls, chat_id=None):
+        
+        if not chat_id:
+            print("+ + + + + + + + + "*3)
+            print("chat_id None")
+            print("+ + + + + + + + + "*3)
+            return None
         if cls.chat_with_id_exists(chat_id):
+            print("+ + + + + + + + + "*3)
+            print(cls.objects.get(pk=chat_id))
+            print("+ + + + + + + + + "*3)
             return cls.objects.get(pk=chat_id)
+        else:
+            print("+ + + + + + + + + "*3)
+            print("chat_id Jdid")
+            print("+ + + + + + + + + "*3)
+            return None

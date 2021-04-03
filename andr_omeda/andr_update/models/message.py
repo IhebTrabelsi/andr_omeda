@@ -32,34 +32,6 @@ class Message(models.Model):
         null=True,
         blank=True
     )
-    update = models.OneToOneField(
-        "Update",
-        on_delete=models.CASCADE,
-        related_name="message",
-        null=True,
-        blank=True
-    )
-    update_for_this_edited_message = models.OneToOneField(
-        "Update",
-        on_delete=models.CASCADE,
-        related_name="edited_message",
-        null=True,
-        blank=True
-    )
-    update_for_this_channel_post = models.OneToOneField(
-        "Update",
-        on_delete=models.CASCADE,
-        related_name="channel_post",
-        null=True,
-        blank=True
-    )
-    update_for_this_edited_channel_post = models.OneToOneField(
-        "Update",
-        on_delete=models.CASCADE,
-        related_name="edited_channel_post",
-        null=True,
-        blank=True
-    )
     callbackquery = models.OneToOneField(
         "CallbackQuery",
         on_delete=models.CASCADE,
@@ -79,6 +51,13 @@ class Message(models.Model):
         related_name="sended_messages",
         null=True,
         blank=True
+    )
+    forward_from = models.ForeignKey(
+        "Andruser",
+        on_delete=models.CASCADE,
+        related_name="forwarded_messages",
+        blank=True,
+        null=True
     )
     forward_from_chat = models.ForeignKey(
         "Chat",
@@ -118,3 +97,12 @@ class Message(models.Model):
     @classmethod
     def get_message_with_message_id_list(cls, message_id):
         return list(cls.objects.get(message_id=message_id))
+
+    @classmethod
+    def get_message_for_message_id_and_chat_id(cls, message_id=None, chat_id=None):
+        if not message_id or not chat_id:
+            return None
+        if cls.objects.filter(chat__chat_id=chat_id).filter(chat__message__id=message_id).exists():
+            return cls.objects.filter(chat__chat_id=chat_id).filter(chat__message__id=message_id)[:1].get()
+        else:
+            return None

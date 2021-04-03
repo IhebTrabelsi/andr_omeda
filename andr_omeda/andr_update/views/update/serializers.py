@@ -63,12 +63,22 @@ class UpdateSerializer(serializers.ModelSerializer):
             update_id = update_id.create(update_id.validated_data)
             validated_data['update_id'] = update_id
 
+        print("++++++++++++++++++++++++++++++++++++++++++++++++++=")
+        print(message_data)
+        print("++++++++++++++++++++++++++++++++++++++++++++++++++=")
         if message_data:
+            message_data['chat']['chat_id'] = message_data['chat']['id']
+            del message_data['chat']['id']
             message = MessageSerializer(data=message_data)
             message_is_valid = message.is_valid(raise_exception=True)
+            
             message = message.save()
+            
             validated_data['message'] = message
-
+        print("2++++++++++++++++++++++++++++++++++++++++++++++++++=")
+        print(message_data)
+        print("2++++++++++++++++++++++++++++++++++++++++++++++++++=")
+        
         if  edited_message_data != None:
             edited_message = MessageSerializer(data=edited_message_data)
             edited_message_is_valid = edited_message.is_valid()
@@ -130,6 +140,7 @@ class UpdateSerializer(serializers.ModelSerializer):
             validated_data['poll_answer'] = poll_answer
 
         if  my_chat_member_data != None:
+            print("_/-\\_"*10)
             my_chat_member_data['from_user'] = my_chat_member_data['from']
             del my_chat_member_data['from']
             my_chat_member_data['from_user']['user_id'] = my_chat_member_data['from_user']['id']

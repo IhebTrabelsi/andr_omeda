@@ -12,6 +12,35 @@ class Update(models.Model):
         blank=False,
         null=True
     )
+    message = models.ForeignKey(
+        "Message",
+        on_delete=models.RESTRICT,
+        related_name="update",
+        blank=False,
+        null=True
+    )
+    edited_message = models.ForeignKey(
+        "Message",
+        on_delete=models.RESTRICT,
+        related_name="update_for_this_edited_message",
+        blank=False,
+        null=True
+    )
+    channel_post = models.ForeignKey(
+        "Message",
+        on_delete=models.RESTRICT,
+        related_name="update_for_this_channel_post",
+        blank=False,
+        null=True
+    )
+    edited_channel_post = models.ForeignKey(
+        "Message",
+        on_delete=models.RESTRICT,
+        related_name="update_for_this_edited_channel_post",
+        blank=False,
+        null=True
+    )
+
 
     def __str__(self):
         if self.id:

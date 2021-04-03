@@ -8,21 +8,14 @@ from django.utils import timezone
 
 
 class Andruser(models.Model):
-    message = models.OneToOneField(
+    message = models.ForeignKey(
         "Message",
         on_delete=models.CASCADE,
         related_name="message_from",
         blank=True,
         null=True
     )
-    forwarder = models.OneToOneField(
-        "Message",
-        on_delete=models.CASCADE,
-        related_name="forward_from",
-        blank=True,
-        null=True
-    )
-    bot_sender = models.OneToOneField(
+    bot_sender = models.ForeignKey(
         "Message",
         on_delete=models.CASCADE,
         related_name="via_bot",

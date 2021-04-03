@@ -9,10 +9,12 @@ class Document(models.Model):
         Message,
         on_delete=models.CASCADE,
         related_name="document",
-        blank=True
+        blank=True,
+        null=True
     )
     file_id = models.TextField(_("file_id"), blank=False)
     file_unique_id = models.TextField(_("file_unique_id"), blank=False)
     file_name = models.TextField(_("file_name"), blank=True)
     mime_type = models.TextField(_("mime_type"), blank=True)
-    file_size = models.IntegerField(_("file_size"), blank=True)
+    file_size = models.IntegerField(_("file_size"), blank=True, null=True)
+

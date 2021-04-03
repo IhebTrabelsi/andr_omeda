@@ -18,5 +18,5 @@ class DocumentSerializer(serializers.ModelSerializer):
             thumb = thumb.save()
             validated_data['thumb'] = thumb
         
-        document = Document(**validated_data)
-        return document.save()
+        document = Document.objects.create(**validated_data)
+        return document
