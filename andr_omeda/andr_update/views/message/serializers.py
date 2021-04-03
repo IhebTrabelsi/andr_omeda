@@ -258,9 +258,14 @@ class MessageSerializer(serializers.ModelSerializer):
             photo = photo.save()
             validated_data['photo'] = photo 
         if sticker_data:
+            print("~~"*10)
+            print(sticker_data)
             sticker = StickerSerializer(data=sticker_data)
             sticker_is_valid = sticker.is_valid()
             sticker = sticker.save()
+            print("~~"*10)
+            print(sticker_is_valid)
+            print(sticker)
             validated_data['sticker'] = sticker  
         if video_data:
             video = VideoSerializer(data=video_data)
@@ -375,7 +380,6 @@ class MessageSerializer(serializers.ModelSerializer):
         
         message = Message.objects.create(**validated_data)
         print("oOo"*15)
-        print(entities)
         if entities_data:
             for entity in entities:
                 entity.message = message
@@ -384,6 +388,9 @@ class MessageSerializer(serializers.ModelSerializer):
             for caption_entity in caption_entities:
                 caption_entity.message = message
                 caption_entity.save()
+        if sticker_data:
+            sticker.message = message
+            sticker.save()
         return message
 
         

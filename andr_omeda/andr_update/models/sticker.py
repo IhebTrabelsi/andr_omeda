@@ -9,7 +9,8 @@ class Sticker(models.Model):
         Message,
         on_delete=models.CASCADE,
         related_name="sticker",
-        blank=True
+        blank=True,
+        null=True
     )
     file_id = models.TextField(_("file_id"), blank=False)
     file_unique_id = models.TextField(_("file_unique_id"), blank=False)
@@ -19,4 +20,8 @@ class Sticker(models.Model):
     emoji = models.TextField(_("emoji"), blank=True)
     set_name = models.TextField(_("set_name"), blank=True)
 
-    file_size = models.IntegerField(_("file_size"), blank=True)
+    file_size = models.IntegerField(_("file_size"), blank=True, null=True)
+
+    def __str__(self):
+        if self.id:
+            return "Sticker with pgId: %i" % self.id

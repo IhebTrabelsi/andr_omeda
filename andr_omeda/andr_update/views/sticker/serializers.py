@@ -5,7 +5,7 @@ from andr_omeda.andr_update.views.maskposition.serializers import MaskPositionSe
 from andr_omeda.andr_update.views.photosize.serializers import PhotoSizeSerializer
 
 class StickerSerializer(serializers.ModelSerializer):
-    mask_position = MaskPositionSerializer()
+    mask_position = MaskPositionSerializer(required=False)
     thumb = PhotoSizeSerializer()
     class Meta:
         model = Sticker
@@ -18,13 +18,15 @@ class StickerSerializer(serializers.ModelSerializer):
         if mask_position_data:
             mask_position = MaskPositionSerializer(data=mask_position_data)
             mask_position_is_valid = mask_position.is_valid()
+            print(mask_position_is_valid)
             mask_position = mask_position.save()
             validated_data['mask_position'] = mask_position
         if thumb_data:
             thumb = PhotoSizeSerializer(data=thumb_data)
             thumb_is_valid = thumb.is_valid()
+            print(thumb_is_valid)
             thumb = thumb.save()
             validated_data['thumb'] = thumb
 
-        sticker = Stricker(**validated_data)
-        return sticker.save()
+        sticker = Sticker.objects.create(**validated_data)
+        return sticker
