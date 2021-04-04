@@ -55,7 +55,11 @@ class ChatSerializer(serializers.ModelSerializer):
         model = Chat
         fields = '__all__'
         extra_kwargs = {
-            'chat_id': {'validators': []},
+            'message_from': {'validators': []},
+            'forward_from': {'validators': []},
+            'via_bot': {'validators': []},
+            'new_chat_members': {'validators': []},
+            'left_chat_member': {'validators': []},
         }
 
     """def __init__(self, *args, **kwargs):
@@ -140,6 +144,9 @@ class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
         fields = '__all__'
+        extra_kwargs = {
+            'user_id': {'validators': []},
+        }
 
     def save(self, **kwargs):
         try:
@@ -153,7 +160,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
-        validated_data = json.loads(json.dumps(validated_data))
+        validated_data = self.context['validated_data']
         user_data = validated_data.pop('from', None)
         sender_chat_data = validated_data.pop('sender_chat', None)
         
@@ -202,7 +209,7 @@ class MessageSerializer(serializers.ModelSerializer):
             return _message
         
         if user_data:
-            message_from = AndruserSerializer(data=user_data)
+            message_from = AndruserSerializer(data=user_data, context={'validated_data': user_data})
             message_from_is_valid = message_from.is_valid()
             message_from = message_from.save()
             validated_data['message_from'] = message_from
@@ -217,7 +224,7 @@ class MessageSerializer(serializers.ModelSerializer):
             chat = chat.save()
             validated_data['chat'] = chat
         if forward_from_data:
-            forward_from = AndruserSerializer(data=forward_from_data)
+            forward_from = AndruserSerializer(data=forward_from_data, context={'validated_data': forward_from_data})
             forward_from_is_valid = forward_from.is_valid()
             forward_from = forward_from.save()
             validated_data['forward_from'] = forward_from
@@ -229,7 +236,7 @@ class MessageSerializer(serializers.ModelSerializer):
             forward_from_chat = forward_from_chat.save()
             validated_data['forward_from_chat'] = forward_from_chat 
         if via_bot_data:
-            via_bot = AndruserSerializer(data=via_bot_data)
+            via_bot = AndruserSerializer(data=via_bot_data, context={'validated_data': via_bot_data})
             via_bot_is_valid = via_bot.is_valid()
             via_bot = via_bot.save()
             validated_data['via_bot'] = via_bot  
@@ -318,12 +325,12 @@ class MessageSerializer(serializers.ModelSerializer):
             location = location.save()
             validated_data['location'] = location 
         if new_chat_members_data:
-            new_chat_members = AndruserSerializer(data=new_chat_members_data)
+            new_chat_members = AndruserSerializer(data=new_chat_members_data, many=True, context={'validated_data': new_chat_members_data})
             new_chat_members_is_valid = new_chat_members.is_valid()
             new_chat_members = new_chat_members.save()
             validated_data['new_chat_members'] = new_chat_members 
         if left_chat_member_data:
-            left_chat_member = AndruserSerializer(data=left_chat_member_data)
+            left_chat_member = AndruserSerializer(data=left_chat_member_data, context={'validated_data': left_chat_member_data})
             left_chat_member_is_valid = left_chat_member.is_valid()
             left_chat_member = left_chat_member.save()
             validated_data['left_chat_member'] = left_chat_member 

@@ -12,7 +12,8 @@ from andr_omeda.andr_update.views.poll.serializers import PollSerializer
 from andr_omeda.andr_update.views.pollanswer.serializers import PollAnswerSerializer
 from andr_omeda.andr_update.views.chatmemberupdated.serializers import ChatMemberUpdatedSerializer
 from andr_omeda.andr_update.models import Update, Andrid, Message, InlineQuery, \
-    ChosenInlineResult, CallbackQuery, ShippingQuery, PreCheckoutQuery, Poll, ChatMemberUpdated
+    ChosenInlineResult, CallbackQuery, ShippingQuery, PreCheckoutQuery, Poll, ChatMemberUpdated, \
+        Chat
 import json
 
 
@@ -66,7 +67,7 @@ class UpdateSerializer(serializers.ModelSerializer):
         if message_data:
             message_data['chat']['chat_id'] = message_data['chat']['id']
             del message_data['chat']['id']
-            message = MessageSerializer(data=message_data)
+            message = MessageSerializer(data=message_data, context={'validated_data': message_data})
             message_is_valid = message.is_valid(raise_exception=True)
             
             message = message.save()
@@ -141,7 +142,14 @@ class UpdateSerializer(serializers.ModelSerializer):
             my_chat_member_data['chat']['chat_id'] = my_chat_member_data['chat']['id']
             del my_chat_member_data['chat']['id']
 
-            my_chat_member = ChatMemberUpdatedSerializer(data=my_chat_member_data, context={'validated_data': my_chat_member_data})
+            chat = Chat.get_chat_with_id(chat_id=my_chat_member_data['chat'].get('chat_id', None))
+            if chat:
+                my_chat_member_data.pop('chat')
+                context = {'validated_data': my_chat_member_data, 'chat': chat.chat_id}
+            else:
+                context = {'validated_data': my_chat_member_data}
+
+            my_chat_member = ChatMemberUpdatedSerializer(data=my_chat_member_data, context=context)
             my_chat_member_is_valid = my_chat_member.is_valid()
             my_chat_member = my_chat_member.save()
 

@@ -9,7 +9,7 @@ class ChatMemberUpdatedSerializer(serializers.ModelSerializer):
     old_chat_member = ChatMemberSerializer()
     new_chat_member = ChatMemberSerializer()
     invite_link = ChatInviteLinkSerializer(required=False)
-    chat = ChatSerializer()
+    chat = ChatSerializer(required=False)
     from_user = AndruserSerializer(required=False)
     class Meta:
         model = ChatMemberUpdated
@@ -17,8 +17,16 @@ class ChatMemberUpdatedSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data = self.context['validated_data']
+        if self.context.get('chat', None):
+            validated_data['chat'] = Chat.get_chat_with_id(chat_id=self.context['chat'])
+        else:
+            chat = ChatSerializer(data=chat_data)
+            chat_is_valid = chat.is_valid()
+            chat = chat.save()
+            validated_data['chat'] = chat
+
+        
         from_user_data = validated_data.pop('from_user', None)
-        chat_data = validated_data.pop('chat', None)
         old_chat_member_data = validated_data.pop('old_chat_member', None)
         new_chat_member_data = validated_data.pop('new_chat_member', None)
         invite_link_data =  validated_data.pop('invite_link_data', None)
@@ -31,14 +39,7 @@ class ChatMemberUpdatedSerializer(serializers.ModelSerializer):
             user = user.save()
             validated_data['from_user'] = user
         
-        if Chat.chat_with_id_exists(chat_id=chat_data.get('chat_id')):
-            chat = Chat.objects.get(pk=chat_data.get('chat_id'))
-            validated_data['chat'] = chat
-        else:
-            chat = ChatSerializer(data=chat_data)
-            chat_is_valid = chat.is_valid()
-            chat = chat.save()
-            validated_data['chat'] = chat
+        
 
         if old_chat_member_data:
             old_chat_member = ChatMemberSerializer(data=old_chat_member_data, context={'validated_data':old_chat_member_data})
@@ -58,7 +59,7 @@ class ChatMemberUpdatedSerializer(serializers.ModelSerializer):
             invite_link_is_valid = invite_link.is_valid()
             invite_link = invite_link.save()
             validated_data['invite_link'] = invite_link
-        
+            
         chat_member_updated = ChatMemberUpdated.objects.create(**validated_data)
         if old_chat_member_data:
             old_chat_member.old_member = chat_member_updated

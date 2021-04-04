@@ -76,6 +76,10 @@ class AndruserSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
+        if validated_data.get('id', None):
+            validated_data['user_id'] = validated_data['id']
+            del validated_data['id']
+            
         if Andruser.user_with_id_exists(validated_data.get('user_id')):
             user = Andruser.objects.get(pk=validated_data.get('user_id'))
         else:
