@@ -51,6 +51,7 @@ class Andruser(models.Model):
         null=True
     )
 
+
     user_id = models.BigIntegerField(_("user_id"), blank=False, primary_key=True)
     is_bot = models.BooleanField(_("is_bot"), blank=False)
     first_name = models.TextField(_("first_name"), blank=False)
@@ -71,12 +72,32 @@ class Andruser(models.Model):
 
     @classmethod
     def user_with_id_exists(cls, user_id):
-        return cls.objects.filter(pk=user_id).exists()
+        return cls.objects.filter(user_id=user_id).exists()
 
     @classmethod
     def get_user_with_id(cls, user_id):
         if cls.user_with_id_exists(user_id):
-            return cls.objects.get(pk=user_id)
+            return cls.objects.get(user_id=user_id)
 
     def __str__(self):
-        return "User with id:%i" % self.id
+        return "User with id:%i" % self.user_id
+
+    @classmethod
+    def context_user_unicity_check_for_field_and_context(cls, data, field='', context=None, prefix=''):
+        if not context:
+            raise Exception("context not provided")
+        if not data.get(field, None):
+            return context
+        _id = data[field].get('user_id', None)
+        if not _id:
+            raise Exception("KeyError something wrong with user_id")
+        user = cls.get_user_with_id(user_id=_id)
+        if user:
+            data.pop(field)
+            #data[field] = {'chat_id': 1000000000, 'first_name': 'Iheb', 'last_name': 'Ben Said', 'type': 'private'}
+            context['validated_data'] = data
+            context['unicity'][prefix + '__' + field] = user.user_id
+        else:
+            pass
+        
+        return context 

@@ -18,7 +18,7 @@ class Message(models.Model):
     # TODO [WORKAROUND20032208] for the present time just get pinned_message
     # of Chat model as JSON field.
 
-    reply_to_message = models.OneToOneField(
+    reply_to_message = models.ForeignKey(
         "self",
         on_delete=models.DO_NOTHING,
         related_name="+",
@@ -43,7 +43,8 @@ class Message(models.Model):
         "Chat",
         on_delete=models.RESTRICT,
         related_name="message",
-        blank=False
+        null=True,
+        blank=True
     )
     sender_chat = models.ForeignKey(
         "Chat",
@@ -66,6 +67,8 @@ class Message(models.Model):
         null=True,
         blank=True
     )
+
+    
 
     date = models.IntegerField(_("date"), blank=False)
     forward_from_message_id = models.IntegerField(_("forward_from_message_id"), blank=True, null=True)
@@ -102,7 +105,16 @@ class Message(models.Model):
     def get_message_for_message_id_and_chat_id(cls, message_id=None, chat_id=None):
         if not message_id or not chat_id:
             return None
-        if cls.objects.filter(chat__chat_id=chat_id).filter(chat__message__id=message_id).exists():
-            return cls.objects.filter(chat__chat_id=chat_id).filter(chat__message__id=message_id)[:1].get()
+
+        if cls.objects.filter(chat__chat_id=chat_id).filter(message_id=message_id).exists():
+            return cls.objects.filter(chat__chat_id=chat_id).filter(message_id=message_id)[:1].get()
         else:
             return None
+
+    @classmethod 
+    def get_message_with_id_attrs(cls):
+        return [['chat', 'sender_chat', 'forward_from_chat'], \
+            ['from', 'forward_from', 'via_bot', 'left_chat_member', 'user']]
+    
+    def __str__(self):
+        return "Message with Id : %i in chat with id : %i" % (self.id , self.chat.chat_id)

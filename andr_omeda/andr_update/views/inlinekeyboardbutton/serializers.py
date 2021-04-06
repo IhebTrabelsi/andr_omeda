@@ -17,12 +17,12 @@ class InlineKeyboardButtonSerializer(serializers.ModelSerializer):
         
         if login_url_data:
             login_url = LoginUrlSerializer(data=login_url_data)
-            login_url_is_valid = login_url.is_valid()
+            login_url_is_valid = login_url.is_valid(raise_exception=True)
             login_url = login_url.save()
             validated_data['login_url'] = login_url
         if callback_game_data:
             callback_game = CallbackGameSerializer(data=login_url_data)
-            callback_game_is_valid = callback_game.is_valid()
+            callback_game_is_valid = callback_game.is_valid(raise_exception=True)
             callback_game = callback_game.save()
             validated_data['callback_game'] = callback_game
 

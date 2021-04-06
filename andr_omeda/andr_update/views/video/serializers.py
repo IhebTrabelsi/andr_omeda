@@ -14,7 +14,7 @@ class VideoSerializer(serializers.ModelSerializer):
         
         if thumb_data:
             thumb = PhotoSizeSerializer(data=thumb_data)
-            thumb_is_valid = thumb.is_valid()
+            thumb_is_valid = thumb.is_valid(raise_exception=True)
             thumb = thumb.save()
             validated_data['thumb'] = thumb
         

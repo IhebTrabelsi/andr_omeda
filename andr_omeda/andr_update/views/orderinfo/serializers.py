@@ -14,7 +14,7 @@ class OrderInfoSerializer(serializers.ModelSerializer):
         
         if shipping_address_data:
             shipping_address = ShippingAddressSerializer(data=shipping_address_data)
-            shipping_address_is_valid = shipping_address.is_valid()
+            shipping_address_is_valid = shipping_address.is_valid(raise_exception=True)
             shipping_address = shipping_address.save()
             validated_data['shipping_address'] = shipping_address
         

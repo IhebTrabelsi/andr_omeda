@@ -12,7 +12,7 @@ class PreCheckoutQuerySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        user_data = validated_data.pop('from')
+        user_data = validated_data.pop('from', None)
         order_info_data = validated_data.pop('order_info', None)
         
         if Andruser.user_with_id_exists(user_id=user_data.get('id')):
@@ -20,14 +20,14 @@ class PreCheckoutQuerySerializer(serializers.ModelSerializer):
             validated_data['from_user'] = user
         else:
             user = AndruserSerializer(data=user_data)
-            user_is_valid = user.is_valid()
+            user_is_valid = user.is_valid(raise_exception=True)
             user = user.save()
             validated_data['from_user'] = user
 
         if order_info_data:
             order_info_ser = self.fields['order_info']
             order_info = OrderInfoSerializer(data=order_info_data)
-            order_info_is_valid = order_info.is_valid()
+            order_info_is_valid = order_info.is_valid(raise_exception=True)
             order_info = order_info.save()
             validated_data['order_info'] = order_info
 

@@ -50,3 +50,57 @@ class Chat(models.Model):
             return cls.objects.get(pk=chat_id)
         else:
             return None
+    
+    @classmethod
+    def context_chat_unicity_check(cls, data):
+        if not data.get('chat', None):
+            raise Exception("KeyError chat not present in data")
+        _id = data['chat'].get('chat_id', None)
+        if not _id:
+            raise Exception("KeyError something wrong with chat_id")
+        chat = cls.get_chat_with_id(chat_id=_id)
+        if chat:
+            data.pop('chat', None)
+            context = {'validated_data': data, 'chat': chat.chat_id}
+        else:
+            context = {'validated_data': data}
+        
+        return context
+
+    @classmethod
+    def context_chat_unicity_check_for_field(cls, data, field=''):
+        if not data.get(field, None):
+            raise Exception("KeyError chat not present in data")
+        _id = data[field].get('chat_id', None)
+        if not _id:
+            raise Exception("KeyError something wrong with chat_id")
+        chat = cls.get_chat_with_id(chat_id=_id)
+        if chat:
+            data.pop(field)
+            context = {'validated_data': data, 'chat': chat.chat_id}
+        else:
+            context = {'validated_data': data}
+        
+        return context
+
+    @classmethod
+    def context_chat_unicity_check_for_field_and_context(cls, data, field='', context=None, prefix=''):
+        if not context:
+            raise Exception("context not provided")
+        if not data.get(field, None):
+            return context
+        _id = data[field].get('chat_id', None)
+        if not _id:
+            raise Exception("KeyError something wrong with chat_id")
+        chat = cls.get_chat_with_id(chat_id=_id)
+        if chat:
+            data.pop(field)
+            #data[field] = {'chat_id': 1000000000, 'first_name': 'Iheb', 'last_name': 'Ben Said', 'type': 'private'}
+            context['validated_data'] = data
+            context['unicity'][prefix + '__' + field] = chat.chat_id
+        else:
+            pass
+        
+        return context 
+    
+    

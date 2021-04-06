@@ -11,14 +11,12 @@ class ChatMemberSerializer(serializers.ModelSerializer):
         validated_data= self.context['validated_data']
         user_data = validated_data.pop('user', None)
         if user_data:
-            user_data['user_id'] = user_data['id']
-            del user_data['id']
             if Andruser.user_with_id_exists(user_id=user_data.get('user_id')):
                 user = Andruser.objects.get(pk=user_data.get('user_id'))
                 validated_data['user'] = user
             else:
                 user = AndruserSerializer(data=user_data)
-                user_is_valid = user.is_valid()
+                user_is_valid = user.is_valid(raise_exception=True)
                 user = user.save()
                 validated_data['user'] = user
         chat_member = ChatMember(**validated_data)

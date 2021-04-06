@@ -21,12 +21,12 @@ class CallbackQuerySerializer(serializers.ModelSerializer):
             validated_data['callback_query_from'] = user
         else:
             user = AndruserSerializer(data=user_data)
-            user_is_valid = user.is_valid()
+            user_is_valid = user.is_valid(raise_exception=True)
             user = user.save()
             validated_data['callback_query_from'] = user
         if message_data:
             message = MessageSerializer(data=message_data)
-            message_is_valid = message.is_valid()
+            message_is_valid = message.is_valid(raise_exception=True)
             message = message.save()
             validated_data['message'] = message
         

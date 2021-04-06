@@ -18,7 +18,7 @@ class MessageEntitySerializer(serializers.ModelSerializer):
                 user = Andruser.objects.get(pk=validated_data.pop('user').get('id'))
             else:
                 user = AndruserSerializer(data=validated_data.pop('user'))
-                user_is_valid = user.is_valid()
+                user_is_valid = user.is_valid(raise_exception=True)
                 user = user.save()
             message_entity.user = user 
         return message_entity.save()

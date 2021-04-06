@@ -17,7 +17,7 @@ class PollAnswerSerializer(serializers.ModelSerializer):
             validated_data['user'] = user
         else:
             user = AndruserSerializer(data=user_data)
-            user_is_valid = user.is_valid()
+            user_is_valid = user.is_valid(raise_exception=True)
             user = user.save()
             validated_data['user'] = user
         

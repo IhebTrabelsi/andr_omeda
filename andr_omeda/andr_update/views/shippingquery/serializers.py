@@ -21,13 +21,13 @@ class ShippingQuerySerializer(serializers.ModelSerializer):
             validated_data['shipping_query_from'] = user
         else:
             user = AndruserSerializer(data=shipping_query_from_data)
-            user_is_valid = user.is_valid()
+            user_is_valid = user.is_valid(raise_exception=True)
             user = user.save()
             validated_data['shipping_query_from'] = user
 
         if shipping_address_data:
             shipping_address = ShippingAddressSerializer(data=shipping_address_data)
-            shipping_address_is_valid = shipping_address.is_valid()
+            shipping_address_is_valid = shipping_address.is_valid(raise_exception=True)
             shipping_address = shipping_address.save()
             validated_data['shipping_address'] = shipping_address
 

@@ -20,13 +20,13 @@ class ChosenInlineResultSerializer(serializers.ModelSerializer):
             validated_data['from'] = user
         else:
             user = AndruserSerializer(data=from_user_data)
-            user_is_valid = user.is_valid()
+            user_is_valid = user.is_valid(raise_exception=True)
             user = user.save()
             validated_data['from'] = user
 
         if location_data:
             location = LocationSerializer(data=location_data)
-            location_is_valid = location.is_valid()
+            location_is_valid = location.is_valid(raise_exception=True)
             location = location.save()
             validated_data['location'] = location
         chosen_inline_result = ChosenInlineResult(**validated_data)

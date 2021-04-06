@@ -15,7 +15,7 @@ class AudioSerializer(serializers.ModelSerializer):
         if thumb_data:
             thumb_ser = self.fields['thumb']
             thumb = PhotoSizeSerializer()(**thumb_data)
-            thumb_is_valid = thumb.is_valid()
+            thumb_is_valid = thumb.is_valid(raise_exception=True)
             thumb = thumb.save()
             audio.thumb = thumb
         

@@ -39,9 +39,8 @@ class UpdateSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        request = self.context['request']
-        validated_data = request.data
-        
+        validated_data = self.context['validated_data']
+        _unicity = self.context['unicity']
         update_id_data = validated_data.pop('update_id', None)
         message_data = validated_data.pop('message', None)
         edited_message_data = validated_data.pop('edited_message', None)
@@ -65,98 +64,92 @@ class UpdateSerializer(serializers.ModelSerializer):
             validated_data['update_id'] = update_id
 
         if message_data:
-            message_data['chat']['chat_id'] = message_data['chat']['id']
-            del message_data['chat']['id']
-            message = MessageSerializer(data=message_data, context={'validated_data': message_data})
+            context = {'validated_data': message_data, 'unicity': _unicity, 'unicity_prefix': 'message'}
+            if self.context.get('message__reply_to_message', None):
+                context['message__reply_to_message'] = self.context.get('message__reply_to_message')
+            message = MessageSerializer(data=message_data, context=context)
             message_is_valid = message.is_valid(raise_exception=True)
-            
             message = message.save()
-            
             validated_data['message'] = message
         
         if  edited_message_data != None:
-            edited_message = MessageSerializer(data=edited_message_data)
-            edited_message_is_valid = edited_message.is_valid()
+            context = {'validated_data': edited_message_data, 'unicity': _unicity, 'unicity_prefix': 'edited_message'}
+            if self.context.get('edited_message__reply_to_message', None):
+                context['edited_message__reply_to_message'] = self.context.get('edited_message__reply_to_message')
+            edited_message = MessageSerializer(data=edited_message_data, context=context)
+            edited_message_is_valid = edited_message.is_valid(raise_exception=True)
             edited_message = edited_message.save()
             validated_data['edited_message'] = edited_message
 
         if  channel_post_data != None:
-            channel_post = MessageSerializer(data=channel_post_data)
-            channel_post_is_valid = channel_post.is_valid()
+            context = {'validated_data': channel_post_data, 'unicity': _unicity, 'unicity_prefix': 'channel_post'}
+            if self.context.get('channel_post__reply_to_message', None):
+                context['channel_post__reply_to_message'] = self.context.get('channel_post__reply_to_message')
+            channel_post = MessageSerializer(data=channel_post_data, context=context)
+            channel_post_is_valid = channel_post.is_valid(raise_exception=True)
             channel_post = channel_post.save()
             validated_data['channel_post'] = channel_post
 
         if  edited_channel_post_data != None:
-            edited_channel_post = MessageSerializer(data=edited_channel_post_data)
-            edited_channel_post_is_valid = edited_channel_post.is_valid()
+            context = {'validated_data': edited_channel_post_data, 'unicity': _unicity, 'unicity_prefix': 'edited_channel_post'}
+            if self.context.get('edited_channel_post__reply_to_message', None):
+                context['edited_channel_post__reply_to_message'] = self.context.get('edited_channel_post__reply_to_message')
+            edited_channel_post = MessageSerializer(data=edited_channel_post_data, context=context)
+            edited_channel_post_is_valid = edited_channel_post.is_valid(raise_exception=True)
             edited_channel_post = edited_channel_post.save()
             validated_data['edited_channel_post'] = edited_channel_post
 
         if  inline_query_data != None:
             inline_query = InlineQuerySerializer(data=inline_query_data)
-            inline_query_is_valid = inline_query.is_valid()
+            inline_query_is_valid = inline_query.is_valid(raise_exception=True)
             inline_query = inline_query.save()
             validated_data['inline_query'] = inline_query
 
         if  chosen_inline_result_data != None:
             chosen_inline_result = ChosenInlineResultSerializer(data=chosen_inline_result_data)
-            chosen_inline_result_is_valid = chosen_inline_result.is_valid()
+            chosen_inline_result_is_valid = chosen_inline_result.is_valid(raise_exception=True)
             chosen_inline_result = chosen_inline_result.save()
             validated_data['chosen_inline_result'] = chosen_inline_result
 
         if  callback_query_data != None:
             callback_query = CallbackQuerySerializer(data=callback_query_data)
-            callback_query_is_valid = callback_query.is_valid()
+            callback_query_is_valid = callback_query.is_valid(raise_exception=True)
             callback_query = callback_query.save()
             validated_data['callback_query'] = callback_query
 
         if  shipping_query_data != None:
             shipping_query = ShippingQuerySerializer(data=shipping_query_data)
-            shipping_query_is_valid = shipping_query.is_valid()
+            shipping_query_is_valid = shipping_query.is_valid(raise_exception=True)
             shipping_query = shipping_query.save()
             validated_data['shipping_query'] = shipping_query
 
         if  pre_checkout_query_data != None:
             pre_checkout_query = PreCheckoutQuerySerializer(data=pre_checkout_query_data)
-            pre_checkout_query_is_valid = pre_checkout_query.is_valid()
+            pre_checkout_query_is_valid = pre_checkout_query.is_valid(raise_exception=True)
             pre_checkout_query = pre_checkout_query.save()
             validated_data['pre_checkout_query'] = pre_checkout_query
 
         if  poll_data != None:
             poll = PollSerializer(data=poll_data)
-            poll_is_valid = poll.is_valid()
+            poll_is_valid = poll.is_valid(raise_exception=True)
             poll = poll.save()
             validated_data['poll'] = poll
 
         if  poll_answer_data != None:
             poll_answer = PollAnswerSerializer(data=poll_answer_data)
-            poll_answer_is_valid = poll_answer.is_valid()
+            poll_answer_is_valid = poll_answer.is_valid(raise_exception=True)
             poll_answer = poll_answer.save()
             validated_data['poll_answer'] = poll_answer
 
         if  my_chat_member_data != None:
-            my_chat_member_data['from_user'] = my_chat_member_data['from']
-            del my_chat_member_data['from']
-            my_chat_member_data['from_user']['user_id'] = my_chat_member_data['from_user']['id']
-            del my_chat_member_data['from_user']['id']
-            my_chat_member_data['chat']['chat_id'] = my_chat_member_data['chat']['id']
-            del my_chat_member_data['chat']['id']
-
-            chat = Chat.get_chat_with_id(chat_id=my_chat_member_data['chat'].get('chat_id', None))
-            if chat:
-                my_chat_member_data.pop('chat')
-                context = {'validated_data': my_chat_member_data, 'chat': chat.chat_id}
-            else:
-                context = {'validated_data': my_chat_member_data}
-
+            context = {'validated_data': my_chat_member_data, 'unicity': _unicity, 'unicity_prefix': 'my_chat_member'}
             my_chat_member = ChatMemberUpdatedSerializer(data=my_chat_member_data, context=context)
-            my_chat_member_is_valid = my_chat_member.is_valid()
+            my_chat_member_is_valid = my_chat_member.is_valid(raise_exception=True)
             my_chat_member = my_chat_member.save()
 
         if  chat_member_data != None:
-            
             chat_member = ChatMemberUpdatedSerializer(data=chat_member_data)
-            chat_member_is_valid = chat_member.is_valid()
+            chat_member_is_valid = chat_member.is_valid(raise_exception=True)
             chat_member = chat_member.save()
             validated_data['chat_member'] = chat_member
 

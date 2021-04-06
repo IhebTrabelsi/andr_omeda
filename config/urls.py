@@ -6,7 +6,7 @@ from django.urls import include, path
 from django.views import defaults as default_views
 from django.views.generic import TemplateView
 from rest_framework.authtoken.views import obtain_auth_token
-from andr_omeda.andr_update.views.update.views import UpdateViewSet, TutorialBotView
+from andr_omeda.andr_update.views.update.views import TutorialBotView
 from django.views.decorators.csrf import csrf_exempt
 
 urlpatterns = [
