@@ -11,6 +11,8 @@ from django.http import JsonResponse
 from django.views import View
 from andr_omeda.andr_update.utils import unicity_sanitize
 
+from andr_omeda.utils.colorify import colorify
+
 
 
 class TutorialBotView(APIView):
@@ -19,10 +21,14 @@ class TutorialBotView(APIView):
         update_id = request.data.pop('update_id', None)
         request.data['update_id'] = {'_id': update_id}
         
+        colorify('\n\n' + '='*100 + '\n\n' , fore='RED', back='RED')
+        colorify(request.data, fore='GREEN', back='WHITE', highlight="START !")
         
-        _context = unicity_sanitize(data=request.data, context=None)
 
+        _context = unicity_sanitize(req_data=request.data)
 
+        colorify(_context, fore='BLACK', back='YELLOW', highlight="UPDATE CONTEXT !")
+        colorify('\n\n' + '='*100 + '\n\n' , fore='RED', back='RED')
         serializer = UpdateSerializer(data=request.data, context=_context)
         
         serializer_is_valid = serializer.is_valid(raise_exception=False)

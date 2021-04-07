@@ -84,23 +84,27 @@ class Chat(models.Model):
         return context
 
     @classmethod
-    def context_chat_unicity_check_for_field_and_context(cls, data, field='', context=None, prefix=''):
-        if not context:
-            raise Exception("context not provided")
+    def context_chat_unicity_check_for_field_and_context(cls, data, unicity, field='', prefix=''):
+        """
+        data: message => {..., 'chat': {'chat_id':10000, ...}}
+        field: 'chat'
+        prefix: message
+        """
         if not data.get(field, None):
-            return context
-        _id = data[field].get('chat_id', None)
+            return unicity
+
+        _id = data[field].get('id', None)
         if not _id:
             raise Exception("KeyError something wrong with chat_id")
+        
         chat = cls.get_chat_with_id(chat_id=_id)
         if chat:
-            data.pop(field)
-            #data[field] = {'chat_id': 1000000000, 'first_name': 'Iheb', 'last_name': 'Ben Said', 'type': 'private'}
-            context['validated_data'] = data
-            context['unicity'][prefix + '__' + field] = chat.chat_id
+            del data[field]
+            unicity[prefix + '__' + field] = chat.chat_id
         else:
-            pass
+            data[field]['chat_id'] = data[field]['id']
+            del data[field]['id']
         
-        return context 
+        return unicity
     
     

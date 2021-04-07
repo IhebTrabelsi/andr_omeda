@@ -27,16 +27,54 @@ def id_key_sanitize_for_value(data , telegramIdKey, \
 
 
 
-def unicity_sanitize(data=None, context=None):
+
+##################################################################################
+##################################################################################
+##################################################################################
+def unicity_sanitize(req_data=None):
+    """
+    req_data: {'message':{'message_id':123456, ...}, '_id':123456789}
+    """
+    
+    this__unicity = {}
+    #TODO remove trimming in get_need_sanitize_attrs()
+    for update_attr in Update.get_need_sanitize_attrs()[:3]:
+        if not req_data.get(update_attr, None):
+            continue 
+        
+        for group in Message.get_message_with_id_attrs():
+            for id_able in group:
+                if 'chat' in group:
+                    this__unicity = Chat.context_chat_unicity_check_for_field_and_context(
+                        req_data[update_attr],
+                        this__unicity,
+                        id_able,
+                        update_attr
+                    )
+                if 'user' in group:
+                    this__unicity = Andruser.context_user_unicity_check_for_field_and_context(
+                        req_data[update_attr],
+                        this__unicity,
+                        id_able,
+                        update_attr
+                    )
+    this__context = {'validated_data': req_data, 'unicity': this__unicity}
+    return this__context
+    
+
+##################################################################################
+##################################################################################
+##################################################################################
+"""def unicity_sanitize(data=None, context=None):
     if not data:
         raise Exception("data/context must be provided")
     if context:
-        this__context={'validated_data': context['validated_data'], 'unicity': context['unicity']}
+        this__context = context
     else:
         this__context={'validated_data': data, 'unicity': {}}
     for attr_name in Update.get_need_sanitize_attrs():
         
-        colorify(attr_name)
+        #colorify(attr_name, fore='RED', back='YELLOW', highlight="ATTR_NAME")
 
         if isinstance(attr_name, tuple):
             tmp_data = data 
@@ -46,6 +84,9 @@ def unicity_sanitize(data=None, context=None):
                 continue 
             else:
                 attr_json_data = data.get(attr_name[1], None)
+                this__sub_context = {
+                    'validated_data': '',
+                    'unicity': {}}
             if not attr_json_data:
                 continue
              
@@ -55,10 +96,10 @@ def unicity_sanitize(data=None, context=None):
                         if 'chat' in group:
                             attr_json_data[attr]['chat_id'] = attr_json_data[attr]['id']
                             del attr_json_data[attr]['id']
-                            this__context = Chat.context_chat_unicity_check_for_field_and_context(
+                            this__sub_context = Chat.context_chat_unicity_check_for_field_and_context(
                                 attr_json_data,
                                 attr,
-                                this__context,
+                                this__sub_context,
                                 attr_name[1]
                             )
                         elif 'from' in group:
@@ -67,17 +108,20 @@ def unicity_sanitize(data=None, context=None):
                             if attr == 'from':
                                 attr_json_data['from_user'] = attr_json_data['from']
                                 del attr_json_data['from']
-                            this__context = Andruser.context_user_unicity_check_for_field_and_context(
+                            this__sub_context = Andruser.context_user_unicity_check_for_field_and_context(
                                 attr_json_data,
                                 attr,
-                                this__context,
+                                this__sub_context,
                                 attr_name[1]
                             )
                             
                         else:
                             raise Exception("message attributes group not recognized ! ")
-            tmp_data[attr_name[0]][attr_name[1]] = attr_json_data
-            this__context['validated_data'] = tmp_data
+            
+            this__context['validated_data'][attr_name[0]] = \
+                this__sub_context['validated_data']
+            
+            this__context['unicity'].append(this__sub_context['unicity'])
             data = tmp_data
             continue
             
@@ -107,6 +151,7 @@ def unicity_sanitize(data=None, context=None):
             for attr in group:
                 if attr_json_data.get(attr, None):
                     if 'chat' in group:
+                        # 'id' alwas present in Chat models, hence direct access
                         attr_json_data[attr]['chat_id'] = attr_json_data[attr]['id']
                         del attr_json_data[attr]['id']
                         this__context = Chat.context_chat_unicity_check_for_field_and_context(
@@ -116,6 +161,7 @@ def unicity_sanitize(data=None, context=None):
                             attr_name
                         )
                     elif 'from' in group:
+                        # 'id' alwas present in User models, hence direct access
                         attr_json_data[attr]['user_id'] = attr_json_data[attr]['id']
                         del attr_json_data[attr]['id']
                         if attr == 'from':
@@ -128,11 +174,9 @@ def unicity_sanitize(data=None, context=None):
                             attr_name
                         )
                     else:
-                        raise Exception("message attributes group not recognized ! ")
-        data[attr_name] = attr_json_data
-        this__context['validated_data'] = data
-    return this__context
-
+                        raise Exception("message attributes group not recognized ! ")"""
+        
+   
 
 """if attr_json_data.get('new_chat_members', None):
         new_chat_members = []

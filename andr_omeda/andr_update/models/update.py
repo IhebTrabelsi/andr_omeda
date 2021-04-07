@@ -47,18 +47,18 @@ class Update(models.Model):
             return "Update with pgId: %i" % self.id
 
     @classmethod 
-    def get_need_sanitize_attrs_rec(cls):
-        return ['message', 'edited_message', 'channel_post', \
+    def get_need_sanitize_attrs(cls):
+        return ['message', 'edited_message', 'channel_post', 'edited_channel_post'\
             'my_chat_member', ('my_chat_member', 'old_chat_member'), \
             ('my_chat_member', 'new_chat_member')]
     
-    @classmethod
+    """@classmethod
     def get_need_sanitize_attrs(cls):
-        attrs_list = cls.get_need_sanitize_attrs_rec()
+        attrs_list = cls.get_need_sanitize_attrs()
         for m in attrs_list[:3]:
             attrs_list.append((m, 'reply_to_message'))
             attrs_list.append((m, 'pinned_message'))
-        return attrs_list
+        return attrs_list"""
 
     """def save(self, *args, **kwargs):
         if self.edited_message:

@@ -83,21 +83,25 @@ class Andruser(models.Model):
         return "User with id:%i" % self.user_id
 
     @classmethod
-    def context_user_unicity_check_for_field_and_context(cls, data, field='', context=None, prefix=''):
-        if not context:
-            raise Exception("context not provided")
+    def context_user_unicity_check_for_field_and_context(cls, data, unicity, field='', prefix=''):
+        """
+        data: message => {..., 'user': {'user_id':10000, ...}}
+        field: 'user'
+        prefix: message
+        """
         if not data.get(field, None):
-            return context
-        _id = data[field].get('user_id', None)
+            return unicity
+
+        _id = data[field].get('id', None)
         if not _id:
             raise Exception("KeyError something wrong with user_id")
+        
         user = cls.get_user_with_id(user_id=_id)
         if user:
-            data.pop(field)
-            #data[field] = {'chat_id': 1000000000, 'first_name': 'Iheb', 'last_name': 'Ben Said', 'type': 'private'}
-            context['validated_data'] = data
-            context['unicity'][prefix + '__' + field] = user.user_id
+            del data[field]
+            unicity[prefix + '__' + field] = user.user_id
         else:
-            pass
+            data[field]['user_id'] = data[field]['id']
+            del data[field]['id']
         
-        return context 
+        return unicity
