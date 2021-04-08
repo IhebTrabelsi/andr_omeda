@@ -7,6 +7,13 @@ from django.utils import timezone
 
 
 class Message(models.Model):
+    from_user = models.ForeignKey(
+        "Andruser",
+        related_name="messages",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True
+    )
     message_id = models.IntegerField(_("message_id"), blank=False)
     """
     this_pinned_message_chat = models.OneToOneField(
@@ -114,7 +121,7 @@ class Message(models.Model):
     @classmethod 
     def get_message_with_id_attrs(cls):
         return [['chat', 'sender_chat', 'forward_from_chat'], \
-            ['from', 'forward_from', 'via_bot', 'left_chat_member', 'user']]
+            ['from', 'from_user', 'forward_from', 'via_bot', 'left_chat_member', 'user']]
     
     def __str__(self):
         return "Message with Id : %i in chat with id : %i" % (self.id , self.chat.chat_id)

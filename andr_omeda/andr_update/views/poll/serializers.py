@@ -5,26 +5,52 @@ from andr_omeda.andr_update.views.polloption.serializers import PollOptionSerial
 from andr_omeda.andr_update.views.messageentity.serializers import MessageEntitySerializer
 
 class PollSerializer(serializers.ModelSerializer):
-    options = PollOptionSerializer(many=True)
-    explanation_entities = MessageEntitySerializer()
+    options = serializers.ListField(
+        child=PollOptionSerializer(),
+        required=False,
+        allow_empty=True 
+    )
+    explanation_entities = serializers.ListField(
+        child=MessageEntitySerializer(),
+        required=False, 
+        allow_empty=True
+    )
+
     class Meta:
         model = Poll
         fields = '__all__'
     
     def create(self, validated_data):
+        validated_data = self.context['validated_data']
+        _lists = self.context['lists']
+
         options_data = validated_data.pop('options', None)
         explanation_entities_data = validated_data.pop('explanation_entities', None)
         
-        if options_data:
-            options = PollOptionSerializer(data=options_data)
-            options_is_valid = options.is_valid(raise_exception=True)
-            options = options.save()
-            validated_data['options'] = options
-        if explanation_entities_data:
-            explanation_entities = MessageEntitySerializer(data=data_data)
-            explanation_entities_is_valid = explanation_entities.is_valid(raise_exception=True)
-            explanation_entities = explanation_entities.save()
-            validated_data['explanation_entities'] = explanation_entities
-
-        poll = Poll(**validated_data)
-        return poll.save()
+        
+        poll = Poll.objects.create(**validated_data)
+        
+        if _lists.get('poll__options', None):
+            for poll__option in _lists['poll__options']:
+                option = PollOptionSerializer(data=poll__option)
+                option_is_valid = option.is_valid()
+                print("/////////////////////////////////////////////////////////////////")
+                print(poll)
+                print(option_is_valid)
+                print(option.errors)
+                print("/////////////////////////////////////////////////////////////////")
+                option.save()
+                option.poll = poll
+                option.save()
+        print("-------------->")
+        print(option.poll)
+        print("<--------------")
+        if _lists.get('poll__explanation_entities', None):
+            for poll__explanation_entity in _lists['poll__explanation_entities']:
+                explanation_entity = MessageEntitySerializer(data=poll__explanation_entity)
+                explanation_entity_is_valid = explanation_entity.is_valid()
+                explanation_entity.save()
+                explanation_entity.poll = poll 
+                explanation_entity.save()
+        
+        return poll

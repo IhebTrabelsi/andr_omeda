@@ -55,7 +55,7 @@ class ChatSerializer(serializers.ModelSerializer):
         model = Chat
         fields = '__all__'
         extra_kwargs = {
-            'message_from': {'validators': []},
+            'from_user': {'validators': []},
             'forward_from': {'validators': []},
             'via_bot': {'validators': []},
             'left_chat_member': {'validators': []},
@@ -76,7 +76,6 @@ class ChatSerializer(serializers.ModelSerializer):
         loc_ser = self.fields['location']
         perm_ser = self.fields['permissions']
         photo_ser = self.fields['photo']
-        pinned_message_ser = self.fields['pinned_message']
 
         if validated_data.get('location'):
             loc = ChatLocationSerializer(data=validated_data.pop('location', None))
@@ -105,10 +104,8 @@ class ChatSerializer(serializers.ModelSerializer):
         return value
 
 class MessageSerializer(serializers.ModelSerializer):
-    message_from = AndruserSerializer(required=False)
     forward_from = AndruserSerializer(required=False)
     via_bot = AndruserSerializer(required=False)
-    user = AndruserSerializer(required=False)
     chat = ChatSerializer(required=False)
     sender_chat = ChatSerializer(required=False)
     forward_from_chat = ChatSerializer(required=False)
@@ -142,7 +139,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = '__all__'
+        exclude = ['from_user', ]
         extra_kwargs = {
             'user_id': {'validators': []},
             'reply_to_message': {'validators': []},
@@ -160,8 +157,14 @@ class MessageSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
+        __user, __sender_chat, __chat, __forward_from_chat, __forward_from\
+              = None, None, None, None, None
         validated_data = self.context['validated_data']
         _unicity = self.context.get('unicity')
+        print("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
+        print(self.context.get('lists'))
+        print("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
+        _lists = self.context.get('lists')
         
         _prefix = self.context.get('unicity_prefix')
         if self.context.get(_prefix + '__' + 'reply_to_message',None):
@@ -169,10 +172,6 @@ class MessageSerializer(serializers.ModelSerializer):
         else:
             reply_to_message_data = None
 
-        if self.context.get(_prefix + '__' + 'pinned_message',None):
-            pinned_message_data = self.context.get(_prefix + '__' + 'pinned_message')
-        else:
-            pinned_message_data = None
 
         
         user_data = validated_data.pop('from_user', None)
@@ -221,14 +220,19 @@ class MessageSerializer(serializers.ModelSerializer):
         if _message and _message.id:
             return _message
         
-        if user_data:
-            message_from = AndruserSerializer(data=user_data, context={'validated_data': user_data})
-            message_from_is_valid = message_from.is_valid(raise_exception=True)
-            message_from = message_from.save()
+        if _unicity.get(_prefix + '__' + 'from_user', None):
+            # __user needs to  be a queryset , so it can be passed to set()
+            __user = Andruser.objects.filter(user_id=_unicity[_prefix + '__' + 'from_user']).get()
+        else:
+            if user_data:
+                user = AndruserSerializer(data=user_data)
+                user_is_valid = __user.is_valid(raise_exception=True)
+                __user = __user.save()
+                # not added to validated_data as from_user 
+                # represents a many to many field
         
         if _unicity.get(_prefix + '__' + 'sender_chat', None):
-            sender_chat = Chat.objects.get(pk=_unicity[_prefix + '__' + 'sender_chat'])
-            validated_data['sender_chat'] = chat
+            __sender_chat = Chat.objects.get(pk=_unicity[_prefix + '__' + 'sender_chat'])
         else:
             if sender_chat_data:
                 sender_chat = ChatSerializer(data=sender_chat_data)
@@ -238,8 +242,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
         
         if _unicity.get(_prefix + '__' + 'chat', None):
-            chat = Chat.objects.get(pk=_unicity[_prefix + '__' + 'chat'])
-            validated_data['chat'] = chat
+            __chat = Chat.objects.get(pk=_unicity[_prefix + '__' + 'chat'])
         else:
             if chat_data:
                 chat = ChatSerializer(data=chat_data)
@@ -248,8 +251,7 @@ class MessageSerializer(serializers.ModelSerializer):
                 validated_data['chat'] = chat
 
         if _unicity.get(_prefix + '__' + 'forward_from_chat', None):
-            forward_from_chat = Chat.objects.get(pk=_unicity[_prefix + '__' + 'forward_from_chat'])
-            validated_data['forward_from_chat'] = forward_from_chat
+            __forward_from_chat = Chat.objects.get(pk=_unicity[_prefix + '__' + 'forward_from_chat'])
         else:
             if forward_from_chat_data:
                 forward_from_chat = ChatSerializer(data=forward_from_chat_data)
@@ -258,14 +260,19 @@ class MessageSerializer(serializers.ModelSerializer):
                 validated_data['forward_from_chat'] = forward_from_chat
         
         if _unicity.get(_prefix + '__' + 'forward_from', None):
-            forward_from = Andruser.get_user_with_id(user_id=_unicity[_prefix + '__' + 'forward_from'])
-            validated_data['forward_from'] = forward_from
+            __forward_from = Andruser.get_user_with_id(user_id=_unicity[_prefix + '__' + 'forward_from'])
         else:
             if forward_from_data:
                 forward_from = AndruserSerializer(data=forward_from_data)
                 forward_from_is_valid = forward_from.is_valid(raise_exception=True)
                 forward_from = forward_from.save()
                 validated_data['forward_from'] = forward_from
+        
+        if _unicity.get(_prefix + '__' + 'pinned_message', None):
+            validated_data['pinned_message'] = Message.objects.get(message_id=_unicity[_prefix + '__' + 'pinned_message'])
+        
+        if _unicity.get(_prefix + '__' + 'reply_to_message', None):
+            validated_data['reply_to_message'] = Message.objects.get(message_id=_unicity[_prefix + '__' + 'reply_to_message'])
         
         if via_bot_data:
             via_bot = AndruserSerializer(data=via_bot_data, context={'validated_data': via_bot_data})
@@ -348,7 +355,11 @@ class MessageSerializer(serializers.ModelSerializer):
             validated_data['game'] = game 
 
         if poll_data:
-            poll = PollSerializer(data=poll_data)
+            print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            print(poll_data)
+            print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+            context = {'validated_data': poll_data, 'lists': _lists}
+            poll = PollSerializer(data=poll_data, context=context)
             poll_is_valid = poll.is_valid(raise_exception=True)
             poll = poll.save()
             validated_data['poll'] = poll 
@@ -446,12 +457,9 @@ class MessageSerializer(serializers.ModelSerializer):
             )
             validated_data['reply_to_message'] = message
 
-        if pinned_message_data:
-            message = Message.get_message_for_message_id_and_chat_id(
-                message_id=pinned_message_data['message_id'],
-                chat_id=pinned_message_data['chat'].chat_id
-            )
-            validated_data['pinned_message'] = message
+        
+        
+        
         message = Message.objects.create(**validated_data)
 
         if entities_data:
@@ -471,11 +479,27 @@ class MessageSerializer(serializers.ModelSerializer):
         if document_data:
             document.message = message
             document.save()
+        
+        
+        if __user:
+            message.from_user = __user
 
-        if user_data:
-            message_from.message = message 
-            message_from.save()
+        if __sender_chat:
+            pass
+            message.sender_chat = __sender_chat
 
+        if __chat:
+            message.chat = __chat
+
+        if __forward_from_chat:
+            message.forward_from_chat = __forward_from_chat
+
+        if __forward_from:
+            message.forward_from = __forward_from
+        
+        message.save()
+        
+        
         return message
 
         

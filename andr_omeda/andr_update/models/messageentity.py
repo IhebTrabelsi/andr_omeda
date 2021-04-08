@@ -35,7 +35,7 @@ class MessageEntity(models.Model):
         null=True
     )
     poll = models.ForeignKey(
-        "MessageEntity",
+        "Poll",
         on_delete=models.CASCADE,
         related_name="explanation_entities",
         blank=True,

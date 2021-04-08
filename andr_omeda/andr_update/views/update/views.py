@@ -26,11 +26,16 @@ class TutorialBotView(APIView):
         
 
         _context = unicity_sanitize(req_data=request.data)
-
         colorify(_context, fore='BLACK', back='YELLOW', highlight="UPDATE CONTEXT !")
-        colorify('\n\n' + '='*100 + '\n\n' , fore='RED', back='RED')
+
+        
         serializer = UpdateSerializer(data=request.data, context=_context)
         
         serializer_is_valid = serializer.is_valid(raise_exception=False)
+        print("\n\n")
+        colorify(serializer_is_valid , fore='BLUE', back='WHITE')
+        colorify('\n' + str(serializer.errors) + '\n', fore='BLUE', back='WHITE')
+        
         serializer.save()
+        colorify('\n\n' + '='*100 + '\n\n' , fore='RED', back='RED')
         return JsonResponse({"ok": "POST request processed"})

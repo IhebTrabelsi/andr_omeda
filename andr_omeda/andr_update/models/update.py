@@ -40,6 +40,48 @@ class Update(models.Model):
         blank=False,
         null=True
     )
+    chosen_inline_result = models.OneToOneField(
+        "ChosenInlineResult",
+        on_delete=models.RESTRICT,
+        related_name="update",
+        blank=True,
+        null=True
+    )
+    inline_query = models.OneToOneField(
+        "InlineQuery",
+        on_delete=models.RESTRICT,
+        related_name="update",
+        blank=True,
+        null=True
+    )
+    callback_query = models.OneToOneField(
+        "CallbackQuery",
+        on_delete=models.RESTRICT,
+        related_name="update",
+        blank=True,
+        null=True
+    )
+    shipping_query = models.OneToOneField(
+        "ShippingQuery",
+        on_delete=models.RESTRICT,
+        related_name="update",
+        blank=False,
+        null=True
+    )
+    pre_checkout_query = models.OneToOneField(
+        "PreCheckoutQuery",
+        on_delete=models.RESTRICT,
+        related_name="update",
+        blank=True,
+        null=True
+    )
+    poll_answer = models.OneToOneField(
+        "PollAnswer",
+        on_delete=models.RESTRICT,
+        related_name="update",
+        blank=True,
+        null=True
+    )
 
 
     def __str__(self):
@@ -49,6 +91,8 @@ class Update(models.Model):
     @classmethod 
     def get_need_sanitize_attrs(cls):
         return ['message', 'edited_message', 'channel_post', 'edited_channel_post'\
+            'inline_query', 'chosen_inline_result', 'callback_query', 'shipping_query', \
+            'pre_checkout_query', 'poll_answer' \
             'my_chat_member', ('my_chat_member', 'old_chat_member'), \
             ('my_chat_member', 'new_chat_member')]
     

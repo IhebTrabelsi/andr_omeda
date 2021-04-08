@@ -1,4 +1,4 @@
-from andr_omeda.andr_update.models import Update, Message, Chat, Andruser
+from andr_omeda.andr_update.models import Update, Message, Chat, Andruser, Poll
 from andr_omeda.utils.colorify import colorify
 
 """iterating through all request data will not be necessary,
@@ -37,10 +37,25 @@ def unicity_sanitize(req_data=None):
     """
     
     this__unicity = {}
+    this__lists = {}
     #TODO remove trimming in get_need_sanitize_attrs()
-    for update_attr in Update.get_need_sanitize_attrs()[:3]:
+    for update_attr in Update.get_need_sanitize_attrs()[:10]:
         if not req_data.get(update_attr, None):
             continue 
+
+        req_data[update_attr] = Andruser.from_user_sanitize( req_data[update_attr] )
+        req_data[update_attr] = Poll.poll_id_sanitize( req_data[update_attr] )
+        this__lists = Poll.extract_lists( req_data[update_attr], this__lists)
+        
+        if req_data[update_attr].get('pinned_message', None):
+            this__unicity[update_attr + '__' + 'pinned_message'] = \
+                req_data[update_attr]['pinned_message']['message_id']
+            del req_data[update_attr]['pinned_message']
+        
+        if req_data[update_attr].get('reply_to_message', None):
+            this__unicity[update_attr + '__' + 'reply_to_message'] = \
+                req_data[update_attr]['reply_to_message']['message_id']
+            del req_data[update_attr]['reply_to_message']
         
         for group in Message.get_message_with_id_attrs():
             for id_able in group:
@@ -58,7 +73,7 @@ def unicity_sanitize(req_data=None):
                         id_able,
                         update_attr
                     )
-    this__context = {'validated_data': req_data, 'unicity': this__unicity}
+    this__context = {'validated_data': req_data, 'unicity': this__unicity, 'lists': this__lists}
     return this__context
     
 

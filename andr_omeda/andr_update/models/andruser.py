@@ -8,13 +8,7 @@ from django.utils import timezone
 
 
 class Andruser(models.Model):
-    message = models.ForeignKey(
-        "Message",
-        on_delete=models.CASCADE,
-        related_name="message_from",
-        blank=True,
-        null=True
-    )
+    
     bot_sender = models.ForeignKey(
         "Message",
         on_delete=models.CASCADE,
@@ -36,13 +30,7 @@ class Andruser(models.Model):
         blank=True,
         null=True
     )
-    inline_query = models.OneToOneField(
-        "InlineQuery",
-        on_delete=models.CASCADE,
-        related_name="inline_query_from",
-        blank=True,
-        null=True
-    )
+    
     callback_query = models.OneToOneField(
         "CallbackQuery",
         on_delete=models.CASCADE,
@@ -105,3 +93,10 @@ class Andruser(models.Model):
             del data[field]['id']
         
         return unicity
+    
+    @classmethod
+    def from_user_sanitize(cls, data, *args, **kwargs):
+        if data.get('from', None):
+            data['from_user'] = data['from']
+            del data['from']
+        return data

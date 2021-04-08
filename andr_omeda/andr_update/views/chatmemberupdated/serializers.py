@@ -16,6 +16,8 @@ class ChatMemberUpdatedSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
+        __chat, __user = None, None
+
         validated_data = self.context['validated_data']
         _unicity = self.context.get('unicity')
         _prefix = self.context.get('unicity_prefix')
@@ -29,7 +31,7 @@ class ChatMemberUpdatedSerializer(serializers.ModelSerializer):
         invite_link_data =  validated_data.pop('invite_link_data', None)
         
         if _unicity.get(_prefix + '__' + 'chat', None):
-            validated_data['chat'] = Chat.get_chat_with_id(chat_id=_unicity.get(_prefix + '__' + 'chat', None))
+            __chat = Chat.get_chat_with_id(chat_id=_unicity.get(_prefix + '__' + 'chat', None))
         else:
             if chat_data:
                 chat = ChatSerializer(data=chat_data)
@@ -38,8 +40,8 @@ class ChatMemberUpdatedSerializer(serializers.ModelSerializer):
                 validated_data['chat'] = chat
         
         if _unicity.get(_prefix + '__' + 'from_user', None):
-            user = Andruser.objects.get(pk=_unicity.get(_prefix + '__' + 'from_user', None))
-            validated_data['from_user'] = user
+            __user = Andruser.objects.get(pk=_unicity.get(_prefix + '__' + 'from_user', None))
+            
         else:
             if from_user_data:
                 user = AndruserSerializer(data=from_user_data)
@@ -74,7 +76,11 @@ class ChatMemberUpdatedSerializer(serializers.ModelSerializer):
             new_chat_member.new_member = chat_member_updated
             new_chat_member.save()
         
-
+        if __chat:
+            chat_member_updated.chat = __chat
+        
+        if __user:
+            chat_member_updated.from_user = __user
         
         
 
