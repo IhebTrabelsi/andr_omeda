@@ -41,7 +41,6 @@ class ChatMemberUpdatedSerializer(serializers.ModelSerializer):
         
         if _unicity.get(_prefix + '__' + 'from_user', None):
             __user = Andruser.objects.get(pk=_unicity.get(_prefix + '__' + 'from_user', None))
-            
         else:
             if from_user_data:
                 user = AndruserSerializer(data=from_user_data)
@@ -51,30 +50,39 @@ class ChatMemberUpdatedSerializer(serializers.ModelSerializer):
         
         
 
-        if old_chat_member_data:
-            old_chat_member = ChatMemberSerializer(data=old_chat_member_data, context={'validated_data':old_chat_member_data})
-            old_chat_member_is_valid = old_chat_member.is_valid(raise_exception=True)
-            old_chat_member = old_chat_member.save()
         
-        if new_chat_member_data:
-            new_chat_member = ChatMemberSerializer(data=new_chat_member_data, context={'validated_data':new_chat_member_data})
-            new_chat_member_is_valid = new_chat_member.is_valid(raise_exception=True)
-            new_chat_member = new_chat_member.save()
-
-        if invite_link_data:
-            new_chat_member_data['creator'] = validated_data['from_user']
-            invite_link = ChatInviteLinkSerializer(data=invite_link_data)
-            invite_link_is_valid = invite_link.is_valid(raise_exception=True)
-            invite_link = invite_link.save()
-            validated_data['invite_link'] = invite_link
             
         chat_member_updated = ChatMemberUpdated.objects.create(**validated_data)
+
         if old_chat_member_data:
-            old_chat_member.old_member = chat_member_updated
-            old_chat_member.save()
+            old_chat_member = ChatMemberSerializer(
+                data=old_chat_member_data, 
+                context={'validated_data': old_chat_member_data, 'unicity': _unicity, 'unicity_prefix': 'old_chat_member'}
+            )
+            old_chat_member_is_valid = old_chat_member.is_valid(raise_exception=True)
+            old_chat_member_instance = old_chat_member.save()
+            old_chat_member_instance.old_member = chat_member_updated
+            old_chat_member_instance.save()
+        
         if new_chat_member_data:
-            new_chat_member.new_member = chat_member_updated
-            new_chat_member.save()
+            new_chat_member = ChatMemberSerializer(
+                data=new_chat_member_data, 
+                context={'validated_data': new_chat_member_data, 'unicity': _unicity, 'unicity_prefix': 'new_chat_member'}
+            )
+            new_chat_member_is_valid = new_chat_member.is_valid(raise_exception=True)
+            new_chat_member_instance = new_chat_member.save()
+            new_chat_member_instance.new_member = chat_member_updated
+            new_chat_member_instance.save()
+
+        if invite_link_data:
+            invite_link = ChatInviteLinkSerializer(
+                data=invite_link_data,
+                context={'validated_data': invite_link_data, 'unicity': _unicity, 'unicity_prefix': 'invite_link'}
+            )
+            invite_link_is_valid = invite_link.is_valid(raise_exception=True)
+            invite_link_instance = invite_link.save()
+            invite_link_instance.chat_member_update = chat_member_updated
+            invite_link_instance.save()
         
         if __chat:
             chat_member_updated.chat = __chat

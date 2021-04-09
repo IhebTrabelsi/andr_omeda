@@ -62,7 +62,7 @@ class Message(models.Model):
     )
     forward_from = models.ForeignKey(
         "Andruser",
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,
         related_name="forwarded_messages",
         blank=True,
         null=True
@@ -73,6 +73,20 @@ class Message(models.Model):
         related_name="forwarded_messages",
         null=True,
         blank=True
+    )
+    left_chat_member = models.ForeignKey(
+        "Andruser",
+        on_delete=models.RESTRICT,
+        related_name="messages_left_from",
+        blank=True,
+        null=True
+    )
+    via_bot = models.ForeignKey(
+        "Andruser",
+        on_delete=models.RESTRICT,
+        related_name="messages_via_this_bot",
+        blank=True,
+        null=True
     )
 
     
@@ -121,7 +135,28 @@ class Message(models.Model):
     @classmethod 
     def get_message_with_id_attrs(cls):
         return [['chat', 'sender_chat', 'forward_from_chat'], \
-            ['from', 'from_user', 'forward_from', 'via_bot', 'left_chat_member', 'user']]
+            ['from', 'from_user', 'forward_from', 'via_bot', 'left_chat_member', 'user', 'creator']]
     
     def __str__(self):
         return "Message with Id : %i in chat with id : %i" % (self.id , self.chat.chat_id)
+
+    @classmethod 
+    def extract_lists(cls, data, lists, *args, **kwargs):
+        new_chat_members = data.get('new_chat_members', None)
+        # del new_chat_participant/new_chat_member (buggy params) at the same spot
+        if data.get('new_chat_participant', None):
+            del data['new_chat_participant']
+        if data.get('left_chat_participant', None):
+            del data['left_chat_participant']
+        if data.get('new_chat_member', None):
+            del data['new_chat_member']
+        if not new_chat_members == None:
+            if len(new_chat_members) == 0:
+                del data['new_chat_members']
+            else:
+                lists['message__new_chat_members'] = data['new_chat_members']
+                del data['new_chat_members']
+        
+        return lists
+    
+    

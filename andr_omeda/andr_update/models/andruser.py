@@ -9,28 +9,13 @@ from django.utils import timezone
 
 class Andruser(models.Model):
     
-    bot_sender = models.ForeignKey(
+    new_to_message = models.ForeignKey(
         "Message",
         on_delete=models.CASCADE,
-        related_name="via_bot",
+        related_name="new_chat_members",
         blank=True,
         null=True
     )
-    user_members_message = models.ForeignKey(
-        "Message",
-        on_delete=models.CASCADE,
-        related_name="new_user_members",
-        blank=True,
-        null=True
-    )
-    user_leaving_member_message = models.OneToOneField(
-        "Message",
-        on_delete=models.CASCADE,
-        related_name="left_user_member",
-        blank=True,
-        null=True
-    )
-    
     callback_query = models.OneToOneField(
         "CallbackQuery",
         on_delete=models.CASCADE,
@@ -100,3 +85,5 @@ class Andruser(models.Model):
             data['from_user'] = data['from']
             del data['from']
         return data
+    
+

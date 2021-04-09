@@ -90,11 +90,11 @@ class Update(models.Model):
 
     @classmethod 
     def get_need_sanitize_attrs(cls):
-        return ['message', 'edited_message', 'channel_post', 'edited_channel_post'\
+        return ['message', 'edited_message', 'channel_post', 'edited_channel_post', \
             'inline_query', 'chosen_inline_result', 'callback_query', 'shipping_query', \
-            'pre_checkout_query', 'poll_answer' \
+            'pre_checkout_query', 'poll_answer', \
             'my_chat_member', ('my_chat_member', 'old_chat_member'), \
-            ('my_chat_member', 'new_chat_member')]
+            ('my_chat_member', 'new_chat_member'), ('my_chat_member', 'invite_link')]
     
     """@classmethod
     def get_need_sanitize_attrs(cls):

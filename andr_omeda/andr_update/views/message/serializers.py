@@ -2,7 +2,7 @@
 import json
 from rest_framework import serializers
 from andr_omeda.andr_update.models import Message, Andruser
-from andr_omeda.andr_update.views.andruser.serializers import AndruserSerializer
+from andr_omeda.andr_update.views.andruser.serializers import AndruserSerializer, AndruserListSerializer
 from andr_omeda.andr_update.views.location.serializers import LocationSerializer
 from andr_omeda.andr_update.views.messageentity.serializers import MessageEntitySerializer
 from andr_omeda.andr_update.views.photosize.serializers import PhotoSizeSerializer
@@ -105,12 +105,11 @@ class ChatSerializer(serializers.ModelSerializer):
 
 class MessageSerializer(serializers.ModelSerializer):
     forward_from = AndruserSerializer(required=False)
-    via_bot = AndruserSerializer(required=False)
     chat = ChatSerializer(required=False)
     sender_chat = ChatSerializer(required=False)
     forward_from_chat = ChatSerializer(required=False)
     #new_chat_members = AndruserSerializer(many=True, required=False)
-    left_chat_member = AndruserSerializer(required=False)
+    #left_chat_member = AndruserSerializer(required=False)
     animation = AnimationSerializer(required=False)
     location = LocationSerializer(required=False)
     entities = MessageEntitySerializer(required=False, many=True)
@@ -177,7 +176,6 @@ class MessageSerializer(serializers.ModelSerializer):
         forward_from_data = validated_data.pop('forward_from', None)
         forward_from_chat_data = validated_data.pop('forward_from_chat', None)
         
-        via_bot_data = validated_data.pop('via_bot', None)
         entities_data = validated_data.pop('entities', None)
         animation_data = validated_data.pop('animation', None)
         audio_data = validated_data.pop('audio', None)
@@ -194,8 +192,7 @@ class MessageSerializer(serializers.ModelSerializer):
         poll_data = validated_data.pop('poll', None)
         venue_data = validated_data.pop('venue', None)
         location_data = validated_data.pop('location', None)
-        new_chat_members_data = validated_data.pop('new_chat_members', None)
-        left_chat_member_data = validated_data.pop('left_chat_member', None)
+        #left_chat_member_data = validated_data.pop('left_chat_member', None)
         new_chat_photo_data = validated_data.pop('new_chat_photo', None)
         #TODO [workaround] to be implemented later
         message_auto_delete_timer_changed_data = validated_data.pop('poll', None)
@@ -270,12 +267,15 @@ class MessageSerializer(serializers.ModelSerializer):
         
         if _unicity.get(_prefix + '__' + 'reply_to_message', None):
             validated_data['reply_to_message'] = Message.objects.get(message_id=_unicity[_prefix + '__' + 'reply_to_message'])
+            
+        if _unicity.get(_prefix + '__' + 'via_bot', None):
+            validated_data['via_bot'] = Message.objects.get(message_id=_unicity[_prefix + '__' + 'via_bot'])
         
-        if via_bot_data:
+        """if via_bot_data:
             via_bot = AndruserSerializer(data=via_bot_data, context={'validated_data': via_bot_data})
             via_bot_is_valid = via_bot.is_valid(raise_exception=True)
             via_bot = via_bot.save()
-            validated_data['via_bot'] = via_bot  
+            validated_data['via_bot'] = via_bot """ 
             
         if entities_data:
             entities = MessageEntitySerializer(data=entities_data, many=True)
@@ -370,17 +370,12 @@ class MessageSerializer(serializers.ModelSerializer):
             location = location.save()
             validated_data['location'] = location 
 
-        if 0:
-            new_chat_members = AndruserSerializer(data=new_chat_members_data, many=True, context={'validated_data': new_chat_members_data})
-            new_chat_members_is_valid = new_chat_members.is_valid(raise_exception=True)
-            new_chat_members = new_chat_members.save()
-            validated_data['new_chat_members'] = new_chat_members 
-
-        if left_chat_member_data:
+        
+        """if left_chat_member_data:
             left_chat_member = AndruserSerializer(data=left_chat_member_data, context={'validated_data': left_chat_member_data})
             left_chat_member_is_valid = left_chat_member.is_valid(raise_exception=True)
             left_chat_member = left_chat_member.save()
-            validated_data['left_chat_member'] = left_chat_member 
+            validated_data['left_chat_member'] = left_chat_member """
 
         if new_chat_photo_data:
             new_chat_photo = PhotoSizeSerializer(data=new_chat_photo_data)
@@ -455,6 +450,20 @@ class MessageSerializer(serializers.ModelSerializer):
         
         
         message = Message.objects.create(**validated_data)
+
+        if _lists.get('message__new_chat_members', None):
+            new_chat_members = AndruserListSerializer(
+                data=_lists['message__new_chat_members'][0] if len(_lists['message__new_chat_members']) > 0 else {}, 
+                context={
+                    'validated_data': _lists['message__new_chat_members'],
+                    'lists': _lists
+                }
+            )
+            new_chat_members_is_valid = new_chat_members.is_valid(raise_exception=True)
+            new_chat_members_list = new_chat_members.save()
+            for member in new_chat_members_list:
+                member.new_to_message = message
+                member.save()
 
         if entities_data:
             for entity in entities:
