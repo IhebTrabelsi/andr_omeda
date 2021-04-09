@@ -161,9 +161,6 @@ class MessageSerializer(serializers.ModelSerializer):
               = None, None, None, None, None
         validated_data = self.context['validated_data']
         _unicity = self.context.get('unicity')
-        print("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
-        print(self.context.get('lists'))
-        print("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
         _lists = self.context.get('lists')
         
         _prefix = self.context.get('unicity_prefix')
@@ -355,9 +352,6 @@ class MessageSerializer(serializers.ModelSerializer):
             validated_data['game'] = game 
 
         if poll_data:
-            print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-            print(poll_data)
-            print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
             context = {'validated_data': poll_data, 'lists': _lists}
             poll = PollSerializer(data=poll_data, context=context)
             poll_is_valid = poll.is_valid(raise_exception=True)

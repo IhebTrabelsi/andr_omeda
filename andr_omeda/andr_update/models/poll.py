@@ -51,10 +51,8 @@ class Poll(models.Model):
             entities = data['poll'].get('explanation_entities', None)
             if not entities == None:
                 if len(entities) == 0:
-                    print("\n\n YES explanation_entities EXISTS !!! \n\n")
                     del data['poll']['explanation_entities']
                 else:
-                    print("\n\n YES explanation_entities EXISTS !!! \n\n")
                     lists['poll__explanation_entities'] = data['poll']['explanation_entities']
                     del data['poll']['explanation_entities']
             

@@ -34,23 +34,15 @@ class PollSerializer(serializers.ModelSerializer):
             for poll__option in _lists['poll__options']:
                 option = PollOptionSerializer(data=poll__option)
                 option_is_valid = option.is_valid()
-                print("/////////////////////////////////////////////////////////////////")
-                print(poll)
-                print(option_is_valid)
-                print(option.errors)
-                print("/////////////////////////////////////////////////////////////////")
-                option.save()
-                option.poll = poll
-                option.save()
-        print("-------------->")
-        print(option.poll)
-        print("<--------------")
+                option_instance = option.save()
+                option_instance.poll = poll
+                option_instance.save()
         if _lists.get('poll__explanation_entities', None):
             for poll__explanation_entity in _lists['poll__explanation_entities']:
                 explanation_entity = MessageEntitySerializer(data=poll__explanation_entity)
                 explanation_entity_is_valid = explanation_entity.is_valid()
-                explanation_entity.save()
-                explanation_entity.poll = poll 
-                explanation_entity.save()
+                explanation_entity_instance = explanation_entity.save()
+                explanation_entity_instance.poll = poll 
+                explanation_entity_instance.save()
         
         return poll
