@@ -8,35 +8,35 @@ from django.utils import timezone
 class MessageEntity(models.Model):
     user = models.ForeignKey(
         "Andruser",
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,
         related_name="mentions",
         blank=True,
         null=True
     )
     message = models.ForeignKey(
         "Message",
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,
         related_name="entities",
         blank=True,
         null=True
     )
     message_captioned = models.ForeignKey(
         "Message",
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,
         related_name="caption_entities",
         blank=True,
         null=True
     )
     game = models.ForeignKey(
         "Game",
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,
         related_name="text_entities",
         blank=True,
         null=True
     )
     poll = models.ForeignKey(
         "Poll",
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,
         related_name="explanation_entities",
         blank=True,
         null=True
@@ -50,7 +50,5 @@ class MessageEntity(models.Model):
     def __str__(self):
         return "MessageEntity %s"%self.type
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs) 
-        return self
+   
 

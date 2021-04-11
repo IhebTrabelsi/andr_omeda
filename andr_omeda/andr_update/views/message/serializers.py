@@ -4,7 +4,7 @@ from rest_framework import serializers
 from andr_omeda.andr_update.models import Message, Andruser
 from andr_omeda.andr_update.views.andruser.serializers import AndruserSerializer, AndruserListSerializer
 from andr_omeda.andr_update.views.location.serializers import LocationSerializer
-from andr_omeda.andr_update.views.messageentity.serializers import MessageEntitySerializer
+from andr_omeda.andr_update.views.messageentity.serializers import MessageEntityListSerializer
 from andr_omeda.andr_update.views.photosize.serializers import PhotoSizeSerializer
 from andr_omeda.andr_update.views.audio.serializers import AudioSerializer
 from andr_omeda.andr_update.views.contact.serializers import ContactSerializer
@@ -112,8 +112,6 @@ class MessageSerializer(serializers.ModelSerializer):
     #left_chat_member = AndruserSerializer(required=False)
     animation = AnimationSerializer(required=False)
     location = LocationSerializer(required=False)
-    entities = MessageEntitySerializer(required=False, many=True)
-    caption_entities = MessageEntitySerializer(required=False, many=True)
     photo = PhotoSizeSerializer(many=True, required=False)
     new_chat_photo = PhotoSizeSerializer(many=True, required=False)
     audio = AudioSerializer(required=False)
@@ -161,7 +159,7 @@ class MessageSerializer(serializers.ModelSerializer):
         validated_data = self.context['validated_data']
         _unicity = self.context.get('unicity')
         _lists = self.context.get('lists')
-        
+        _specials = self.context.get('specials')
         _prefix = self.context.get('unicity_prefix')
         if self.context.get(_prefix + '__' + 'reply_to_message',None):
             reply_to_message_data = self.context.get(_prefix + '__' + 'reply_to_message')
@@ -277,10 +275,7 @@ class MessageSerializer(serializers.ModelSerializer):
             via_bot = via_bot.save()
             validated_data['via_bot'] = via_bot """ 
             
-        if entities_data:
-            entities = MessageEntitySerializer(data=entities_data, many=True)
-            entities_is_valid = entities.is_valid(raise_exception=True)
-            entities = entities.save()
+        
 
         if animation_data:
             animation = AnimationSerializer(data=animation_data)
@@ -328,10 +323,7 @@ class MessageSerializer(serializers.ModelSerializer):
             voice = voice.save()
             validated_data['voice'] = voice 
 
-        if caption_entities_data:
-            caption_entities = MessageEntitySerializer(data=caption_entities_data, many=True)
-            caption_entities_is_valid = caption_entities.is_valid(raise_exception=True)
-            caption_entities = caption_entities.save()
+       
 
         if contact_data:
             contact = ContactSerializer(data=contact_data)
@@ -464,11 +456,19 @@ class MessageSerializer(serializers.ModelSerializer):
             for member in new_chat_members_list:
                 member.new_to_message = message
                 member.save()
-
-        if entities_data:
-            for entity in entities:
-                entity.message = message
+        
+        if _lists.get('message__entities', None):
+            
+            message_entities_ser = MessageEntityListSerializer(
+                data = {}, 
+                context = {'lists': _lists, 'specials': _specials}
+            )
+            message_entities_is_valid = message_entities_ser.is_valid()
+            entity_instances = message_entities_ser.save()
+            for  entity in entity_instances:
+                entity.message = message 
                 entity.save()
+
 
         if caption_entities_data:
             for caption_entity in caption_entities:

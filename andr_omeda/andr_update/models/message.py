@@ -141,8 +141,9 @@ class Message(models.Model):
         return "Message with Id : %i in chat with id : %i" % (self.id , self.chat.chat_id)
 
     @classmethod 
-    def extract_lists(cls, data, lists, *args, **kwargs):
-        new_chat_members = data.get('new_chat_members', None)
+    def extract_lists(cls, data, lists, specials, *args, **kwargs):
+        new_chat_members_data = data.get('new_chat_members', None)
+        entities_data = data.get('entities', None)
         # del new_chat_participant/new_chat_member (buggy params) at the same spot
         if data.get('new_chat_participant', None):
             del data['new_chat_participant']
@@ -150,13 +151,27 @@ class Message(models.Model):
             del data['left_chat_participant']
         if data.get('new_chat_member', None):
             del data['new_chat_member']
-        if not new_chat_members == None:
-            if len(new_chat_members) == 0:
+        if not new_chat_members_data == None:
+            if len(new_chat_members_data) == 0:
                 del data['new_chat_members']
             else:
                 lists['message__new_chat_members'] = data['new_chat_members']
                 del data['new_chat_members']
+        if not entities_data == None:
+            if len(entities_data) == 0:
+                del data['entities']
+            else:
+                lists['message__entities'] = data['entities']
+                special_entities = []
+                for entity in lists['message__entities']:
+                    #special_entities.append(entity.get('user', {}))
+                    special_entities.append({'id': 1305811960, 'is_bot': False, 'first_name': 'Iheb', 'last_name': 'Ben Said', 'language_code': 'fr'})
+                    #BREAKPOINT2 mouch kol entity lezem ykoun aandha user m3aha ,
+                    #imposi special feregh ala kol entity maandhech user 
+                specials['entities__users'] = special_entities
+
+                del data['entities']
         
-        return lists
+        return lists, specials
     
     

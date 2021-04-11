@@ -27,7 +27,15 @@ def id_key_sanitize_for_value(data , telegramIdKey, \
 
 
 
+##################################################################################
+##################################################################################
+##################################################################################
 
+def is_entities__users(l):
+    for u in l:
+        if u:
+            return True
+    return False
 ##################################################################################
 ##################################################################################
 ##################################################################################
@@ -38,6 +46,7 @@ def unicity_sanitize(req_data=None):
     
     this__unicity = {}
     this__lists = {}
+    this__specials = {}
     #TODO remove trimming in get_need_sanitize_attrs()
     for update_attr in Update.get_need_sanitize_attrs():
         if isinstance(update_attr, tuple):
@@ -62,6 +71,7 @@ def unicity_sanitize(req_data=None):
                             id_able,
                             update_attr[1]
                         )
+            continue
 
 
 
@@ -76,7 +86,7 @@ def unicity_sanitize(req_data=None):
 
         this__lists = Poll.extract_lists( req_data[update_attr], this__lists )
         if update_attr in Update.get_need_sanitize_attrs()[:4]:
-            this__lists = Message.extract_lists( req_data[update_attr], this__lists )
+            this__lists, this__specials = Message.extract_lists( req_data[update_attr], this__lists, this__specials )
         
         
         if req_data[update_attr].get('pinned_message', None):
@@ -106,7 +116,7 @@ def unicity_sanitize(req_data=None):
                         id_able,
                         update_attr
                     )
-    this__context = {'validated_data': req_data, 'unicity': this__unicity, 'lists': this__lists}
+    this__context = {'validated_data': req_data, 'unicity': this__unicity, 'lists': this__lists, 'specials': this__specials}
     return this__context
     
 

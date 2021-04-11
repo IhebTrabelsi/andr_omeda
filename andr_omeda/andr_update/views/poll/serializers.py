@@ -26,8 +26,10 @@ class PollSerializer(serializers.ModelSerializer):
 
         options_data = validated_data.pop('options', None)
         explanation_entities_data = validated_data.pop('explanation_entities', None)
-        
-        
+
+        validated_data['poll_id'] = validated_data['id']
+        del validated_data['id']
+
         poll = Poll.objects.create(**validated_data)
         
         if _lists.get('poll__options', None):

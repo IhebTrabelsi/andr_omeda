@@ -42,6 +42,7 @@ class UpdateSerializer(serializers.ModelSerializer):
         validated_data = self.context['validated_data']
         _unicity = self.context['unicity']
         _lists = self.context['lists']
+        _specials = self.context['specials']
 
         update_id_data = validated_data.pop('update_id', None)
         message_data = validated_data.pop('message', None)
@@ -66,7 +67,7 @@ class UpdateSerializer(serializers.ModelSerializer):
             validated_data['update_id'] = update_id
 
         if message_data:
-            context = {'validated_data': message_data, 'unicity': _unicity, 'unicity_prefix': 'message', 'lists': _lists}
+            context = {'validated_data': message_data, 'unicity': _unicity, 'unicity_prefix': 'message', 'lists': _lists, 'specials': _specials}
             if self.context.get('message__reply_to_message', None):
                 context['message__reply_to_message'] = self.context.get('message__reply_to_message')
             message = MessageSerializer(data=message_data, context=context)
@@ -75,7 +76,7 @@ class UpdateSerializer(serializers.ModelSerializer):
             validated_data['message'] = message
         
         if  edited_message_data != None:
-            context = {'validated_data': edited_message_data, 'unicity': _unicity, 'unicity_prefix': 'edited_message', 'lists': _lists}
+            context = {'validated_data': edited_message_data, 'unicity': _unicity, 'unicity_prefix': 'edited_message', 'lists': _lists, 'specials': _specials}
             if self.context.get('edited_message__reply_to_message', None):
                 context['edited_message__reply_to_message'] = self.context.get('edited_message__reply_to_message')
             edited_message = MessageSerializer(data=edited_message_data, context=context)
@@ -84,7 +85,7 @@ class UpdateSerializer(serializers.ModelSerializer):
             validated_data['edited_message'] = edited_message
 
         if  channel_post_data != None:
-            context = {'validated_data': channel_post_data, 'unicity': _unicity, 'unicity_prefix': 'channel_post', 'lists': _lists}
+            context = {'validated_data': channel_post_data, 'unicity': _unicity, 'unicity_prefix': 'channel_post', 'lists': _lists, 'specials': _specials}
             if self.context.get('channel_post__reply_to_message', None):
                 context['channel_post__reply_to_message'] = self.context.get('channel_post__reply_to_message')
             channel_post = MessageSerializer(data=channel_post_data, context=context)
@@ -93,7 +94,7 @@ class UpdateSerializer(serializers.ModelSerializer):
             validated_data['channel_post'] = channel_post
 
         if  edited_channel_post_data != None:
-            context = {'validated_data': edited_channel_post_data, 'unicity': _unicity, 'unicity_prefix': 'edited_channel_post', 'lists': _lists}
+            context = {'validated_data': edited_channel_post_data, 'unicity': _unicity, 'unicity_prefix': 'edited_channel_post', 'lists': _lists, 'specials': _specials}
             if self.context.get('edited_channel_post__reply_to_message', None):
                 context['edited_channel_post__reply_to_message'] = self.context.get('edited_channel_post__reply_to_message')
             edited_channel_post = MessageSerializer(data=edited_channel_post_data, context=context)
@@ -137,7 +138,8 @@ class UpdateSerializer(serializers.ModelSerializer):
             validated_data['pre_checkout_query'] = pre_checkout_query
 
         if  poll_data != None:
-            poll = PollSerializer(data=poll_data)
+            context = {'validated_data': poll_data, 'lists': _lists}
+            poll = PollSerializer(data=poll_data, context=context)
             poll_is_valid = poll.is_valid(raise_exception=True)
             poll = poll.save()
             validated_data['poll'] = poll
