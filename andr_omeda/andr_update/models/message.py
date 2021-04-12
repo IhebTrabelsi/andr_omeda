@@ -88,6 +88,41 @@ class Message(models.Model):
         blank=True,
         null=True
     )
+    voice = models.OneToOneField(
+        "Voice",
+        on_delete=models.RESTRICT,
+        related_name="message",
+        blank=True,
+        null=True
+    )
+    document = models.OneToOneField(
+        "Document",
+        on_delete=models.RESTRICT,
+        related_name="message",
+        blank=True,
+        null=True
+    )
+    sticker = models.OneToOneField(
+        "Sticker",
+        on_delete=models.RESTRICT,
+        related_name="message",
+        blank=True,
+        null=True
+    )
+    video = models.OneToOneField(
+        "Video",
+        on_delete=models.RESTRICT,
+        related_name="message",
+        blank=True,
+        null=True
+    )
+    video_note = models.OneToOneField(
+        "VideoNote",
+        on_delete=models.RESTRICT,
+        related_name="message",
+        blank=True,
+        null=True
+    )
 
     
 

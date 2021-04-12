@@ -1,4 +1,5 @@
-from andr_omeda.andr_update.models import Update, Message, Chat, Andruser, Poll
+from andr_omeda.andr_update.models import Update, Message, Chat, Andruser, Poll, \
+    InlineQuery
 from andr_omeda.utils.colorify import colorify
 
 """iterating through all request data will not be necessary,
@@ -43,11 +44,12 @@ def unicity_sanitize(req_data=None):
     """
     req_data: {'message':{'message_id':123456, ...}, '_id':123456789}
     """
-    
+    req_data = InlineQuery.inlinequery_validation( req_data )
+   
+
     this__unicity = {}
     this__lists = {}
     this__specials = {}
-    #TODO remove trimming in get_need_sanitize_attrs()
     for update_attr in Update.get_need_sanitize_attrs():
         if isinstance(update_attr, tuple):
             if not req_data.get(update_attr[0], None):

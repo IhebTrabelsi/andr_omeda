@@ -475,13 +475,13 @@ class MessageSerializer(serializers.ModelSerializer):
                 caption_entity.message = message
                 caption_entity.save()
 
-        if sticker_data:
+        """if sticker_data:
             sticker.message = message
-            sticker.save()
+            sticker.save()"""
 
-        if document_data:
+        """if document_data:
             document.message = message
-            document.save()
+            document.save()"""
         
         
         if __user:

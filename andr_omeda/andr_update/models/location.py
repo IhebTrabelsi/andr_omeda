@@ -37,8 +37,8 @@ class Location(models.Model):
         related_name="location",
         blank=True
     )
-    longitude = models.FloatField(_("longitude"), blank=False)
-    latitude = models.FloatField(_("latitude"), blank=False)
+    longitude = models.FloatField(_("longitude"), blank=True)
+    latitude = models.FloatField(_("latitude"), blank=True)
     horizontal_accuracy = models.FloatField(_("horizontal_accuracy"), blank=True)
     live_period = models.IntegerField(_("live_period"), blank=True)
     heading = models.IntegerField(_("heading"), blank=True)
