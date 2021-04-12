@@ -5,12 +5,6 @@ from andr_omeda.andr_update.models import Message
 
 
 class Voice(models.Model):
-    message = models.OneToOneField(
-        Message,
-        on_delete=models.CASCADE,
-        related_name="voice",
-        blank=True
-    )
     file_id = models.TextField(_("file_id"), blank=False)
     file_unique_id = models.TextField(_("file_unique_id"), blank=False)
     duration = models.IntegerField(_("duration"), blank=False)

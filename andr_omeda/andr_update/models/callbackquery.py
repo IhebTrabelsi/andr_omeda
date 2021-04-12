@@ -5,12 +5,6 @@ from andr_omeda.andr_update.models import Update
 
 
 class CallbackQuery(models.Model):
-    update = models.OneToOneField(
-        Update,
-        on_delete=models.CASCADE,
-        related_name="callback_query",
-        blank=True
-    )
     callback_query_id = models.TextField(_("callback_query_id"), blank=False)
     inline_message_id = models.TextField(_("inline_message_id"), blank=True)
     chat_instance = models.TextField(_("chat_instance"), blank=True)

@@ -5,21 +5,18 @@ from andr_omeda.andr_update.models import Update
 
 
 class PreCheckoutQuery(models.Model):
-    update = models.OneToOneField(
-        Update,
-        on_delete=models.CASCADE,
-        related_name="pre_checkout_query",
-        blank=True
-    )
     order_info = models.OneToOneField(
         "OrderInfo",
         on_delete=models.CASCADE,
-        blank=True
+        blank=True,
+        null=True
     )
     from_user = models.ForeignKey(
         "Andruser",
         on_delete=models.CASCADE,
-        blank=False
+        related_name="pre_checkout_queries",
+        blank=False,
+        null=True
     )
     pre_checkout_query_id = models.TextField(_("pre_checkout_query_id"), blank=False)
     total_amount = models.IntegerField(_("total_amount"), blank=False)

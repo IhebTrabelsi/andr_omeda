@@ -8,38 +8,11 @@ from django.utils import timezone
 
 
 class Andruser(models.Model):
-    message = models.ForeignKey(
+    
+    new_to_message = models.ForeignKey(
         "Message",
         on_delete=models.CASCADE,
-        related_name="message_from",
-        blank=True,
-        null=True
-    )
-    bot_sender = models.ForeignKey(
-        "Message",
-        on_delete=models.CASCADE,
-        related_name="via_bot",
-        blank=True,
-        null=True
-    )
-    user_members_message = models.ForeignKey(
-        "Message",
-        on_delete=models.CASCADE,
-        related_name="new_user_members",
-        blank=True,
-        null=True
-    )
-    user_leaving_member_message = models.OneToOneField(
-        "Message",
-        on_delete=models.CASCADE,
-        related_name="left_user_member",
-        blank=True,
-        null=True
-    )
-    inline_query = models.OneToOneField(
-        "InlineQuery",
-        on_delete=models.CASCADE,
-        related_name="inline_query_from",
+        related_name="new_chat_members",
         blank=True,
         null=True
     )
@@ -50,6 +23,7 @@ class Andruser(models.Model):
         blank=True,
         null=True
     )
+
 
     user_id = models.BigIntegerField(_("user_id"), blank=False, primary_key=True)
     is_bot = models.BooleanField(_("is_bot"), blank=False)
@@ -71,12 +45,45 @@ class Andruser(models.Model):
 
     @classmethod
     def user_with_id_exists(cls, user_id):
-        return cls.objects.filter(pk=user_id).exists()
+        return cls.objects.filter(user_id=user_id).exists()
 
     @classmethod
     def get_user_with_id(cls, user_id):
         if cls.user_with_id_exists(user_id):
-            return cls.objects.get(pk=user_id)
+            return cls.objects.get(user_id=user_id)
 
     def __str__(self):
-        return "User with id:%i" % self.id
+        return "User with id:%i" % self.user_id
+
+    @classmethod
+    def context_user_unicity_check_for_field_and_context(cls, data, unicity, field='', prefix=''):
+        """
+        data: message => {..., 'user': {'user_id':10000, ...}}
+        field: 'user'
+        prefix: message
+        """
+        if not data.get(field, None):
+            return unicity
+
+        _id = data[field].get('id', None)
+        if not _id:
+            raise Exception("KeyError something wrong with user_id")
+        
+        user = cls.get_user_with_id(user_id=_id)
+        if user:
+            del data[field]
+            unicity[prefix + '__' + field] = user.user_id
+        else:
+            data[field]['user_id'] = data[field]['id']
+            del data[field]['id']
+        
+        return unicity
+    
+    @classmethod
+    def from_user_sanitize(cls, data, *args, **kwargs):
+        if data.get('from', None):
+            data['from_user'] = data['from']
+            del data['from']
+        return data
+    
+

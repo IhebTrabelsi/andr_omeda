@@ -8,16 +8,16 @@ class ChatMember(models.Model):
     """
     This object contains information about one member of a chat.
     """
-    old_member = models.OneToOneField(
+    old_member = models.ForeignKey(
         "ChatMemberUpdated",
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,
         blank=True,
         null=True,
         related_name="old_chat_member"
     )
-    new_member = models.OneToOneField(
+    new_member = models.ForeignKey(
         "ChatMemberUpdated",
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,
         blank=True,
         null=True,
         related_name="new_chat_member"
@@ -50,6 +50,4 @@ class ChatMember(models.Model):
     can_add_web_page_previews = models.BooleanField(_("can_add_web_page_previews"), blank=True, null=True)
     until_date = models.IntegerField(_("until_date"), blank=True, null=True)
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)  # Call the "real" save() method.
-        return self
+   

@@ -1,10 +1,10 @@
 # automatically created
 import json
 from rest_framework import serializers
-from andr_omeda.andr_update.models import Message
-from andr_omeda.andr_update.views.andruser.serializers import AndruserSerializer
+from andr_omeda.andr_update.models import Message, Andruser
+from andr_omeda.andr_update.views.andruser.serializers import AndruserSerializer, AndruserListSerializer
 from andr_omeda.andr_update.views.location.serializers import LocationSerializer
-from andr_omeda.andr_update.views.messageentity.serializers import MessageEntitySerializer
+from andr_omeda.andr_update.views.messageentity.serializers import MessageEntityListSerializer
 from andr_omeda.andr_update.views.photosize.serializers import PhotoSizeSerializer
 from andr_omeda.andr_update.views.audio.serializers import AudioSerializer
 from andr_omeda.andr_update.views.contact.serializers import ContactSerializer
@@ -55,10 +55,9 @@ class ChatSerializer(serializers.ModelSerializer):
         model = Chat
         fields = '__all__'
         extra_kwargs = {
-            'message_from': {'validators': []},
+            'from_user': {'validators': []},
             'forward_from': {'validators': []},
             'via_bot': {'validators': []},
-            'new_chat_members': {'validators': []},
             'left_chat_member': {'validators': []},
         }
 
@@ -77,23 +76,22 @@ class ChatSerializer(serializers.ModelSerializer):
         loc_ser = self.fields['location']
         perm_ser = self.fields['permissions']
         photo_ser = self.fields['photo']
-        pinned_message_ser = self.fields['pinned_message']
 
         if validated_data.get('location'):
             loc = ChatLocationSerializer(data=validated_data.pop('location', None))
-            loc_is_valid = loc.is_valid()
+            loc_is_valid = loc.is_valid(raise_exception=True)
             loc = loc.save()
             validated_data['location'] = loc
 
         if validated_data.get('permissions'):
             perm = ChatPermissionsSerializer(data=validated_data.pop('permissions', None))
-            perm_is_valid = perm.is_valid()
+            perm_is_valid = perm.is_valid(raise_exception=True)
             perm = perm.save()
             validated_data['permissions'] = perm
 
         if validated_data.get('photo'):
             photo = ChatPhotoSerializer(data=validated_data.pop('permissions', None))
-            photo_is_valid = photo.is_valid()
+            photo_is_valid = photo.is_valid(raise_exception=True)
             photo = photo.save()
             validated_data['photo'] = photo
 
@@ -106,19 +104,14 @@ class ChatSerializer(serializers.ModelSerializer):
         return value
 
 class MessageSerializer(serializers.ModelSerializer):
-    message_from = AndruserSerializer(required=False)
     forward_from = AndruserSerializer(required=False)
-    via_bot = AndruserSerializer(required=False)
-    user = AndruserSerializer(required=False)
-    chat = ChatSerializer()
+    chat = ChatSerializer(required=False)
     sender_chat = ChatSerializer(required=False)
     forward_from_chat = ChatSerializer(required=False)
-    new_chat_members = AndruserSerializer(many=True, required=False)
-    left_chat_member = AndruserSerializer(required=False)
+    #new_chat_members = AndruserSerializer(many=True, required=False)
+    #left_chat_member = AndruserSerializer(required=False)
     animation = AnimationSerializer(required=False)
     location = LocationSerializer(required=False)
-    entities = MessageEntitySerializer(required=False, many=True)
-    caption_entities = MessageEntitySerializer(required=False, many=True)
     photo = PhotoSizeSerializer(many=True, required=False)
     new_chat_photo = PhotoSizeSerializer(many=True, required=False)
     audio = AudioSerializer(required=False)
@@ -143,9 +136,10 @@ class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = '__all__'
+        exclude = ['from_user', ]
         extra_kwargs = {
             'user_id': {'validators': []},
+            'reply_to_message': {'validators': []},
         }
 
     def save(self, **kwargs):
@@ -160,15 +154,26 @@ class MessageSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
+        __user, __sender_chat, __chat, __forward_from_chat, __forward_from\
+              = None, None, None, None, None
         validated_data = self.context['validated_data']
-        user_data = validated_data.pop('from', None)
-        sender_chat_data = validated_data.pop('sender_chat', None)
+        _unicity = self.context.get('unicity')
+        _lists = self.context.get('lists')
+        _specials = self.context.get('specials')
+        _prefix = self.context.get('unicity_prefix')
+        if self.context.get(_prefix + '__' + 'reply_to_message',None):
+            reply_to_message_data = self.context.get(_prefix + '__' + 'reply_to_message')
+        else:
+            reply_to_message_data = None
+
+
         
-        chat_data = validated_data.pop('chat')
+        user_data = validated_data.pop('from_user', None)
+        sender_chat_data = validated_data.pop('sender_chat', None)
+        chat_data = validated_data.pop('chat', None)
         forward_from_data = validated_data.pop('forward_from', None)
         forward_from_chat_data = validated_data.pop('forward_from_chat', None)
-        reply_to_message_data = validated_data.pop('reply_to_message', None)
-        via_bot_data = validated_data.pop('via_bot', None)
+        
         entities_data = validated_data.pop('entities', None)
         animation_data = validated_data.pop('animation', None)
         audio_data = validated_data.pop('audio', None)
@@ -185,12 +190,11 @@ class MessageSerializer(serializers.ModelSerializer):
         poll_data = validated_data.pop('poll', None)
         venue_data = validated_data.pop('venue', None)
         location_data = validated_data.pop('location', None)
-        new_chat_members_data = validated_data.pop('new_chat_members', None)
-        left_chat_member_data = validated_data.pop('left_chat_member', None)
+        #left_chat_member_data = validated_data.pop('left_chat_member', None)
         new_chat_photo_data = validated_data.pop('new_chat_photo', None)
         #TODO [workaround] to be implemented later
         message_auto_delete_timer_changed_data = validated_data.pop('poll', None)
-        pinned_message_data = validated_data.pop('pinned_message', None)
+        
         invoice_data = validated_data.pop('invoice', None)
         successful_payment_data = validated_data.pop('successful_payment', None)
         passport_data_data = validated_data.pop('passport_data', None)
@@ -203,203 +207,302 @@ class MessageSerializer(serializers.ModelSerializer):
         
         _message = Message.get_message_for_message_id_and_chat_id(
             validated_data.get('message_id', None),
-            chat_data.get('chat_id', None)
+            _unicity.get('chat', None)
         )
         if _message and _message.id:
             return _message
         
-        if user_data:
-            message_from = AndruserSerializer(data=user_data, context={'validated_data': user_data})
-            message_from_is_valid = message_from.is_valid()
-            message_from = message_from.save()
-            validated_data['message_from'] = message_from
-        if sender_chat_data:
-            sender_chat = ChatSerializer(data=sender_chat_data)
-            sender_chat_is_valid = sender_chat.is_valid()
-            sender_chat = sender_chat.save()
-            validated_data['sender_chat'] = sender_chat
-        if chat_data:
-            chat = ChatSerializer(data=chat_data)
-            chat_is_valid = chat.is_valid()
-            chat = chat.save()
-            validated_data['chat'] = chat
-        if forward_from_data:
-            forward_from = AndruserSerializer(data=forward_from_data, context={'validated_data': forward_from_data})
-            forward_from_is_valid = forward_from.is_valid()
-            forward_from = forward_from.save()
-            validated_data['forward_from'] = forward_from
-        if forward_from_chat_data:
-            forward_from_chat_data['chat_id'] = forward_from_chat_data['id']
-            del forward_from_chat_data['id']
-            forward_from_chat = ChatSerializer(data=forward_from_chat_data)
-            forward_from_chat_is_valid = forward_from_chat.is_valid()
-            forward_from_chat = forward_from_chat.save()
-            validated_data['forward_from_chat'] = forward_from_chat 
-        if via_bot_data:
+        if _unicity.get(_prefix + '__' + 'from_user', None):
+            # __user needs to  be a queryset , so it can be passed to set()
+            __user = Andruser.objects.filter(user_id=_unicity[_prefix + '__' + 'from_user']).get()
+        else:
+            if user_data:
+                user = AndruserSerializer(data=user_data)
+                user_is_valid = __user.is_valid(raise_exception=True)
+                __user = __user.save()
+                # not added to validated_data as from_user 
+                # represents a many to many field
+        
+        if _unicity.get(_prefix + '__' + 'sender_chat', None):
+            __sender_chat = Chat.objects.get(pk=_unicity[_prefix + '__' + 'sender_chat'])
+        else:
+            if sender_chat_data:
+                sender_chat = ChatSerializer(data=sender_chat_data)
+                sender_chat_is_valid = sender_chat.is_valid(raise_exception=True)
+                sender_chat = sender_chat.save()
+                validated_data['sender_chat'] = sender_chat
+
+        
+        if _unicity.get(_prefix + '__' + 'chat', None):
+            __chat = Chat.objects.get(pk=_unicity[_prefix + '__' + 'chat'])
+        else:
+            if chat_data:
+                chat = ChatSerializer(data=chat_data)
+                chat_is_valid = chat.is_valid(raise_exception=True)
+                chat = chat.save()
+                validated_data['chat'] = chat
+
+        if _unicity.get(_prefix + '__' + 'forward_from_chat', None):
+            __forward_from_chat = Chat.objects.get(pk=_unicity[_prefix + '__' + 'forward_from_chat'])
+        else:
+            if forward_from_chat_data:
+                forward_from_chat = ChatSerializer(data=forward_from_chat_data)
+                forward_from_chat_is_valid = forward_from_chat.is_valid(raise_exception=True)
+                forward_from_chat = forward_from_chat.save()
+                validated_data['forward_from_chat'] = forward_from_chat
+        
+        if _unicity.get(_prefix + '__' + 'forward_from', None):
+            __forward_from = Andruser.get_user_with_id(user_id=_unicity[_prefix + '__' + 'forward_from'])
+        else:
+            if forward_from_data:
+                forward_from = AndruserSerializer(data=forward_from_data)
+                forward_from_is_valid = forward_from.is_valid(raise_exception=True)
+                forward_from = forward_from.save()
+                validated_data['forward_from'] = forward_from
+        
+        if _unicity.get(_prefix + '__' + 'pinned_message', None):
+            validated_data['pinned_message'] = Message.objects.get(message_id=_unicity[_prefix + '__' + 'pinned_message'])
+        
+        if _unicity.get(_prefix + '__' + 'reply_to_message', None):
+            validated_data['reply_to_message'] = Message.objects.get(message_id=_unicity[_prefix + '__' + 'reply_to_message'])
+            
+        if _unicity.get(_prefix + '__' + 'via_bot', None):
+            validated_data['via_bot'] = Message.objects.get(message_id=_unicity[_prefix + '__' + 'via_bot'])
+        
+        """if via_bot_data:
             via_bot = AndruserSerializer(data=via_bot_data, context={'validated_data': via_bot_data})
-            via_bot_is_valid = via_bot.is_valid()
+            via_bot_is_valid = via_bot.is_valid(raise_exception=True)
             via_bot = via_bot.save()
-            validated_data['via_bot'] = via_bot  
-        if sender_chat_data:
-            sender_chat = ChatSerializer(data=sender_chat_data)
-            sender_chat_is_valid = sender_chat.is_valid()
-            sender_chat = sender_chat.save()
-            validated_data['sender_chat'] = sender_chat 
-        if entities_data:
-            entities = MessageEntitySerializer(data=entities_data, many=True)
-            entities_is_valid = entities.is_valid()
-            entities = entities.save()
+            validated_data['via_bot'] = via_bot """ 
+            
+        
 
         if animation_data:
             animation = AnimationSerializer(data=animation_data)
-            animation_is_valid = animation.is_valid()
+            animation_is_valid = animation.is_valid(raise_exception=True)
             animation = animation.save()
+
         if audio_data:
             audio = AudioSerializer(data=audio_data)
-            audio_is_valid = audio.is_valid()
+            audio_is_valid = audio.is_valid(raise_exception=True)
             audio = audio.save()
             validated_data['audio'] = audio
+
         if document_data:
             document = DocumentSerializer(data=document_data)
-            document_is_valid = document.is_valid()
+            document_is_valid = document.is_valid(raise_exception=True)
             document = document.save()
             validated_data['document'] = document
+
         if photo_data:
             photo = PhotoSizeSerializer(data=photo_data, many=True)
-            photo_is_valid = photo.is_valid()
+            photo_is_valid = photo.is_valid(raise_exception=True)
             photo = photo.save()
-            #validated_data['photo'] = photo 
+
         if sticker_data:
             sticker = StickerSerializer(data=sticker_data)
-            sticker_is_valid = sticker.is_valid()
+            sticker_is_valid = sticker.is_valid(raise_exception=True)
             sticker = sticker.save()
             validated_data['sticker'] = sticker  
+
         if video_data:
             video = VideoSerializer(data=video_data)
-            video_is_valid = video.is_valid()
+            video_is_valid = video.is_valid(raise_exception=True)
             video = video.save()
             validated_data['video'] = video 
+
         if video_note_data:
             video_note = VideoNoteSerializer(data=video_note_data)
-            video_note_is_valid = video_note.is_valid()
+            video_note_is_valid = video_note.is_valid(raise_exception=True)
             video_note = video_note.save()
             validated_data['video_note'] = video_note 
+
         if voice_data:
             voice = VoiceSerializer(data=voice_data)
-            voice_is_valid = voice.is_valid()
+            voice_is_valid = voice.is_valid(raise_exception=True)
             voice = voice.save()
             validated_data['voice'] = voice 
-        if caption_entities_data:
-            caption_entities = MessageEntitySerializer(data=caption_entities_data, many=True)
-            caption_entities_is_valid = caption_entities.is_valid()
-            caption_entities = caption_entities.save()
+
+       
 
         if contact_data:
             contact = ContactSerializer(data=contact_data)
-            contact_is_valid = contact.is_valid()
+            contact_is_valid = contact.is_valid(raise_exception=True)
             contact = contact.save()
             validated_data['contact'] = contact 
+
         if dice_data:
             dice = DiceSerializer(data=dice_data)
-            dice_is_valid = dice.is_valid()
+            dice_is_valid = dice.is_valid(raise_exception=True)
             dice = dice.save()
             validated_data['dice'] = dice 
+
         if game_data:
             game = GameSerializer(data=game_data)
-            game_is_valid = game.is_valid()
+            game_is_valid = game.is_valid(raise_exception=True)
             game = game.save()
             validated_data['game'] = game 
+
         if poll_data:
-            poll = PollSerializer(data=poll_data)
-            poll_is_valid = poll.is_valid()
+            context = {'validated_data': poll_data, 'lists': _lists}
+            poll = PollSerializer(data=poll_data, context=context)
+            poll_is_valid = poll.is_valid(raise_exception=True)
             poll = poll.save()
             validated_data['poll'] = poll 
+
         if venue_data:
             venue = VenueSerializer(data=venue_data)
-            venue_is_valid = venue.is_valid()
+            venue_is_valid = venue.is_valid(raise_exception=True)
             venue = venue.save()
-            validated_data['venue'] = venue 
+            validated_data['venue'] = venue
+
         if location_data:
             location = LocationSerializer(data=location_data)
-            location_is_valid = location.is_valid()
+            location_is_valid = location.is_valid(raise_exception=True)
             location = location.save()
             validated_data['location'] = location 
-        if new_chat_members_data:
-            new_chat_members = AndruserSerializer(data=new_chat_members_data, many=True, context={'validated_data': new_chat_members_data})
-            new_chat_members_is_valid = new_chat_members.is_valid()
-            new_chat_members = new_chat_members.save()
-            validated_data['new_chat_members'] = new_chat_members 
-        if left_chat_member_data:
+
+        
+        """if left_chat_member_data:
             left_chat_member = AndruserSerializer(data=left_chat_member_data, context={'validated_data': left_chat_member_data})
-            left_chat_member_is_valid = left_chat_member.is_valid()
+            left_chat_member_is_valid = left_chat_member.is_valid(raise_exception=True)
             left_chat_member = left_chat_member.save()
-            validated_data['left_chat_member'] = left_chat_member 
+            validated_data['left_chat_member'] = left_chat_member """
+
         if new_chat_photo_data:
             new_chat_photo = PhotoSizeSerializer(data=new_chat_photo_data)
-            new_chat_photo_is_valid = new_chat_photo.is_valid()
+            new_chat_photo_is_valid = new_chat_photo.is_valid(raise_exception=True)
             new_chat_photo = new_chat_photo.save()
             validated_data['new_chat_photo'] = new_chat_photo  
+
         if message_auto_delete_timer_changed_data:
             message_auto_delete_timer_changed = MessageAutoDeleteTimerChangedSerializer(data=message_auto_delete_timer_changed_data)
-            message_auto_delete_timer_changed_is_valid = message_auto_delete_timer_changed.is_valid()
+            message_auto_delete_timer_changed_is_valid = message_auto_delete_timer_changed.is_valid(raise_exception=True)
             message_auto_delete_timer_changed = message_auto_delete_timer_changed.save()
             validated_data['message_auto_delete_timer_changed'] = message_auto_delete_timer_changed  
+
         if invoice_data:
             invoice = InvoiceSerializer(data=invoice_data)
-            invoice_is_valid = invoice.is_valid()
+            invoice_is_valid = invoice.is_valid(raise_exception=True)
             invoice = invoice.save()
             validated_data['invoice'] = invoice  
+
         if successful_payment_data:
             successful_payment = SuccessfulPaymentSerializer(data=successful_payment_data)
-            successful_payment_is_valid = successful_payment.is_valid()
+            successful_payment_is_valid = successful_payment.is_valid(raise_exception=True)
             successful_payment = successful_payment.save()
-            validated_data['successful_payment'] = successful_payment  
+            validated_data['successful_payment'] = successful_payment 
+
         if passport_data_data:
             passport_data = PassportDataSerializer(data=passport_data_data)
-            passport_data_is_valid = passport_data.is_valid()
+            passport_data_is_valid = passport_data.is_valid(raise_exception=True)
             passport_data = passport_data.save()
             validated_data['passport_data'] = passport_data  
+
         if proximity_alert_triggered_data:
             proximity_alert_triggered = ProximityAlertTriggeredSerializer(data=proximity_alert_triggered_data)
-            proximity_alert_triggered_is_valid = proximity_alert_triggered.is_valid()
+            proximity_alert_triggered_is_valid = proximity_alert_triggered.is_valid(raise_exception=True)
             proximity_alert_triggered = proximity_alert_triggered.save()
             validated_data['proximity_alert_triggered'] = proximity_alert_triggered 
+
         if voice_chat_started_data:
             voice_chat_started = VoiceChatStartedSerializer(data=voice_chat_started_data)
-            voice_chat_started_is_valid = voice_chat_started.is_valid()
+            voice_chat_started_is_valid = voice_chat_started.is_valid(raise_exception=True)
             voice_chat_started = voice_chat_started.save()
             validated_data['voice_chat_started'] = voice_chat_started  
+
         if voice_chat_ended_data:
             voice_chat_ended = VoiceChatEndedSerializer(data=voice_chat_ended_data)
-            voice_chat_ended_is_valid = voice_chat_ended.is_valid()
+            voice_chat_ended_is_valid = voice_chat_ended.is_valid(raise_exception=True)
             voice_chat_ended = voice_chat_ended.save()
-            validated_data['voice_chat_ended'] = voice_chat_ended   
+            validated_data['voice_chat_ended'] = voice_chat_ended 
+
         if voice_chat_participants_invited_data:
             voice_chat_participants_invited = VoiceChatParticipantsInvitedSerializer(data=voice_chat_participants_invited_data)
-            voice_chat_participants_invited_is_valid = voice_chat_participants_invited.is_valid()
+            voice_chat_participants_invited_is_valid = voice_chat_participants_invited.is_valid(raise_exception=True)
             voice_chat_participants_invited = voice_chat_participants_invited.save()
-            validated_data['voice_chat_participants_invited'] = voice_chat_participants_invited  
+            validated_data['voice_chat_participants_invited'] = voice_chat_participants_invited
+             
         if reply_markup_data:
             reply_markup = InlineKeyboardMarkupSerializer(data=reply_markup_data)
-            reply_markup_is_valid = reply_markup.is_valid()
+            reply_markup_is_valid = reply_markup.is_valid(raise_exception=True)
             reply_markup = reply_markup.save()
             validated_data['reply_markup'] = reply_markup 
+
+        
+
+        if reply_to_message_data:
+            message = Message.get_message_for_message_id_and_chat_id(
+                message_id=reply_to_message_data['message_id'],
+                chat_id=validated_data['chat'].chat_id
+            )
+            validated_data['reply_to_message'] = message
+
+        
+        
         
         message = Message.objects.create(**validated_data)
-        if entities_data:
-            for entity in entities:
-                entity.message = message
+
+        if _lists.get('message__new_chat_members', None):
+            new_chat_members = AndruserListSerializer(
+                data=_lists['message__new_chat_members'][0] if len(_lists['message__new_chat_members']) > 0 else {}, 
+                context={
+                    'validated_data': _lists['message__new_chat_members'],
+                    'lists': _lists
+                }
+            )
+            new_chat_members_is_valid = new_chat_members.is_valid(raise_exception=True)
+            new_chat_members_list = new_chat_members.save()
+            for member in new_chat_members_list:
+                member.new_to_message = message
+                member.save()
+        
+        if _lists.get('message__entities', None):
+            
+            message_entities_ser = MessageEntityListSerializer(
+                data = {}, 
+                context = {'lists': _lists, 'specials': _specials}
+            )
+            message_entities_is_valid = message_entities_ser.is_valid()
+            entity_instances = message_entities_ser.save()
+            for  entity in entity_instances:
+                entity.message = message 
                 entity.save()
+
+
         if caption_entities_data:
             for caption_entity in caption_entities:
                 caption_entity.message = message
                 caption_entity.save()
-        if sticker_data:
+
+        """if sticker_data:
             sticker.message = message
-            sticker.save()
-        if document_data:
+            sticker.save()"""
+
+        """if document_data:
             document.message = message
-            document.save()
+            document.save()"""
+        
+        
+        if __user:
+            message.from_user = __user
+
+        if __sender_chat:
+            pass
+            message.sender_chat = __sender_chat
+
+        if __chat:
+            message.chat = __chat
+
+        if __forward_from_chat:
+            message.forward_from_chat = __forward_from_chat
+
+        if __forward_from:
+            message.forward_from = __forward_from
+        
+        message.save()
+        
+        
         return message
 
         

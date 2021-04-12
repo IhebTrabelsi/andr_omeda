@@ -5,3 +5,6 @@ class PollOptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = PollOption
         fields = '__all__'
+    
+    def create(self, validated_data):
+        return PollOption.objects.create(**validated_data)

@@ -7,6 +7,13 @@ from django.utils import timezone
 
 
 class Message(models.Model):
+    from_user = models.ForeignKey(
+        "Andruser",
+        related_name="messages",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True
+    )
     message_id = models.IntegerField(_("message_id"), blank=False)
     """
     this_pinned_message_chat = models.OneToOneField(
@@ -18,7 +25,7 @@ class Message(models.Model):
     # TODO [WORKAROUND20032208] for the present time just get pinned_message
     # of Chat model as JSON field.
 
-    reply_to_message = models.OneToOneField(
+    reply_to_message = models.ForeignKey(
         "self",
         on_delete=models.DO_NOTHING,
         related_name="+",
@@ -43,7 +50,8 @@ class Message(models.Model):
         "Chat",
         on_delete=models.RESTRICT,
         related_name="message",
-        blank=False
+        null=True,
+        blank=True
     )
     sender_chat = models.ForeignKey(
         "Chat",
@@ -54,7 +62,7 @@ class Message(models.Model):
     )
     forward_from = models.ForeignKey(
         "Andruser",
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,
         related_name="forwarded_messages",
         blank=True,
         null=True
@@ -66,6 +74,57 @@ class Message(models.Model):
         null=True,
         blank=True
     )
+    left_chat_member = models.ForeignKey(
+        "Andruser",
+        on_delete=models.RESTRICT,
+        related_name="messages_left_from",
+        blank=True,
+        null=True
+    )
+    via_bot = models.ForeignKey(
+        "Andruser",
+        on_delete=models.RESTRICT,
+        related_name="messages_via_this_bot",
+        blank=True,
+        null=True
+    )
+    voice = models.OneToOneField(
+        "Voice",
+        on_delete=models.RESTRICT,
+        related_name="message",
+        blank=True,
+        null=True
+    )
+    document = models.OneToOneField(
+        "Document",
+        on_delete=models.RESTRICT,
+        related_name="message",
+        blank=True,
+        null=True
+    )
+    sticker = models.OneToOneField(
+        "Sticker",
+        on_delete=models.RESTRICT,
+        related_name="message",
+        blank=True,
+        null=True
+    )
+    video = models.OneToOneField(
+        "Video",
+        on_delete=models.RESTRICT,
+        related_name="message",
+        blank=True,
+        null=True
+    )
+    video_note = models.OneToOneField(
+        "VideoNote",
+        on_delete=models.RESTRICT,
+        related_name="message",
+        blank=True,
+        null=True
+    )
+
+    
 
     date = models.IntegerField(_("date"), blank=False)
     forward_from_message_id = models.IntegerField(_("forward_from_message_id"), blank=True, null=True)
@@ -102,7 +161,52 @@ class Message(models.Model):
     def get_message_for_message_id_and_chat_id(cls, message_id=None, chat_id=None):
         if not message_id or not chat_id:
             return None
-        if cls.objects.filter(chat__chat_id=chat_id).filter(chat__message__id=message_id).exists():
-            return cls.objects.filter(chat__chat_id=chat_id).filter(chat__message__id=message_id)[:1].get()
+
+        if cls.objects.filter(chat__chat_id=chat_id).filter(message_id=message_id).exists():
+            return cls.objects.filter(chat__chat_id=chat_id).filter(message_id=message_id)[:1].get()
         else:
             return None
+
+    @classmethod 
+    def get_message_with_id_attrs(cls):
+        return [['chat', 'sender_chat', 'forward_from_chat'], \
+            ['from', 'from_user', 'forward_from', 'via_bot', 'left_chat_member', 'user', 'creator']]
+    
+    def __str__(self):
+        return "Message with Id : %i in chat with id : %i" % (self.id , self.chat.chat_id)
+
+    @classmethod 
+    def extract_lists(cls, data, lists, specials, *args, **kwargs):
+        new_chat_members_data = data.get('new_chat_members', None)
+        entities_data = data.get('entities', None)
+        # del new_chat_participant/new_chat_member (buggy params) at the same spot
+        if data.get('new_chat_participant', None):
+            del data['new_chat_participant']
+        if data.get('left_chat_participant', None):
+            del data['left_chat_participant']
+        if data.get('new_chat_member', None):
+            del data['new_chat_member']
+        if not new_chat_members_data == None:
+            if len(new_chat_members_data) == 0:
+                del data['new_chat_members']
+            else:
+                lists['message__new_chat_members'] = data['new_chat_members']
+                del data['new_chat_members']
+        if not entities_data == None:
+            if len(entities_data) == 0:
+                del data['entities']
+            else:
+                lists['message__entities'] = data['entities']
+                special_entities = []
+                for entity in lists['message__entities']:
+                    #special_entities.append(entity.get('user', {}))
+                    special_entities.append({'id': 1305811960, 'is_bot': False, 'first_name': 'Iheb', 'last_name': 'Ben Said', 'language_code': 'fr'})
+                    #BREAKPOINT2 mouch kol entity lezem ykoun aandha user m3aha ,
+                    #imposi special feregh ala kol entity maandhech user 
+                specials['entities__users'] = special_entities
+
+                del data['entities']
+        
+        return lists, specials
+    
+    

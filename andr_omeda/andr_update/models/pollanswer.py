@@ -5,10 +5,12 @@ from django.contrib.postgres.fields import JSONField
 
 
 class PollAnswer(models.Model):
-    user = models.ForeignKey(
+    from_user = models.ForeignKey(
         "Andruser",
-        on_delete=models.CASCADE,
-        blank=False
+        on_delete=models.RESTRICT,
+        related_name="poll_answers",
+        blank=True,
+        null=True
     )
     option_ids = models.JSONField(_("option_ids"), blank=False)
     poll_id = models.TextField(_("poll_id"), blank=False)

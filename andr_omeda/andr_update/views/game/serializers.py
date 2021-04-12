@@ -21,17 +21,17 @@ class GameSerializer(serializers.ModelSerializer):
 
         if animation_data:
             animation = AnimationSerializer(data=animation_data)
-            animation_is_valid = animation.is_valid()
+            animation_is_valid = animation.is_valid(raise_exception=True)
             animation = animation.save()
             validated_data['animation'] = animation
         if text_entities_data:
             text_entities = MessageEntitySerializer(data=text_entities_data)
-            text_entities_is_valid = text_entities.is_valid()
+            text_entities_is_valid = text_entities.is_valid(raise_exception=True)
             text_entities = text_entities.save()
             validated_data['text_entities'] = text_entities
         if photo_data:
             photo = PhotoSizeSerializer(data=photo_data)
-            photo_is_valid = photo.is_valid()
+            photo_is_valid = photo.is_valid(raise_exception=True)
             photo = photo.save()
             validated_data['photo'] = photo
 

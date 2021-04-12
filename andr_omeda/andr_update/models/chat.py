@@ -50,3 +50,61 @@ class Chat(models.Model):
             return cls.objects.get(pk=chat_id)
         else:
             return None
+    
+    @classmethod
+    def context_chat_unicity_check(cls, data):
+        if not data.get('chat', None):
+            raise Exception("KeyError chat not present in data")
+        _id = data['chat'].get('chat_id', None)
+        if not _id:
+            raise Exception("KeyError something wrong with chat_id")
+        chat = cls.get_chat_with_id(chat_id=_id)
+        if chat:
+            data.pop('chat', None)
+            context = {'validated_data': data, 'chat': chat.chat_id}
+        else:
+            context = {'validated_data': data}
+        
+        return context
+
+    @classmethod
+    def context_chat_unicity_check_for_field(cls, data, field=''):
+        if not data.get(field, None):
+            raise Exception("KeyError chat not present in data")
+        _id = data[field].get('chat_id', None)
+        if not _id:
+            raise Exception("KeyError something wrong with chat_id")
+        chat = cls.get_chat_with_id(chat_id=_id)
+        if chat:
+            data.pop(field)
+            context = {'validated_data': data, 'chat': chat.chat_id}
+        else:
+            context = {'validated_data': data}
+        
+        return context
+
+    @classmethod
+    def context_chat_unicity_check_for_field_and_context(cls, data, unicity, field='', prefix=''):
+        """
+        data: message => {..., 'chat': {'chat_id':10000, ...}}
+        field: 'chat'
+        prefix: message
+        """
+        if not data.get(field, None):
+            return unicity
+
+        _id = data[field].get('id', None)
+        if not _id:
+            raise Exception("KeyError something wrong with chat_id")
+        
+        chat = cls.get_chat_with_id(chat_id=_id)
+        if chat:
+            del data[field]
+            unicity[prefix + '__' + field] = chat.chat_id
+        else:
+            data[field]['chat_id'] = data[field]['id']
+            del data[field]['id']
+        
+        return unicity
+    
+    

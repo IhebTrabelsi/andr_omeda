@@ -3,69 +3,7 @@ from rest_framework import serializers
 from andr_omeda.andr_update.models import Andruser
 
 
-"""class AndruserSerializer(serializers.Serializer):
-    user_id = serializers.IntegerField(required=True)
-    is_bot = serializers.BooleanField(required=True)
-    first_name = serializers.CharField(required=True)
-    last_name = serializers.CharField(required=False)
-    username = serializers.CharField(required=False)
-    language_code = serializers.CharField(required=False)
-    can_join_groups = serializers.BooleanField(required=False)
-    can_read_all_group_messages = serializers.BooleanField(required=False)
-    supports_inline_queries = serializers.BooleanField(required=False)
 
-    def to_internal_value(self, data):
-
-        _id = data.get('id')
-        is_bot = data.get('is_bot')
-        first_name = data.get('first_name')
-        last_name = data.get('last_name')
-        username = data.get('username')
-        language_code = data.get('language_code')
-        can_join_groups = data.get('can_join_groups')
-        can_read_all_group_messages = data.get('can_read_all_group_messages')
-        supports_inline_queries = data.get('supports_inline_queries')
-        if not _id:
-            raise serializers.ValidationError({
-                'id': 'This field is required.'
-            })
-
-        if not isinstance(update_id, int):
-            raise serializers.ValidationError({
-                'id': 'This field is not in int form.'
-            })
-
-        return {
-            'user_id': _id
-            'is_bot': is_bot
-            'first_name': first_name
-            'last_name': last_name
-            'username': username
-            'language_code': language_code
-            'can_join_groups': can_join_groups
-            'can_read_all_group_messages': can_read_all_group_messages
-            'supports_inline_queries': supports_inline_queries
-        }
-
-    def create(self, validated_data):
-        return Andruser.objects.create(**validated_data)"""
-
-
-
-class AndruserListSerializer(serializers.ListSerializer):
-    def create(self, validated_data):
-        users = []
-        for user in validated_data:
-            if Andruser.user_with_id_exists(user.get('id')):
-                user = Andruser.objects.get(pk=user.get('id'))
-                users.append(user)
-            else:
-                user = AndruserSerializer(data=user)
-                user_is_valid = user.is_valid()
-                user = user.save()
-                users.append(user)
-        
-        return users
 
 class AndruserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -76,13 +14,28 @@ class AndruserSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        if validated_data.get('id', None):
-            validated_data['user_id'] = validated_data['id']
-            del validated_data['id']
-            
         if Andruser.user_with_id_exists(validated_data.get('user_id')):
             user = Andruser.objects.get(pk=validated_data.get('user_id'))
         else:
             user = Andruser.objects.create(**validated_data)
         
         return user
+
+class AndruserListSerializer(serializers.Serializer):
+    def create(self, validated_data):
+        _lists = None
+        if self.context:
+            validated_data = self.context['validated_data']
+            if self.context.get('lists', None):
+                _lists = self.context['lists']
+        if _lists:
+            _users = []
+            new_chat_members_data = _lists['message__new_chat_members']
+            for member in new_chat_members_data:
+                if Andruser.user_with_id_exists(user_id=member['id']):
+                    _users.append(Andruser.objects.get(user_id=member['id']))
+                else:
+                    new_user = Andruser.objects.create(**member)
+                    _users.append(new_user)
+            return _users 
+        return []

@@ -5,17 +5,13 @@ from andr_omeda.andr_update.models import Update
 
 
 class ShippingQuery(models.Model):
-    update = models.OneToOneField(
-        Update,
-        on_delete=models.CASCADE,
-        related_name="shipping_query",
-        blank=True
-    )
-
-    shipping_query_from = models.ForeignKey(
+    from_user = models.ForeignKey(
         "Andruser",
-        on_delete=models.CASCADE,
-        blank=False
+        on_delete=models.RESTRICT,
+        related_name="shipping_queries",
+        blank=True,
+        null=True
     )
+    
     shipping_query_id = models.TextField(_("id"), blank=False)
     invoice_payload = models.TextField(_("invoice_payload"), blank=False)
