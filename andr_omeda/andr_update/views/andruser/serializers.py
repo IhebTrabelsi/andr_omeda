@@ -3,12 +3,10 @@ from rest_framework import serializers
 from andr_omeda.andr_update.models import Andruser
 
 
-
-
 class AndruserSerializer(serializers.ModelSerializer):
     class Meta:
-        model=Andruser
-        fields='__all__'
+        model = Andruser
+        fields = '__all__'
         extra_kwargs = {
             'user_id': {'validators': []},
         }
@@ -17,9 +15,11 @@ class AndruserSerializer(serializers.ModelSerializer):
         if Andruser.user_with_id_exists(validated_data.get('user_id')):
             user = Andruser.objects.get(pk=validated_data.get('user_id'))
         else:
+
             user = Andruser.objects.create(**validated_data)
-        
+
         return user
+
 
 class AndruserListSerializer(serializers.Serializer):
     def create(self, validated_data):
@@ -37,5 +37,5 @@ class AndruserListSerializer(serializers.Serializer):
                 else:
                     new_user = Andruser.objects.create(**member)
                     _users.append(new_user)
-            return _users 
+            return _users
         return []

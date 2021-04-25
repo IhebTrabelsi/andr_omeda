@@ -23,12 +23,11 @@ class InlineQuery(models.Model):
             data['inline_query']['inline_query_id'] = data['inline_query']['id']
             del data['inline_query']['id']
         return data
-    
-    @classmethod 
+
+    @classmethod
     def inlinequery_validation(cls, data, *args, **kwargs):
         _data = cls.inlinequery_id_sanitize(data)
         if _data.get('inline_query', None):
-            print("/////////////////////////////////////////")
             if not _data.get('inline_query').get('location', None):
                 _data['inline_query']['location'] = {}
             _query = _data.get('inline_query').get('query', None)
