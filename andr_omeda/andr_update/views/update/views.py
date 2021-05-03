@@ -12,30 +12,16 @@ from django.views import View
 from andr_omeda.andr_update.utils import unicity_sanitize
 
 from andr_omeda.utils.colorify import colorify
-
+from andr_omeda.andr_update.tasks import async_serialize_update
 
 
 class TutorialBotView(APIView):
     permission_classes = (AllowAny,)
+
     def post(self, request, *args, **kwargs):
         update_id = request.data.pop('update_id', None)
         request.data['update_id'] = {'_id': update_id}
-        
-        colorify('\n\n' + '='*100 + '\n\n' , fore='RED', back='RED')
-        colorify(request.data, fore='GREEN', back='WHITE', highlight="START !")
-        
 
-        _context = unicity_sanitize(req_data=request.data)
-        colorify(_context, fore='BLACK', back='YELLOW', highlight="UPDATE CONTEXT !")
+        async_serialize_update.delay(request.data)
 
-        
-        serializer = UpdateSerializer(data=request.data, context=_context)
-        
-        serializer_is_valid = serializer.is_valid(raise_exception=False)
-        print("\n\n")
-        colorify(serializer_is_valid , fore='BLUE', back='WHITE')
-        colorify('\n' + str(serializer.errors) + '\n', fore='BLUE', back='WHITE')
-        
-        serializer.save()
-        colorify('\n\n' + '='*100 + '\n\n' , fore='RED', back='RED')
         return JsonResponse({"ok": "POST request processed"})

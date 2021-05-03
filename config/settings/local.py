@@ -11,7 +11,7 @@ SECRET_KEY = env(
     default="iDEjjie92hV66o2cLw6j99MdyO2MkM8xOEWzF7CUKm2U1uLGaGdpsVRO9UwJFwRw",
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "0f0e8c039088.ngrok.io"]
+ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "9c886647e917.ngrok.io"]
 
 # CACHES
 # ------------------------------------------------------------------------------
@@ -62,3 +62,4 @@ INSTALLED_APPS += ["django_extensions"]  # noqa F405
 
 # Your stuff...
 # ------------------------------------------------------------------------------
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
