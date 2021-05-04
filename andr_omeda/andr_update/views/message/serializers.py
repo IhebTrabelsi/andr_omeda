@@ -142,6 +142,7 @@ class MessageSerializer(serializers.ModelSerializer):
             'user_id': {'validators': []},
             'reply_to_message': {'validators': []},
         }
+        nested_proxy_field = True
 
     def save(self, **kwargs):
         try:

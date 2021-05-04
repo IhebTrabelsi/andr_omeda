@@ -21,7 +21,7 @@ class TutorialBotView(APIView):
     def post(self, request, *args, **kwargs):
         update_id = request.data.pop('update_id', None)
         request.data['update_id'] = {'_id': update_id}
-
+        print(request.data)
         async_serialize_update.delay(request.data)
 
         return JsonResponse({"ok": "POST request processed"})
