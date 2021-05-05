@@ -15,7 +15,7 @@ from andr_omeda.utils.colorify import colorify
 from andr_omeda.andr_update.tasks import async_serialize_update
 
 
-class TutorialBotView(APIView):
+class TelegramView(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):

@@ -16,19 +16,17 @@ class Bots(APIView):
         owner_serializer = BotERPOwnerSerializer(
             data={"owner_erp_name": erp_owner_data}
         )
-        print(owner_serializer, end='\n\n')
         owner_serializer.is_valid(raise_exception=True)
-        print(owner_serializer.errors, end='\n\n')
         owner_name = owner_serializer.validated_data
         owner = BotERPOwner.objects.get_or_create(
-            owner_erp_name=owner_name
+            **owner_name
         )[0]
 
         bot_serializer = CreateBotSerializer(data=request.data)
         bot_serializer.is_valid(raise_exception=True)
         bot_token = bot_serializer.validated_data
         bot = Bot.objects.create(
-            token=bot_token,
+            **bot_token,
             erp_owner=owner
         )
         return Response({
@@ -44,21 +42,24 @@ class Bots(APIView):
             )
         except ValidationError as e:
             return Response({
-                'error': e
+                'error': 'bot owner does not exist'
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = GetBotSerializer(data=request_data)
-        serializer.is_valid(raise_exception=True)
+        serializer = GetBotSerializer(data={'token': request_data.pop('token', '')})
+        serializer.is_valid()
 
         token_data = serializer.validated_data
 
-        bot = BotERPOwner.get_bot_with_token_for_user_with_name(token_data, owner_name)
-
+        try:
+            bot = BotERPOwner.get_bot_with_token_for_user_with_name(owner_name, **token_data)
+        except Exception as e:
+            return Response({
+                'error': 'bot not found.'
+            }, status=status.HTTP_404_NOT_FOUND)
         bot_serializer = BotSerializer(bot)
 
-        return Response({
-            bot_serializer.data
-        }, status=status.HTTP_200_OK)
+        return Response(
+            bot_serializer.data, status=status.HTTP_200_OK)
 
     def _get_request_data(self, request, user_erp_name, token):
         request_data = request.data.copy()
