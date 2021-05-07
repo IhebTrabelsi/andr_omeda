@@ -43,3 +43,23 @@ class TelegramBotWebhookSetError(ValidationError):
 
     def __str__(self):
         return "description: {} -> {}".format(self.description, self.message)
+
+
+class TelegramBotFieldAccessError(ValidationError):
+    def __init__(self, field, message="Trying to access this field caused an error!"):
+        self.field = field
+        self.message = message
+        super().__init__(self.message)
+
+    def __str__(self):
+        return "field: {} -> {}".format(self.field, self.message)
+
+
+class TelegramAPIResultParsingError(ValidationError):
+    def __init__(self, method_name, message="Trying to parse result from telegram api request caused an error!"):
+        self.method_name = method_name
+        self.message = message
+        super().__init__(self.message)
+
+    def __str__(self):
+        return "method name: {} -> {}".format(self.method_name, self.message)

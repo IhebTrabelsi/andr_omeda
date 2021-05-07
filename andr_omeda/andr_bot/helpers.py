@@ -2,7 +2,8 @@ import requests
 from django.conf import settings
 from urllib.parse import urljoin
 from andr_omeda.andr_bot.exceptions import TelegramBotDoesNotExist, \
-    TelegramBotAsyncCreationError, TelegramBotAsyncCreationFieldError
+    TelegramBotAsyncCreationError, TelegramBotAsyncCreationFieldError, \
+    TelegramAPIResultParsingError
 
 
 def bot_api_request_for_bot_with_token(token, method_name='', params={}):
@@ -43,6 +44,15 @@ def bot_with_token_exists_and_res(token):
 
     res = bot_api_request_for_bot_with_token(method_name='getMe', token=token)
     return "ok" in res and res["ok"] == True and res["result"]["is_bot"] == True, res
+
+
+def parse_setwebhook_res(res):
+    try:
+        res_ok = res['ok']
+        res_description = res['description']
+    except Exception as e:
+        raise TelegramAPIResultParsingError('setwebhook')
+    return res_ok, res_description
 
 
 def bot_basic_info(token):

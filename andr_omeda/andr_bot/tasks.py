@@ -12,41 +12,34 @@ from andr_omeda.andr_bot.exceptions import TelegramBotDoesNotExist, TBDE, \
 # TODO consider registering bot basic info between checking existeence of
 # bot and saving it (maybe done after saving as it's on separate async task)
 import time
+from django.db import transaction
+from andr_omeda.andr_bot.models.bot import Bot
+from andr_omeda.andr_bot.helpers import parse_setwebhook_res
 
 
 @shared_task
-def async_set_webhook(bot) -> None:
-    if settings.DEBUG:
-        webhook_base_url = settings.WEBHOOK_URL + "/webhooks/update/" + bot.token + "/"
-    else:
-        webhook_base_url = settings.SCALEHERO_DOMAIN + "/webhooks/update/" + bot.token + "/"
-    print("///////////////////////////////////////////////")
-    print(webhook_base_url)
-    if not bot_with_token_exists(bot.token):
-        raise TelegramBotDoesNotExist(bot.token)
-    print("----------------------------------------")
+def async_set_webhook(token) -> None:
+    with transaction.atomic():
+        if settings.DEBUG:
+            webhook_base_url = settings.WEBHOOK_URL + "/webhooks/update/" + token + "/"
+        else:
+            webhook_base_url = settings.SCALEHERO_DOMAIN + "/webhooks/update/" + token + "/"
+        print("///////////////////////////////////////////////")
+        print(webhook_base_url)
+        if not bot_with_token_exists(token):
+            raise TelegramBotDoesNotExist(token)
+        print("----------------------------------------")
 
-    allowed_update_types_param = config_bot_with_update_types()
-    res = bot_api_request_for_bot_with_token(
-        bot.token,
-        settings.SET_WEBHOOK_FUNCTION_NAME,
-        {'url': webhook_base_url,
-            'allowed_updates': allowed_update_types_param}
-    )
-    print(res)
-
-    time.sleep(60 * 3)
-    # save bot to database
-    if res['ok'] == True:
+        allowed_update_types_param = config_bot_with_update_types()
+        res = bot_api_request_for_bot_with_token(
+            token,
+            settings.SET_WEBHOOK_FUNCTION_NAME,
+            {'url': webhook_base_url,
+                'allowed_updates': allowed_update_types_param}
+        )
+        time.sleep(60 * 3)
+        bot = Bot.objects.get(token=token)
+        res_ok, res_description = parse_setwebhook_res(res)
+        bot.is_webhook_set = res_ok
+        bot.webhook_result_description = res_description
         bot.save()
-    else:
-        raise TelegramBotWebhookSetError(bot.token)
-
-
-def create_bot_async(obj, *args, **kwargs):
-    obj_token = getattr(obj, 'token', 'undefined')
-    if obj_token == 'undefined':
-        raise TelegramBotAsyncCreationFieldError(obj_token)
-    if obj.id:
-        raise TelegramBotAsyncCreationError(obj_token)
-    async_set_webhook.delay(obj)
