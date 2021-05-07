@@ -12,7 +12,7 @@ SECRET_KEY = env(
 )
 
 NGROK_PREFIX = "https://"
-NGROK_DOMAIN = "656381b9c6bd.ngrok.io"
+NGROK_DOMAIN = "6d215154ca47.ngrok.io"
 
 
 WEBHOOK_URL = NGROK_PREFIX + NGROK_DOMAIN

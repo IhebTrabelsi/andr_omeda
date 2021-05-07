@@ -45,6 +45,8 @@ class UpdateSerializer(serializers.ModelSerializer):
         _specials = self.context['specials']
 
         update_id_data = validated_data.pop('update_id', None)
+        related_to_bot_data = validated_data.pop('related_to_bot', None)
+        for_erp_user_data = validated_data.pop('related_to_bot', None)
         message_data = validated_data.pop('message', None)
         edited_message_data = validated_data.pop('edited_message', None)
         channel_post_data = validated_data.pop('channel_post', None)
@@ -64,6 +66,12 @@ class UpdateSerializer(serializers.ModelSerializer):
             update_id_is_valid = update_id.is_valid(raise_exception=True)
             update_id = update_id.create(update_id.validated_data)
             validated_data['update_id'] = update_id
+
+        if related_to_bot_data != None:
+            validated_data['related_to_bot'] = related_to_bot_data
+
+        if for_erp_user_data != None:
+            validated_data['for_erp_user'] = for_erp_user_data
 
         if message_data:
             context = {'validated_data': message_data, 'unicity': _unicity,

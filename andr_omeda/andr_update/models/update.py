@@ -15,6 +15,20 @@ class Update(models.Model):
         (ERROR, 'Error'),
     )
     status = models.CharField(max_length=250, choices=STATUSES, default=UNPROCESSED)
+    related_to_bot = models.CharField(
+        _('related_to_bot'),
+        blank=False,
+        null=False,
+        default='',
+        max_length=50
+    )
+    for_erp_user = models.CharField(
+        _('for_erp_user'),
+        blank=False,
+        null=False,
+        default='',
+        max_length=255
+    )
     update_id = models.OneToOneField(
         Andrid,
         on_delete=models.RESTRICT,
