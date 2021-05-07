@@ -1,9 +1,11 @@
 import requests
 from django.conf import settings
+from django.db import transaction
 from urllib.parse import urljoin
 from andr_omeda.andr_bot.exceptions import TelegramBotDoesNotExist, \
     TelegramBotAsyncCreationError, TelegramBotAsyncCreationFieldError, \
     TelegramAPIResultParsingError
+from andr_omeda.andr_bot.models.bot import Bot
 
 
 def bot_api_request_for_bot_with_token(token, method_name='', params={}):
@@ -16,20 +18,6 @@ def bot_api_request_for_bot_with_token(token, method_name='', params={}):
     print(req_url)
     res = requests.post(req_url, data=params)
     return res.json()
-
-
-def webhookinfo_for_bot_with_id(cls, id):
-    bot = cls.objects.get(id=id)
-    method_name = bot.get_webhookinfo_methodname()
-    res = bot_api_request(method_name=method_name, params={})
-    # TODO [IHEB] place holder for later to come API ENCAPS OBJECT
-    if not res["ok"] == True:
-        raise Exception("Failing bot api request")
-    try:
-        url = res["result"]["url"]
-
-    except:
-        raise Exception("request succeded but can't access result. ")
 
 
 def bot_with_token_exists(token):
@@ -76,3 +64,58 @@ def config_bot_with_update_types(default=True, obj=None):
         return settings.BOT_CONFIG_PARAM_ALLOWED_UPDATES
 
     return obj.allowed_update_types
+
+
+def resolve_webhook_base_url(domain="", token=None):
+    if not token:
+        raise ValueError("[arg: token] need to be specified!")
+    if settings.DEBUG:
+        if domain == "":
+            webhook_base_url = settings.WEBHOOK_URL + "/webhooks/update/" + token + "/"
+        else:
+            if domain.startswith("https://"):
+                domain = domain[len("https://"):]
+            elif domain.startswith("http://"):
+                domain = domain[len("http://"):]
+
+            webhook_base_url = settings.NGROK_PREFIX + domain + "/webhooks/update/" + token + "/"
+    else:
+        webhook_base_url = settings.SCALEHERO_DOMAIN + "/webhooks/update/" + token + "/"
+
+    return webhook_base_url
+
+
+def set_webhook_for_bot_with_token(domain="", token=None):
+    try:
+        webhook_base_url = resolve_webhook_base_url(domain=domain, token=token)
+
+        if not bot_with_token_exists(token):
+            raise TelegramBotDoesNotExist(token)
+
+        allowed_update_types_param = config_bot_with_update_types()
+
+        res = bot_api_request_for_bot_with_token(
+            token,
+            settings.SET_WEBHOOK_FUNCTION_NAME,
+            {'url': webhook_base_url,
+                'allowed_updates': allowed_update_types_param}
+        )
+
+        return res
+
+    except ValueError as e:
+        raise ValueError(e.message)
+
+
+def update_webhook_fields_for_bot_with_token(token=None, request_res=None):
+    if not token:
+        raise ValueError("[arg: token] need to be specified!")
+    if not request_res:
+        raise ValueError("[arg: request_res] need to be specified!")
+
+    with transaction.atomic():
+        bot = Bot.objects.get(token=token)
+        res_ok, res_description = parse_setwebhook_res(request_res)
+        bot.is_webhook_set = res_ok
+        bot.webhook_result_description = res_description
+        bot.save()

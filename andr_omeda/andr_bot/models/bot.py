@@ -1,8 +1,6 @@
 from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from andr_omeda.andr_bot.helpers import bot_with_token_exists, \
-    get_bot_name_for_bot_token
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 from django.contrib.postgres.fields import ArrayField
