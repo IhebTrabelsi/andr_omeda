@@ -5,6 +5,8 @@ from andr_omeda.andr_bot.helpers import bot_with_token_exists, \
     get_bot_name_for_bot_token
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
+from django.contrib.postgres.fields import ArrayField
+from andr_omeda.andr_bot.tasks import async_set_webhook
 
 
 class BotERPOwner(models.Model):
@@ -30,6 +32,10 @@ class BotERPOwner(models.Model):
 
 class Bot(models.Model):
     token = models.CharField(_('bot-token'), max_length=50, unique=True)
+    allowed_update_types = ArrayField(
+        models.CharField(max_length=255, blank=True),
+        size=None,
+    )
     erp_owner = models.ForeignKey(
         "BotERPOwner",
         on_delete=models.CASCADE,
@@ -38,3 +44,7 @@ class Bot(models.Model):
     )
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        # async_set_webhook.delay(self.token)
+        super().save(*args, **kwargs)

@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from andr_omeda.andr_bot.tasks import create_bot_async
 
 
 class Bots(APIView):
@@ -25,10 +26,14 @@ class Bots(APIView):
         bot_serializer = CreateBotSerializer(data=request.data)
         bot_serializer.is_valid(raise_exception=True)
         bot_token = bot_serializer.validated_data
-        bot = Bot.objects.create(
+
+        bot = Bot(
             **bot_token,
+            allowed_update_types=[],
             erp_owner=owner
         )
+
+        create_bot_async(bot)
         return Response({
             'status': 'ok'
         }, status=status.HTTP_200_OK)

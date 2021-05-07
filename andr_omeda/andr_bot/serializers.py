@@ -24,4 +24,4 @@ class BotSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Bot
-        fields = '__all__'
+        exclude = ['allowed_update_types', ]

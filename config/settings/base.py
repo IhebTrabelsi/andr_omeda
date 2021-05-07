@@ -53,7 +53,7 @@ LOCALE_PATHS = [str(ROOT_DIR / "locale")]
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'andr_omeda14',
+        'NAME': 'andr_omeda18',
         'USER': 'postgres',
         'PASSWORD': 'nht5432',
         'HOST': '127.0.0.1',
@@ -313,6 +313,6 @@ CORS_URLS_REGEX = r"^/api/.*$"
 
 # Bot
 # ------------------------------------------------------------------------------
-BOT_API_BASE_URL = 'https://api.telegram.org/bot'
-BOT_TOKEN = '1763314382:AAE0ZVW_QL4K0-u3NPrPXR-TtpyaP3IV4fw'
-NGROK_TUNNEL_URL = 'https://caf6805f06c6.ngrok.io/'
+BOT_API_BASE_URL = "https://api.telegram.org/bot"
+SET_WEBHOOK_FUNCTION_NAME = "setWebhook"
+BOT_CONFIG_PARAM_ALLOWED_UPDATES = []

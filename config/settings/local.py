@@ -10,8 +10,15 @@ SECRET_KEY = env(
     "DJANGO_SECRET_KEY",
     default="iDEjjie92hV66o2cLw6j99MdyO2MkM8xOEWzF7CUKm2U1uLGaGdpsVRO9UwJFwRw",
 )
+
+NGROK_PREFIX = "https://"
+NGROK_DOMAIN = "656381b9c6bd.ngrok.io"
+
+
+WEBHOOK_URL = NGROK_PREFIX + NGROK_DOMAIN
+
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "656381b9c6bd.ngrok.io"]
+ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", NGROK_DOMAIN]
 
 # CACHES
 # ------------------------------------------------------------------------------
