@@ -6,8 +6,9 @@ from django.urls import include, path
 from django.views import defaults as default_views
 from django.views.generic import TemplateView
 from rest_framework.authtoken.views import obtain_auth_token
-from andr_omeda.andr_update.views.update.views import TutorialBotView
+from andr_omeda.andr_update.views.update.views import TelegramView
 from django.views.decorators.csrf import csrf_exempt
+from andr_omeda.andr_bot.views import Bots
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
@@ -27,11 +28,25 @@ if settings.DEBUG:
     # Static file serving when using Gunicorn + Uvicorn for local web socket development
     urlpatterns += staticfiles_urlpatterns()
 
+
+bot_patterns = [
+    path('', Bots.as_view(), name='bots'),
+]
+
+bots_patterns = [
+    path("<user_erp_name>/<token>/", include(bot_patterns)),
+]
+
+erp_patterns = [
+    path("bots/", include(bots_patterns)),
+]
+
 # API URLS
 urlpatterns += [
     # API base url
     path("api/", include("config.api_router")),
-    path('webhooks/tutorial/', csrf_exempt(TutorialBotView.as_view())),
+    path("erp/", include(erp_patterns)),
+    path("webhooks/update/<token>/", csrf_exempt(TelegramView.as_view())),
     # DRF auth token
     path("auth-token/", obtain_auth_token),
 ]

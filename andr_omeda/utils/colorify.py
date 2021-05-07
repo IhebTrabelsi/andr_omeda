@@ -20,17 +20,16 @@ fore_back_mapping = {
 }
 
 
-
-def colorify(text, fore='GREEN', back='WHITE', highlight=''):
+def colorify(text='', fore='GREEN', back='WHITE', highlight=''):
     color = fore_back_mapping.get(fore + '_ON_' + back, None)
     if not color:
         print(text)
-    
+
     if highlight:
         init()
         print()
-        print(color + '\t\t=========>'+ highlight , end='\n\n')
+        print(color + '\t\t=========>' + highlight, end='\n\n')
     else:
         init(autoreset=True)
     print(color + str(text) + Style.RESET_ALL)
-    #deinit()
+    # deinit()

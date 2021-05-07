@@ -10,8 +10,15 @@ SECRET_KEY = env(
     "DJANGO_SECRET_KEY",
     default="iDEjjie92hV66o2cLw6j99MdyO2MkM8xOEWzF7CUKm2U1uLGaGdpsVRO9UwJFwRw",
 )
+
+NGROK_PREFIX = "https://"
+NGROK_DOMAIN = "6d215154ca47.ngrok.io"
+
+
+WEBHOOK_URL = NGROK_PREFIX + NGROK_DOMAIN
+
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "0f0e8c039088.ngrok.io"]
+ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", NGROK_DOMAIN]
 
 # CACHES
 # ------------------------------------------------------------------------------
@@ -62,3 +69,4 @@ INSTALLED_APPS += ["django_extensions"]  # noqa F405
 
 # Your stuff...
 # ------------------------------------------------------------------------------
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'

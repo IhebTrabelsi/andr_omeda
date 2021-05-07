@@ -6,36 +6,25 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from andr_omeda.andr_update.views.update.serializers import UpdateSerializer
 from django.views.decorators.csrf import csrf_exempt
+from django.db import transaction
 from andr_omeda.andr_update.models import Message, Chat
 from django.http import JsonResponse
 from django.views import View
 from andr_omeda.andr_update.utils import unicity_sanitize
 
 from andr_omeda.utils.colorify import colorify
+from andr_omeda.andr_update.tasks import async_serialize_update
 
 
-
-class TutorialBotView(APIView):
+class TelegramView(APIView):
     permission_classes = (AllowAny,)
-    def post(self, request, *args, **kwargs):
-        update_id = request.data.pop('update_id', None)
-        request.data['update_id'] = {'_id': update_id}
-        
-        colorify('\n\n' + '='*100 + '\n\n' , fore='RED', back='RED')
-        colorify(request.data, fore='GREEN', back='WHITE', highlight="START !")
-        
 
-        _context = unicity_sanitize(req_data=request.data)
-        colorify(_context, fore='BLACK', back='YELLOW', highlight="UPDATE CONTEXT !")
+    def post(self, request, token, *args, **kwargs):
+        with transaction.atomic():
+            update_id = request.data.pop('update_id', None)
+            request.data['update_id'] = {'_id': update_id}
+            request.data['_token_'] = token
+            print(request.data)
+            transaction.on_commit(async_serialize_update.s(request.data).delay)
 
-        
-        serializer = UpdateSerializer(data=request.data, context=_context)
-        
-        serializer_is_valid = serializer.is_valid(raise_exception=False)
-        print("\n\n")
-        colorify(serializer_is_valid , fore='BLUE', back='WHITE')
-        colorify('\n' + str(serializer.errors) + '\n', fore='BLUE', back='WHITE')
-        
-        serializer.save()
-        colorify('\n\n' + '='*100 + '\n\n' , fore='RED', back='RED')
-        return JsonResponse({"ok": "POST request processed"})
+            return JsonResponse({"ok": "POST request processed"})

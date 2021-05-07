@@ -1,1 +1,11 @@
 https://api.telegram.org/bot1739671048:AAGqZ7YiwKcjxFMJou9m2oz997Ztd6rEypc/setWebhook?url=https://0f0e8c039088.ngrok.io/webhooks/tutorial/
+
+
+#celery:
+https://treeschema.com/blog/comprehensive-ecs-deployments-building-the-django-app/
+
+# running with celery 
+
+    - cmd>W:\andr_back\andr_omeda> celery -A andr_omeda worker -l info -P gevent (for windows)
+    - wsl> redis-server
+    - cmd>W:\andr_back\andr_omeda> python manage.py runserver 127.0.0.1:8001

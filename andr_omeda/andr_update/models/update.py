@@ -5,6 +5,30 @@ from andr_omeda.andr_update.models import Andrid, Message
 
 
 class Update(models.Model):
+    UNPROCESSED = 1
+    PROCESSED = 2
+    ERROR = 3
+
+    STATUSES = (
+        (UNPROCESSED, 'Unprocessed'),
+        (PROCESSED, 'Processed'),
+        (ERROR, 'Error'),
+    )
+    status = models.CharField(max_length=250, choices=STATUSES, default=UNPROCESSED)
+    related_to_bot = models.CharField(
+        _('related_to_bot'),
+        blank=False,
+        null=False,
+        default='',
+        max_length=50
+    )
+    for_erp_user = models.CharField(
+        _('for_erp_user'),
+        blank=False,
+        null=False,
+        default='',
+        max_length=255
+    )
     update_id = models.OneToOneField(
         Andrid,
         on_delete=models.RESTRICT,
@@ -83,19 +107,18 @@ class Update(models.Model):
         null=True
     )
 
-
     def __str__(self):
         if self.id:
             return "Update with pgId: %i" % self.id
 
-    @classmethod 
+    @classmethod
     def get_need_sanitize_attrs(cls):
-        return ['message', 'edited_message', 'channel_post', 'edited_channel_post', \
-            'inline_query', 'chosen_inline_result', 'callback_query', 'shipping_query', \
-            'pre_checkout_query', 'poll_answer', \
-            'my_chat_member', ('my_chat_member', 'old_chat_member'), \
-            ('my_chat_member', 'new_chat_member'), ('my_chat_member', 'invite_link')]
-    
+        return ['message', 'edited_message', 'channel_post', 'edited_channel_post',
+                'inline_query', 'chosen_inline_result', 'callback_query', 'shipping_query',
+                'pre_checkout_query', 'poll_answer',
+                'my_chat_member', ('my_chat_member', 'old_chat_member'),
+                ('my_chat_member', 'new_chat_member'), ('my_chat_member', 'invite_link')]
+
     """@classmethod
     def get_need_sanitize_attrs(cls):
         attrs_list = cls.get_need_sanitize_attrs()

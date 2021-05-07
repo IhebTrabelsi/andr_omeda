@@ -4,9 +4,11 @@ from andr_omeda.andr_update.models import Sticker
 from andr_omeda.andr_update.views.maskposition.serializers import MaskPositionSerializer
 from andr_omeda.andr_update.views.photosize.serializers import PhotoSizeSerializer
 
+
 class StickerSerializer(serializers.ModelSerializer):
     mask_position = MaskPositionSerializer(required=False)
-    thumb = PhotoSizeSerializer()
+    thumb = PhotoSizeSerializer(allow_null=True, required=False)
+
     class Meta:
         model = Sticker
         fields = '__all__'
@@ -14,7 +16,7 @@ class StickerSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         mask_position_data = validated_data.pop('mask_position', None)
         thumb_data = validated_data.pop('thumb', None)
-        
+
         if mask_position_data:
             mask_position = MaskPositionSerializer(data=mask_position_data)
             mask_position_is_valid = mask_position.is_valid(raise_exception=True)
