@@ -100,6 +100,7 @@ LOCAL_APPS = [
     "andr_omeda.andr_bot.apps.AndrBotConfig",
     "andr_omeda.andr_update.apps.AndrUpdateConfig",
     "andr_omeda.andr_record.apps.AndrRecordConfig",
+    "andr_omeda.andr_base.apps.AndrBaseConfig",
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
