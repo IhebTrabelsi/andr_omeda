@@ -2,6 +2,8 @@ import requests
 from requests.exceptions import HTTPError, ConnectionError, Timeout
 from andr_omeda.andr_base.utils import logging
 from andr_omeda.andr_base.utils import types
+from andr_omeda.andr_base.utils.exceptions import ApiTelegramException, \
+    ApiInvalidJSONException, ApiHTTPException
 
 try:
     from requests.packages.urllib3 import fields

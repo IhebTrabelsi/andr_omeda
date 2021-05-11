@@ -1,11 +1,7 @@
+from andr_omeda.andr_base.utils import util
+import json
+
 DISABLE_KEYLEN_ERROR = False
-
-
-def chunks(lst, n):
-    """Yield successive n-sized chunks from lst."""
-    # https://stackoverflow.com/a/312464/9935473
-    for i in range(0, len(lst), n):
-        yield lst[i:i + n]
 
 
 class JsonSerializable(object):
@@ -21,6 +17,42 @@ class JsonSerializable(object):
         :return: a JSON formatted string.
         """
         raise NotImplementedError
+
+
+class Dictionaryable(object):
+    """
+    Subclasses of this class are guaranteed to be able to be converted to dictionary.
+    All subclasses of this class must override to_dict.
+    """
+
+    def to_dict(self):
+        """
+        Returns a DICT with class field values
+        This function must be overridden by subclasses.
+        :return: a DICT
+        """
+        raise NotImplementedError
+
+
+class KeyboardButton(Dictionaryable, JsonSerializable):
+    def __init__(self, text, request_contact=None, request_location=None, request_poll=None):
+        self.text = text
+        self.request_contact = request_contact
+        self.request_location = request_location
+        self.request_poll = request_poll
+
+    def to_json(self):
+        return json.dumps(self.to_dict())
+
+    def to_dict(self):
+        json_dict = {'text': self.text}
+        if self.request_contact:
+            json_dict['request_contact'] = self.request_contact
+        if self.request_location:
+            json_dict['request_location'] = self.request_location
+        if self.request_poll:
+            json_dict['request_poll'] = self.request_poll.to_dict()
+        return json_dict
 
 
 class ReplyKeyboardMarkup(JsonSerializable):

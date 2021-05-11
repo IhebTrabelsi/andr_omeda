@@ -6,6 +6,7 @@ from andr_omeda.andr_update.views.update.serializers import UpdateSerializer
 from andr_omeda.andr_bot.models.bot import BotERPOwner
 from andr_omeda.andr_record.models import FlowQueue
 from andr_omeda.andr_update import choices
+from andr_omeda.andr_update import helpers
 import time
 
 
@@ -46,6 +47,14 @@ def async_serialize_update(request_data) -> None:
         print(state)
         print("===========================================================", end="\n\n")
 
-        if state == choices.GREET:
-            pass
+        if state == choices.GREET[0]:
+            res = helpers.greet_chat_with_id_in_bot_with_token(update.message.chat.chat_id, token)
+            print("==========================RES============================")
+            print(res)
+            print("===========================================================", end="\n\n")
+        else:
+            print("==========================RES============================")
+            print("MOUCH GREET")
+            print("===========================================================", end="\n\n")
+
         print("===========================================================", end="\n\n")
