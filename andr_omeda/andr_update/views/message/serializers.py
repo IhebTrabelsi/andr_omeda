@@ -29,6 +29,7 @@ from andr_omeda.andr_update.views.messageautodeletetimerchanged.serializers impo
 
 from rest_framework import serializers
 from andr_omeda.andr_update.models import Chat
+from andr_omeda.andr_record.models import FlowQueue
 from andr_omeda.andr_update.views.chatlocation.serializers import ChatLocationSerializer
 from andr_omeda.andr_update.views.chatpermissions.serializers import ChatPermissionsSerializer
 from andr_omeda.andr_update.views.chatphoto.serializers import ChatPhotoSerializer
@@ -98,6 +99,10 @@ class ChatSerializer(serializers.ModelSerializer):
 
         chat = Chat(**validated_data)
         chat.save()
+
+        flow = FlowQueue(chat=chat)
+        flow.save()
+
         return chat
 
     def validate_chat_id(self, value):

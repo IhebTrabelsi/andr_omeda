@@ -7,6 +7,7 @@ redis==3.5.3  # https://github.com/andymccurdy/redis-py
 hiredis==1.1.0  # https://github.com/redis/hiredis-py
 uvicorn[standard]==0.13.4  # https://github.com/encode/uvicorn
 celery==5.0.5
+pyTelegramBotAPI==3.7.7
 
 # Django
 # ------------------------------------------------------------------------------
