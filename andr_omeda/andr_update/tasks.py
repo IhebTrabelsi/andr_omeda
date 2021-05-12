@@ -3,13 +3,27 @@ from django.db import transaction
 from andr_omeda.utils.colorify import colorify
 from andr_omeda.andr_update.utils import unicity_sanitize
 from andr_omeda.andr_update.views.update.serializers import UpdateSerializer
+from andr_omeda.andr_update.models.update import Update
 from andr_omeda.andr_bot.models.bot import BotERPOwner
 from andr_omeda.andr_record.models import FlowQueue
-from andr_omeda.andr_update import choices
-from andr_omeda.andr_update import helpers
+from andr_omeda.andr_record.helpers import dispatch_state
 import time
 
 
+###########################################################################
+#
+#
+#                               TODO
+#
+#
+###########################################################################
+
+# save last control message/update id sent after responding to user
+# and check before sending that the current message.text not eaqual
+# to last update.text
+
+
+###########################################################################
 @shared_task()
 def async_serialize_update(request_data) -> None:
     time.sleep(5)
@@ -47,14 +61,24 @@ def async_serialize_update(request_data) -> None:
         print(state)
         print("===========================================================", end="\n\n")
 
-        if state == choices.GREET[0]:
-            res = helpers.greet_chat_with_id_in_bot_with_token(update.message.chat.chat_id, token)
-            print("==========================RES============================")
-            print(res)
-            print("===========================================================", end="\n\n")
+        # get last uuid
+        no_prev_uuid = len(flow_queue.last_update_uuid) <= 1
+        if not no_prev_uuid:
+            print("==========================len(last_update_uuid)>1========================", end="\n\n")
+            prev_uuid = flow_queue.last_update_uuid[-2]
+            update_with_last_uuid = Update.objects.get(
+                message__chat__chat_id=update.message.chat.chat_id,
+                uuid=prev_uuid)
+
+            # BREAKPOINT LOOKING FOR WHERE UUID IS ADDED
+            if update_with_last_uuid.message.text == update.message.text:
+                print("==========================SENT BY APP========================", end="\n\n")
+                return
+            else:
+                print("==========================dispatch normally========================", end="\n\n")
+                dispatch_state(state=state, chat_id=update.message.chat.chat_id, token=token)
         else:
-            print("==========================RES============================")
-            print("MOUCH GREET")
-            print("===========================================================", end="\n\n")
+            print("==========================dispatch first event=======================", end="\n\n")
+            dispatch_state(state=state, chat_id=update.message.chat.chat_id, token=token)
 
         print("===========================================================", end="\n\n")

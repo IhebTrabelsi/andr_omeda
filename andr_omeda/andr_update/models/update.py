@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -15,6 +16,7 @@ class Update(models.Model):
         (ERROR, 'Error'),
     )
     status = models.CharField(max_length=250, choices=STATUSES, default=UNPROCESSED)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)
     related_to_bot = models.CharField(
         _('related_to_bot'),
         blank=False,

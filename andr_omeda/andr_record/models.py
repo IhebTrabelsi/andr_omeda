@@ -185,6 +185,10 @@ def _def_queue():
     return [choices.GREET[0]]
 
 
+def _def_update_queue():
+    return []
+
+
 class FlowQueue(models.Model):
     chat = models.OneToOneField(
         "andr_update.Chat",
@@ -195,4 +199,9 @@ class FlowQueue(models.Model):
     queue = ArrayField(
         models.IntegerField(),
         default=_def_queue
+    )
+
+    last_update_uuid = ArrayField(
+        models.UUIDField(),
+        default=_def_update_queue
     )

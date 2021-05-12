@@ -184,6 +184,10 @@ class UpdateSerializer(serializers.ModelSerializer):
 
         update = Update.objects.create(**validated_data)
 
+        _flow = update.message.chat.flow_queue
+        _flow.last_update_uuid.append(update.uuid)
+        _flow.save()
+
         if my_chat_member_data:
             my_chat_member.update = update
             my_chat_member.save()
