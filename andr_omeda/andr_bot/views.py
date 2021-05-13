@@ -1,7 +1,8 @@
 from rest_framework.views import APIView
 from .serializers import BotERPOwnerSerializer, CreateBotSerializer, GetBotSerializer, \
     BotSerializer
-from andr_omeda.andr_bot.models.bot import BotERPOwner, Bot
+from andr_omeda.andr_bot.models.bot import Bot
+from andr_omeda.andr_bot.models.erp import BotERPOwner
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny

@@ -4,7 +4,7 @@ from andr_omeda.utils.colorify import colorify
 from andr_omeda.andr_update.utils import unicity_sanitize
 from andr_omeda.andr_update.views.update.serializers import UpdateSerializer
 from andr_omeda.andr_update.models.update import Update
-from andr_omeda.andr_bot.models.bot import BotERPOwner
+from andr_omeda.andr_bot.models.erp import BotERPOwner
 from andr_omeda.andr_record.models import FlowQueue
 from andr_omeda.andr_record.helpers import dispatch_state
 import time

@@ -37,8 +37,33 @@ bots_patterns = [
     path("<user_erp_name>/<token>/", include(bot_patterns)),
 ]
 
+moderation_moderated_object_patterns = [
+    path('', ModeratedObjectItem.as_view(), name='moderated-object'),
+    path('approve/', ApproveModeratedObject.as_view(), name='approve-moderated-object'),
+    path('reject/', RejectModeratedObject.as_view(), name='reject-moderated-object'),
+    path('verify/', VerifyModeratedObject.as_view(), name='verify-moderated-object'),
+    path('unverify/', UnverifyModeratedObject.as_view(), name='unverify-moderated-object'),
+    path('logs/', ModeratedObjectLogs.as_view(), name='moderated-object-logs'),
+    path('reports/', ModeratedObjectReports.as_view(), name='moderated-object-reports'),
+]
+
+moderation_moderated_objects_patterns = [
+    path('<int:moderated_object_id>/', include(moderation_moderated_object_patterns)),
+    path('global/', GlobalModeratedObjects.as_view(), name='global-moderated-objects'),
+]
+
+moderation_patterns = [
+    path('moderated-objects/', include(moderation_moderated_objects_patterns), name='moderation-moderated-objects'),
+    path('categories/', ModerationCategories.as_view(), name='moderation-categories'),
+    #path('is-not-suspended-check/', IsNotSuspendedCheck.as_view(), name='is-not-suspended-check'),
+    #path('andruser/penalties/', AndruserModerationPenalties.as_view(), name='user-moderation-penalties'),
+    path('<str:erp_name>/pending-moderated-objects-communities/', AndruserPendingModeratedObjectsCommunities.as_view(),
+         name='andruser-pending-moderated-objects-communities'),
+]
+
 erp_patterns = [
     path("bots/", include(bots_patterns)),
+    path("moderation/", include(moderation_patterns)),
 ]
 
 # API URLS
