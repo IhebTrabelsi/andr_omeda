@@ -13,6 +13,12 @@ class Bot(models.Model):
         models.CharField(max_length=255, blank=True),
         size=None,
     )
+    chats = models.ManyToManyField(
+        "andr_update.Chat",
+        related_name="bots",
+        null=True,
+        blank=True
+    )
     is_webhook_set = models.BooleanField(_('is_webhook_set'), default=False)
     webhook_result_description = models.CharField(
         _('webhook_error_description'),

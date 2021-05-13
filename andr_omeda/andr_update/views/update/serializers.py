@@ -46,7 +46,7 @@ class UpdateSerializer(serializers.ModelSerializer):
 
         update_id_data = validated_data.pop('update_id', None)
         related_to_bot_data = validated_data.pop('related_to_bot', None)
-        for_erp_user_data = validated_data.pop('related_to_bot', None)
+        for_erp_user_data = validated_data.pop('for_erp_user', None)
         message_data = validated_data.pop('message', None)
         edited_message_data = validated_data.pop('edited_message', None)
         channel_post_data = validated_data.pop('channel_post', None)
@@ -75,7 +75,8 @@ class UpdateSerializer(serializers.ModelSerializer):
 
         if message_data:
             context = {'validated_data': message_data, 'unicity': _unicity,
-                       'unicity_prefix': 'message', 'lists': _lists, 'specials': _specials}
+                       'unicity_prefix': 'message', 'lists': _lists, 'specials': _specials,
+                       'related_to_bot': validated_data['related_to_bot']}
             if self.context.get('message__reply_to_message', None):
                 context['message__reply_to_message'] = self.context.get('message__reply_to_message')
             message = MessageSerializer(data=message_data, context=context)
@@ -85,7 +86,8 @@ class UpdateSerializer(serializers.ModelSerializer):
 
         if edited_message_data != None:
             context = {'validated_data': edited_message_data, 'unicity': _unicity,
-                       'unicity_prefix': 'edited_message', 'lists': _lists, 'specials': _specials}
+                       'unicity_prefix': 'edited_message', 'lists': _lists, 'specials': _specials,
+                       'related_to_bot': validated_data['related_to_bot']}
             if self.context.get('edited_message__reply_to_message', None):
                 context['edited_message__reply_to_message'] = self.context.get('edited_message__reply_to_message')
             edited_message = MessageSerializer(data=edited_message_data, context=context)

@@ -9,7 +9,7 @@ from andr_omeda.andr_moderation.views.erpuser.serializers import \
 from andr_omeda.andr_bot.models.erp import BotERPOwner
 
 
-class UserPendingModeratedObjectsCommunities(APIView):
+class ChatPendingModeratedObjectsBots(APIView):
     permission_classes = (AllowAny,)
 
     def get(self, erp_name, request):
@@ -29,7 +29,7 @@ class UserPendingModeratedObjectsCommunities(APIView):
         communities = user.get_pending_moderated_objects_communities(max_id=max_id, ).order_by('-id')[
             :count]
 
-        response_serializer = PendingModeratedObjectsCommunitySerializer(communities, many=True,
-                                                                         context={"request": request})
+        response_serializer = PendingModeratedObjectsBotSerializer(communities, many=True,
+                                                                   context={"request": request})
 
         return Response(response_serializer.data, status=status.HTTP_200_OK)

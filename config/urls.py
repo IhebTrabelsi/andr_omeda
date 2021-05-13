@@ -57,8 +57,8 @@ moderation_patterns = [
     path('categories/', ModerationCategories.as_view(), name='moderation-categories'),
     #path('is-not-suspended-check/', IsNotSuspendedCheck.as_view(), name='is-not-suspended-check'),
     #path('andruser/penalties/', AndruserModerationPenalties.as_view(), name='user-moderation-penalties'),
-    path('<str:erp_name>/pending-moderated-objects-communities/', AndruserPendingModeratedObjectsCommunities.as_view(),
-         name='andruser-pending-moderated-objects-communities'),
+    path('<str:erp_name>/pending-moderated-objects-communities/', ChatPendingModeratedObjectsBots.as_view(),
+         name='chat-pending-moderated-objects-communities'),
 ]
 
 erp_patterns = [
