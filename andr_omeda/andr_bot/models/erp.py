@@ -23,5 +23,5 @@ class BotERPOwner(models.Model):
 
         return token_owner.bots.get()
 
-    def get_pending_moderated_objects_communities(self, max_id):
+    def get_pending_moderated_objects_bots(self, max_id):
         query = Q(erp_owner__owner_erp_name=self.owner_erp_name)

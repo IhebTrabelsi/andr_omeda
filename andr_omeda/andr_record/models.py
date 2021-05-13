@@ -104,7 +104,6 @@ def _table_data():
 
 
 class Record(models.Model):
-
     andruser = models.ForeignKey(
         "andr_update.Andruser",
         on_delete=models.CASCADE,
