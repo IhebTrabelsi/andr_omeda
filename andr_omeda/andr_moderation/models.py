@@ -61,10 +61,10 @@ class ModeratedObject(models.Model):
 
     category = models.ForeignKey(ModerationCategory, on_delete=models.CASCADE, related_name='moderated_objects')
 
-    OBJECT_TYPE_ANDRUSER = 'A'
+    OBJECT_TYPE_CHAT = 'C'
 
     OBJECT_TYPES = (
-        (OBJECT_TYPE_ANDRUSER, 'Andruser'),
+        (OBJECT_TYPE_CHAT, 'Chat'),
     )
 
     object_type = models.CharField(max_length=5, choices=OBJECT_TYPES)
@@ -97,9 +97,9 @@ class ModeratedObject(models.Model):
         return moderated_object
 
     @classmethod
-    def get_or_create_moderated_object_for_andruser(cls, andruser, category_id):
-        return cls._get_or_create_moderated_object(object_type=cls.OBJECT_TYPE_ANDRUSER,
-                                                   content_object=andruser,
+    def get_or_create_moderated_object_for_chat(cls, chat, category_id):
+        return cls._get_or_create_moderated_object(object_type=cls.OBJECT_TYPE_CHAT,
+                                                   content_object=chat,
                                                    category_id=category_id)
 
     def is_verified(self):
