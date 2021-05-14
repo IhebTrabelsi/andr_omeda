@@ -1,6 +1,8 @@
 from django.db import models
 from rest_framework.exceptions import ValidationError
 from django.db.models import Q, F, Count
+from andr_omeda.andr_moderation.models import ModeratedObject
+from andr_omeda.andr_bot.models.bot import Bot
 
 
 class BotERPOwner(models.Model):
@@ -25,3 +27,9 @@ class BotERPOwner(models.Model):
 
     def get_pending_moderated_objects_bots(self, max_id):
         query = Q(erp_owner__owner_erp_name=self.owner_erp_name)
+        query.add(Q(chats__moderated_objects__status=ModeratedObject.STATUS_PENDING), Q.AND)
+
+        if max_id:
+            query.add(Q(id__lt=max_id), Q.AND)
+
+        return Bot.objects.filter(query).distinct
