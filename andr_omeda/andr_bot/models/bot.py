@@ -5,6 +5,7 @@ from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 from django.contrib.postgres.fields import ArrayField
 from andr_omeda.andr_bot.exceptions import TelegramBotFieldAccessError
+from andr_omeda.andr_moderation.models import ModeratedObject
 
 
 class Bot(models.Model):
@@ -34,3 +35,8 @@ class Bot(models.Model):
     )
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    def count_pending_moderated_objects(self):
+        query = Q(chats__moderated_objects=ModeratedObject.STATUS_PENDING)
+        query.add(Q(id=self.id), Q.AND)
+        return Bot.objects.filter(query).count()
