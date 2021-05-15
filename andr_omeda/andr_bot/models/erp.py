@@ -3,6 +3,7 @@ from rest_framework.exceptions import ValidationError
 from django.db.models import Q, F, Count
 from andr_omeda.andr_moderation.models import ModeratedObject
 from andr_omeda.andr_bot.models.bot import Bot
+from django.utils.translation import ugettext_lazy as _
 
 
 class BotERPOwner(models.Model):
@@ -33,3 +34,36 @@ class BotERPOwner(models.Model):
             query.add(Q(id__lt=max_id), Q.AND)
 
         return Bot.objects.filter(query).distinct
+
+    def update_moderated_object_with_id(self, moderated_object_id, description=None,
+                                        category_id=None):
+        moderated_object = ModeratedObject.objects.get(pk=moderated_object_id)
+
+        return self.update_moderated_object(moderated_object=moderated_object, description=description,
+                                            category_id=category_id)
+
+    def update_moderated_object(self, moderated_object, description=None,
+                                category_id=None):
+        #check_can_update_moderated_object(user=self, moderated_object=moderated_object)
+        moderated_object.update_with_actor_with_id(actor_id=self.pk, description=description,
+                                                   category_id=category_id)
+        return moderated_object
+
+    def reject_moderated_object_with_id(self, moderated_object_id):
+        moderated_object = ModeratedObject.objects.get(pk=moderated_object_id)
+        return self.reject_moderated_object(moderated_object=moderated_object)
+
+    def reject_moderated_object(self, moderated_object):
+        moderated_object.reject_with_actor_with_id(actor_id=self.pk)
+
+    def get_logs_for_moderated_object_with_id(self, moderated_object_id, max_id=None):
+        moderated_object = ModeratedObject.objects.get(pk=moderated_object_id)
+        return self.get_logs_for_moderated_object(moderated_object=moderated_object, max_id=max_id)
+
+    def get_logs_for_moderated_object(self, moderated_object, max_id=None):
+        query = Q()
+
+        if max_id:
+            query.add(Q(id__lt=max_id), Q.AND)
+
+        return moderated_object.logs.filter(query)

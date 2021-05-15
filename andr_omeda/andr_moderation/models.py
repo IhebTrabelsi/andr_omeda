@@ -37,7 +37,7 @@ class ModerationCategory(models.Model):
         return super(ModerationCategory, self).save(*args, **kwargs)
 
     @classmethod
-    def make_moderation_category(cls, severity=cls.SEVERITY_MEDIUM):
+    def make_moderation_category(cls, severity=SEVERITY_MEDIUM):
         return mixer.blend(cls, severity=severity)
 
 
@@ -160,7 +160,7 @@ class ModeratedObject(models.Model):
 
 
 class ModeratedObjectLog(models.Model):
-    actor = models.ForeignKey("BotERPOwner", on_delete=models.CASCADE, related_name='+', null=True)
+    actor = models.ForeignKey("andr_bot.BotERPOwner", on_delete=models.CASCADE, related_name='+', null=True)
 
     LOG_TYPE_DESCRIPTION_CHANGED = 'DC'
     LOG_TYPE_STATUS_CHANGED = 'AC'

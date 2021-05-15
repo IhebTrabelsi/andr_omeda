@@ -17,7 +17,6 @@ class Bot(models.Model):
     chats = models.ManyToManyField(
         "andr_update.Chat",
         related_name="bots",
-        null=True,
         blank=True
     )
     is_webhook_set = models.BooleanField(_('is_webhook_set'), default=False)

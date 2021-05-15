@@ -53,7 +53,7 @@ LOCALE_PATHS = [str(ROOT_DIR / "locale")]
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'andr_omeda23',
+        'NAME': 'andr_omeda24',
         'USER': 'postgres',
         'PASSWORD': 'nht5432',
         'HOST': '127.0.0.1',
@@ -93,6 +93,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
+    "generic_relations",
 ]
 
 LOCAL_APPS = [

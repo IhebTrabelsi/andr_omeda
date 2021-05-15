@@ -24,12 +24,12 @@ class ChatPendingModeratedObjectsBots(APIView):
         max_id = data.get('max_id')
 
         request['erp_name'] = erp_name
-        user = request.user
+        erpuser = BotERPOwner.objects.get(owner_erp_name=erp_name)
 
-        communities = user.get_pending_moderated_objects_communities(max_id=max_id, ).order_by('-id')[
+        bots = erpuser.get_pending_moderated_objects_bots(max_id=max_id, ).order_by('-id')[
             :count]
 
-        response_serializer = PendingModeratedObjectsBotSerializer(communities, many=True,
+        response_serializer = PendingModeratedObjectsBotSerializer(bots, many=True,
                                                                    context={"request": request})
 
         return Response(response_serializer.data, status=status.HTTP_200_OK)
