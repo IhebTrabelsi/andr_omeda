@@ -104,3 +104,51 @@ Scheduled Enhancements
 [ ] moderated_objects for each workspace ( with different types )
 
 
+Current workflow
+----------
+
+Celery
+^^^^^^^^^^^
+Run celery (for windows):
+
+::
+
+  $ cmd>W:\andr_back\andr_omeda> celery -A andr_omeda worker -l info -P gevent (for windows)
+  
+Redis
+^^^^^^^^^^^
+Run redis server (for windows):
+
+::
+
+  $ wsl> redis-server
+  
+Django
+^^^^^^^^^^^
+Run Django server (for windows):
+
+::
+
+  $ cmd>W:\andr_back\andr_omeda> python manage.py runserver 127.0.0.1:8001
+  
+Postman
+^^^^^^^^^^^
+Create bot/bots for erp user:
+
+::
+
+  $ POST> http://127.0.0.1:8001/erp/bots/user123456/tokenjnejfkjegfzkjegeggzzgegz/
+  body: 
+    erp_owner_name: user123458
+    token: 1732768364:AAF6rhx9U9Bmn6sGQAOPTNab_hmUQB8T8yg
+    
+Webhook + ngrok
+^^^^^^^^^^^
+Set webhook for new ngrok domain:
+
+::
+
+  $ cmd> python manage.py reset_webhook_for_ngrok 123456.ngrok.io 1732768364:AAF6rhx9U9Bmn6sGQAOPTNab_hmUQB8T8yg
+
+
+
