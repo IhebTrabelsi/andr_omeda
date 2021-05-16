@@ -18,7 +18,7 @@ NGROK_DOMAIN = "6d215154ca47.ngrok.io"
 WEBHOOK_URL = NGROK_PREFIX + NGROK_DOMAIN
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "aabe17f11b00.ngrok.io"]
+ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "c9b8d42a4861.ngrok.io"]
 
 # CACHES
 # ------------------------------------------------------------------------------

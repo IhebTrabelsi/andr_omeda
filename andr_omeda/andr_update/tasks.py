@@ -53,15 +53,10 @@ def async_serialize_update(request_data) -> None:
         chat_id=update.message.chat.chat_id
     )
 
-    state = flow_queue.get_last_queue_state()
-
-    print("==========================STATE============================")
-    print(state)
-    print("===========================================================", end="\n\n")
-
     # get last uuid
     no_prev_uuid = flow_queue.no_prev_uuid()
     if not no_prev_uuid:
+
         print("==========================len(last_update_uuid)>1========================", end="\n\n")
         prev_uuid = flow_queue.get_prev_uuid()
         update_with_last_uuid = Update.objects.get(
@@ -74,9 +69,9 @@ def async_serialize_update(request_data) -> None:
             return
         else:
             print("==========================dispatch normally========================", end="\n\n")
-            dispatch_state(state=state, chat_id=update.message.chat.chat_id, token=token)
+            dispatch_state(queue=flow_queue, chat_id=update.message.chat.chat_id, token=token)
     else:
         print("==========================dispatch first event=======================", end="\n\n")
-        dispatch_state(state=state, chat_id=update.message.chat.chat_id, token=token)
+        dispatch_state(queue=flow_queue, chat_id=update.message.chat.chat_id, token=token)
 
     print("===========================================================", end="\n\n")

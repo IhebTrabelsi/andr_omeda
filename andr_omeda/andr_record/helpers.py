@@ -18,18 +18,17 @@ def get_flow_queue_for_chat_with_id(chat_id):
         raise Exception('chat does not exist')
 
 
-def dispatch_state(state, chat_id, token):
+def dispatch_state(queue, chat_id, token):
+    state = queue.get_last_queue_state()
+    print("~~"*20, end='\n')
+    print(state)
 
     if state == choices.WAITING_FOR_APPROVAL[0]:
         moderation_approved = check_moderation_approved(chat_id=chat_id)
         if moderation_approved:
             queue = get_flow_queue_for_chat_with_id(chat_id=chat_id)
-            queue.queue.append(choices.GREET[0])
-            return dispatch_state(
-                state=choices.GREET[0],
-                chat_id=chat_id,
-                token=token
-            )
+            queue.append_state(choices.GREET[0])
+
         else:
             res = helpers.info_chat_must_be_approved(chat_id, token)
             print("==========================RES============================")

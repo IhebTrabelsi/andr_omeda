@@ -214,3 +214,7 @@ class FlowQueue(models.Model):
 
     def get_prev_uuid(self):
         return self.last_update_uuid[-2]
+
+    def append_state(self, state):
+        self.queue.append(state)
+        self.save()
