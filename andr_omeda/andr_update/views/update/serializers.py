@@ -187,11 +187,8 @@ class UpdateSerializer(serializers.ModelSerializer):
             validated_data['chat_member'] = chat_member
 
         update = Update.objects.create(**validated_data)
-        print("/////////////////////////////////////////////////////\n"*3)
-        print(update.message.chat.flow_queue)
-        print("/////////////////////////////////////////////////////\n"*3)
 
-        if update.id:
+        if update.id and update.message:
             if update.message.id:
                 _flow = get_flow_queue_for_chat_with_id(chat_id=update.message.chat.chat_id)
                 _flow.last_update_uuid.append(update.uuid)

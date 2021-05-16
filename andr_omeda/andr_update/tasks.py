@@ -35,27 +35,23 @@ def async_serialize_update(request_data) -> None:
     bot_owner = BotERPOwner.objects.get(bots__token=token)
     bot_owner_name = bot_owner.owner_erp_name
     request_data['for_erp_user'] = bot_owner_name
-    print("========================REQUEST_DATA=======================")
-    print(request_data)
-    print("===========================================================", end="\n\n")
 
     _context = unicity_sanitize(req_data=request_data)
-    print("==========================CONTEXT==========================")
-    print(_context)
-    print("===========================================================", end="\n\n")
 
     serializer = UpdateSerializer(data=request_data, context=_context)
 
     serializer_is_valid = serializer.is_valid(raise_exception=False)
     update = serializer.save()
 
+    # TODO for now return if update has no message attr #
+    if not update.message:                              #
+        return                                          #
+    #####################################################
+
     message_text = update.message.text
     flow_queue = get_flow_queue_for_chat_with_id(
         chat_id=update.message.chat.chat_id
     )
-    print("==========================FLOWQUEUE========================")
-    print(flow_queue.id)
-    print("===========================================================", end="\n\n")
 
     state = flow_queue.get_last_queue_state()
 
