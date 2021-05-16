@@ -27,6 +27,7 @@ class TelegramView(APIView):
         print("============================VIEW===========================")
         print(request.data)
         print("===========================================================", end="\n\n")
-        transaction.on_commit(async_serialize_update.s(request.data).delay)
+        # transaction.on_commit(async_serialize_update.s(request.data).delay)
+        async_serialize_update(request.data)
 
         return JsonResponse({"ok": "POST request processed"})

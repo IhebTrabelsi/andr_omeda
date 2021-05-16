@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from andr_omeda.andr_update import choices
 from django.contrib.postgres.fields import ArrayField
-
+from andr_omeda.andr_base.utils.related import AutoOneToOneField
 
 """
 -->new user starts conversation with bot 
@@ -181,7 +181,7 @@ class FlowNode(models.Model):
 
 
 def _def_queue():
-    return [choices.GREET[0]]
+    return [choices.WAITING_FOR_APPROVAL[0]]
 
 
 def _def_update_queue():
@@ -193,6 +193,7 @@ class FlowQueue(models.Model):
         "andr_update.Chat",
         on_delete=models.CASCADE,
         related_name="flow_queue",
+        null=True
     )
 
     queue = ArrayField(
@@ -204,3 +205,12 @@ class FlowQueue(models.Model):
         models.UUIDField(),
         default=_def_update_queue
     )
+
+    def get_last_queue_state(self):
+        return self.queue[-1]
+
+    def no_prev_uuid(self):
+        return len(self.last_update_uuid) <= 1
+
+    def get_prev_uuid(self):
+        return self.last_update_uuid[-2]

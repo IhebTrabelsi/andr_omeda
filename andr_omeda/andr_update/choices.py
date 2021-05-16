@@ -14,8 +14,10 @@ DELETE_ROW = (5,)
 SUBMIT_TABLE = (6,)
 ABORT = (7,)
 GREET = (8,)
+WAITING_FOR_APPROVAL = (9,)
 
 NEW_MEMBER_FLOW = [
+    (WAITING_FOR_APPROVAL[0], _('not yet approved')),
     (SHOULD_ACCEPT_TERMS[0], _('terms'))
 ]
 

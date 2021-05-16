@@ -9,3 +9,10 @@ https://treeschema.com/blog/comprehensive-ecs-deployments-building-the-django-ap
     - cmd>W:\andr_back\andr_omeda> celery -A andr_omeda worker -l info -P gevent (for windows)
     - wsl> redis-server
     - cmd>W:\andr_back\andr_omeda> python manage.py runserver 127.0.0.1:8001
+
+
+[ ] create moderated object at creation of new chat
+    -default state should be defaulted to "not yet approved" so we directly
+    receive the waiting message 
+[ ] set flow status to waiting for approval
+[ ] in Task check if state approved or not 

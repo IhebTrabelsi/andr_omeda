@@ -56,6 +56,13 @@ class BotERPOwner(models.Model):
     def reject_moderated_object(self, moderated_object):
         moderated_object.reject_with_actor_with_id(actor_id=self.pk)
 
+    def approve_moderated_object_with_id(self, moderated_object_id):
+        moderated_object = ModeratedObject.objects.get(pk=moderated_object_id)
+        return self.approve_moderated_object(moderated_object=moderated_object)
+
+    def approve_moderated_object(self, moderated_object):
+        moderated_object.approve_with_actor_with_id(actor_id=self.pk)
+
     def get_logs_for_moderated_object_with_id(self, moderated_object_id, max_id=None):
         moderated_object = ModeratedObject.objects.get(pk=moderated_object_id)
         return self.get_logs_for_moderated_object(moderated_object=moderated_object, max_id=max_id)

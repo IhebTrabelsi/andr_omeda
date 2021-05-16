@@ -145,6 +145,7 @@ class ModeratedObject(models.Model):
         self.save()
 
     def approve_with_actor_with_id(self, actor_id):
+        current_status = self.status
         self.status = ModeratedObject.STATUS_APPROVED
         ModeratedObjectStatusChangedLog.create_moderated_object_status_changed_log(
             changed_from=current_status, changed_to=self.status, moderated_object_id=self.pk, actor_id=actor_id)

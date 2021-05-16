@@ -1,5 +1,6 @@
 # automatically created
 from rest_framework import serializers
+from django.db import transaction
 from andr_omeda.andr_update.views.andrid.serializers import AndridSerializer
 from andr_omeda.andr_update.views.andruser.serializers import AndruserSerializer
 from andr_omeda.andr_update.views.message.serializers import MessageSerializer
@@ -15,6 +16,7 @@ from andr_omeda.andr_update.models import Update, Andrid, Message, InlineQuery, 
     ChosenInlineResult, CallbackQuery, ShippingQuery, PreCheckoutQuery, Poll, ChatMemberUpdated, \
     Chat
 import json
+from andr_omeda.andr_record.helpers import get_flow_queue_for_chat_with_id
 
 
 class UpdateSerializer(serializers.ModelSerializer):
@@ -185,10 +187,15 @@ class UpdateSerializer(serializers.ModelSerializer):
             validated_data['chat_member'] = chat_member
 
         update = Update.objects.create(**validated_data)
+        print("/////////////////////////////////////////////////////\n"*3)
+        print(update.message.chat.flow_queue)
+        print("/////////////////////////////////////////////////////\n"*3)
 
-        _flow = update.message.chat.flow_queue
-        _flow.last_update_uuid.append(update.uuid)
-        _flow.save()
+        if update.id:
+            if update.message.id:
+                _flow = get_flow_queue_for_chat_with_id(chat_id=update.message.chat.chat_id)
+                _flow.last_update_uuid.append(update.uuid)
+                _flow.save()
 
         if my_chat_member_data:
             my_chat_member.update = update

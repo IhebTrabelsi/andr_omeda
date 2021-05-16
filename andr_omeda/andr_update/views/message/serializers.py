@@ -35,6 +35,7 @@ from andr_omeda.andr_update.views.chatlocation.serializers import ChatLocationSe
 from andr_omeda.andr_update.views.chatpermissions.serializers import ChatPermissionsSerializer
 from andr_omeda.andr_update.views.chatphoto.serializers import ChatPhotoSerializer
 from andr_omeda.andr_update.views.animation.serializers import AnimationSerializer
+from andr_omeda.andr_moderation.models import ModerationCategory, ModeratedObject
 
 
 class ChatSerializer(serializers.ModelSerializer):
@@ -100,13 +101,26 @@ class ChatSerializer(serializers.ModelSerializer):
             photo = photo.save()
             validated_data['photo'] = photo
 
-        chat = Chat(**validated_data)
         bot = Bot.objects.get(token=related_to_bot)
-        chat.bots = bot
-        chat.save()
+        chat = Chat.objects.create(**validated_data)
+        chat.bots.set([bot])
 
-        flow = FlowQueue(chat=chat)
-        flow.save()
+        fq = FlowQueue(chat=chat)
+        fq.save()
+
+        print("/////////////////////////////////////////////////////\n"*3)
+        print(chat.flow_queue)
+        print("/////////////////////////////////////////////////////\n"*3)
+
+        if ModerationCategory.objects.all().count() == 0:
+            category = ModerationCategory.make_moderation_category()
+        else:
+            category = ModerationCategory.objects.first()
+
+        moderated_object = ModeratedObject.get_or_create_moderated_object_for_chat(
+            chat,
+            category.id
+        )
 
         return chat
 
