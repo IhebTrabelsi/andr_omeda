@@ -61,6 +61,8 @@ class ModeratedObject(models.Model):
 
     category = models.ForeignKey(ModerationCategory, on_delete=models.CASCADE, related_name='moderated_objects')
 
+    bot = models.ForeignKey("andr_bot.Bot", on_delete=models.CASCADE, null=True)
+
     OBJECT_TYPE_CHAT = 'C'
 
     OBJECT_TYPES = (
@@ -79,26 +81,28 @@ class ModeratedObject(models.Model):
         ]
 
     @classmethod
-    def create_moderated_object(cls, object_type, content_object, category_id):
-        return cls.objects.create(object_type=object_type, content_object=content_object,
+    def create_moderated_object(cls, object_type, bot, content_object, category_id):
+        return cls.objects.create(object_type=object_type, bot=bot, content_object=content_object,
                                   category_id=category_id)
 
     @classmethod
-    def _get_or_create_moderated_object(cls, object_type, content_object, category_id):
+    def _get_or_create_moderated_object(cls, object_type, bot, content_object, category_id):
         # category_id makes sense only in object creation, for retreiving, we get
         # what's been already created
         try:
-            moderated_object = cls.objects.get(object_type=object_type, object_id=content_object.pk)
+            moderated_object = cls.objects.get(object_type=object_type, bot=bot, object_id=content_object.pk)
         except cls.DoesNotExist:
             moderated_object = cls.create_moderated_object(object_type=object_type,
+                                                           bot=bot,
                                                            content_object=content_object,
                                                            category_id=category_id)
 
         return moderated_object
 
     @classmethod
-    def get_or_create_moderated_object_for_chat(cls, chat, category_id):
+    def get_or_create_moderated_object_for_chat(cls, bot, chat, category_id):
         return cls._get_or_create_moderated_object(object_type=cls.OBJECT_TYPE_CHAT,
+                                                   bot=bot,
                                                    content_object=chat,
                                                    category_id=category_id)
 
@@ -110,6 +114,11 @@ class ModeratedObject(models.Model):
 
     def is_pending(self):
         return self.status == ModeratedObject.STATUS_PENDING
+
+    @classmethod
+    def check_moderation_approved(cls, chat_id, token):
+        mod_ob = cls.objects.get(chats__chat_id=chat_id, bot__token=token)
+        return mod_ob.is_approved()
 
     def update_with_actor_with_id(self, actor_id, description, category_id):
         if description is not None:

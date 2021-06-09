@@ -19,3 +19,16 @@ yes_no_keyboard_markup = types.ReplyKeyboardMarkup(
     accept_terms_yes_button,
     accept_terms_no_button
 )
+
+get_last_ster = types.KeyboardButton(
+    text=r'1'
+)
+
+idle_keyboard_markup = types.ReplyKeyboardMarkup(
+    resize_keyboard=True,
+    one_time_keyboard=True,
+    selective=None,
+    row_width=1
+).row(
+    get_last_ster
+)
