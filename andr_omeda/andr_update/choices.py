@@ -15,6 +15,8 @@ SUBMIT_TABLE = (6,)
 ABORT = (7,)
 GREET = (8,)
 WAITING_FOR_APPROVAL = (9,)
+WAITING_FOR_TERMS_ACCEPT = (10,)
+IDLE = (11,)
 
 NEW_MEMBER_FLOW = [
     (WAITING_FOR_APPROVAL[0], _('not yet approved')),

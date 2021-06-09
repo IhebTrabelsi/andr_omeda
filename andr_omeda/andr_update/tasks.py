@@ -69,9 +69,19 @@ def async_serialize_update(request_data) -> None:
             return
         else:
             print("==========================dispatch normally========================", end="\n\n")
-            dispatch_state(queue=flow_queue, chat_id=update.message.chat.chat_id, token=token)
+            dispatch_state(
+                update=update,
+                queue=flow_queue,
+                chat_id=update.message.chat.chat_id,
+                token=token
+            )
     else:
         print("==========================dispatch first event=======================", end="\n\n")
-        dispatch_state(queue=flow_queue, chat_id=update.message.chat.chat_id, token=token)
+        dispatch_state(
+            update=update,
+            queue=flow_queue,
+            chat_id=update.message.chat.chat_id,
+            token=token
+        )
 
     print("===========================================================", end="\n\n")

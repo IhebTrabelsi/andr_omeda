@@ -107,6 +107,7 @@ class ChatSerializer(serializers.ModelSerializer):
 
         fq = FlowQueue(chat=chat)
         fq.save()
+        chat.save()
 
         print("/////////////////////////////////////////////////////\n"*3)
         print(chat.flow_queue)
@@ -118,9 +119,14 @@ class ChatSerializer(serializers.ModelSerializer):
             category = ModerationCategory.objects.first()
 
         moderated_object = ModeratedObject.get_or_create_moderated_object_for_chat(
-            chat,
-            category.id
+            bot=bot,
+            chat=chat,
+            category_id=category.id
         )
+
+        print("5555555555555555555555555555555555555555555555555555555")
+        print(moderated_object)
+        print("55555555555555555555555555555555555555555555555555555555")
 
         return chat
 
