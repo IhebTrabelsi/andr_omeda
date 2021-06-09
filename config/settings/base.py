@@ -53,7 +53,7 @@ LOCALE_PATHS = [str(ROOT_DIR / "locale")]
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'andr_omeda20',
+        'NAME': 'andr_omeda31',
         'USER': 'postgres',
         'PASSWORD': 'nht5432',
         'HOST': '127.0.0.1',
@@ -93,12 +93,16 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
+    "generic_relations",
 ]
 
 LOCAL_APPS = [
     "andr_omeda.users.apps.UsersConfig",
     "andr_omeda.andr_bot.apps.AndrBotConfig",
     "andr_omeda.andr_update.apps.AndrUpdateConfig",
+    "andr_omeda.andr_record.apps.AndrRecordConfig",
+    "andr_omeda.andr_base.apps.AndrBaseConfig",
+    "andr_omeda.andr_moderation.apps.AndrModerationConfig",
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

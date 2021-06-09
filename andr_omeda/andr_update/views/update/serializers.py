@@ -1,5 +1,6 @@
 # automatically created
 from rest_framework import serializers
+from django.db import transaction
 from andr_omeda.andr_update.views.andrid.serializers import AndridSerializer
 from andr_omeda.andr_update.views.andruser.serializers import AndruserSerializer
 from andr_omeda.andr_update.views.message.serializers import MessageSerializer
@@ -15,6 +16,7 @@ from andr_omeda.andr_update.models import Update, Andrid, Message, InlineQuery, 
     ChosenInlineResult, CallbackQuery, ShippingQuery, PreCheckoutQuery, Poll, ChatMemberUpdated, \
     Chat
 import json
+from andr_omeda.andr_record.helpers import get_flow_queue_for_chat_with_id
 
 
 class UpdateSerializer(serializers.ModelSerializer):
@@ -46,7 +48,7 @@ class UpdateSerializer(serializers.ModelSerializer):
 
         update_id_data = validated_data.pop('update_id', None)
         related_to_bot_data = validated_data.pop('related_to_bot', None)
-        for_erp_user_data = validated_data.pop('related_to_bot', None)
+        for_erp_user_data = validated_data.pop('for_erp_user', None)
         message_data = validated_data.pop('message', None)
         edited_message_data = validated_data.pop('edited_message', None)
         channel_post_data = validated_data.pop('channel_post', None)
@@ -75,7 +77,8 @@ class UpdateSerializer(serializers.ModelSerializer):
 
         if message_data:
             context = {'validated_data': message_data, 'unicity': _unicity,
-                       'unicity_prefix': 'message', 'lists': _lists, 'specials': _specials}
+                       'unicity_prefix': 'message', 'lists': _lists, 'specials': _specials,
+                       'related_to_bot': validated_data['related_to_bot']}
             if self.context.get('message__reply_to_message', None):
                 context['message__reply_to_message'] = self.context.get('message__reply_to_message')
             message = MessageSerializer(data=message_data, context=context)
@@ -85,7 +88,8 @@ class UpdateSerializer(serializers.ModelSerializer):
 
         if edited_message_data != None:
             context = {'validated_data': edited_message_data, 'unicity': _unicity,
-                       'unicity_prefix': 'edited_message', 'lists': _lists, 'specials': _specials}
+                       'unicity_prefix': 'edited_message', 'lists': _lists, 'specials': _specials,
+                       'related_to_bot': validated_data['related_to_bot']}
             if self.context.get('edited_message__reply_to_message', None):
                 context['edited_message__reply_to_message'] = self.context.get('edited_message__reply_to_message')
             edited_message = MessageSerializer(data=edited_message_data, context=context)
@@ -183,6 +187,12 @@ class UpdateSerializer(serializers.ModelSerializer):
             validated_data['chat_member'] = chat_member
 
         update = Update.objects.create(**validated_data)
+
+        if update.id and update.message:
+            if update.message.id:
+                _flow = get_flow_queue_for_chat_with_id(chat_id=update.message.chat.chat_id)
+                _flow.last_update_uuid.append(update.uuid)
+                _flow.save()
 
         if my_chat_member_data:
             my_chat_member.update = update

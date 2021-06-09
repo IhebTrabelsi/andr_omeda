@@ -1,7 +1,8 @@
 from rest_framework.views import APIView
 from .serializers import BotERPOwnerSerializer, CreateBotSerializer, GetBotSerializer, \
     BotSerializer
-from andr_omeda.andr_bot.models.bot import BotERPOwner, Bot
+from andr_omeda.andr_bot.models.bot import Bot
+from andr_omeda.andr_bot.models.erp import BotERPOwner
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny
@@ -14,32 +15,31 @@ class Bots(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request, user_erp_name, token):
-        with transaction.atomic():
-            erp_owner_data = request.data.get('erp_owner_name', None)
-            owner_serializer = BotERPOwnerSerializer(
-                data={"owner_erp_name": erp_owner_data}
-            )
-            owner_serializer.is_valid(raise_exception=True)
-            owner_name = owner_serializer.validated_data
-            owner = BotERPOwner.objects.get_or_create(
-                **owner_name
-            )[0]
+        erp_owner_data = request.data.get('erp_owner_name', None)
+        owner_serializer = BotERPOwnerSerializer(
+            data={"owner_erp_name": erp_owner_data}
+        )
+        owner_serializer.is_valid(raise_exception=True)
+        owner_name = owner_serializer.validated_data
+        owner = BotERPOwner.objects.get_or_create(
+            **owner_name
+        )[0]
 
-            bot_serializer = CreateBotSerializer(data=request.data)
-            bot_serializer.is_valid(raise_exception=True)
-            bot_token = bot_serializer.validated_data
+        bot_serializer = CreateBotSerializer(data=request.data)
+        bot_serializer.is_valid(raise_exception=True)
+        bot_token = bot_serializer.validated_data
 
-            bot = Bot.objects.create(
-                **bot_token,
-                allowed_update_types=[],
-                erp_owner=owner
-            )
+        bot = Bot.objects.create(
+            **bot_token,
+            allowed_update_types=[],
+            erp_owner=owner
+        )
 
-            transaction.on_commit(async_set_webhook.s(bot.token).delay)
+        transaction.on_commit(async_set_webhook.s(bot.token).delay)
 
-            return Response({
-                'status': 'ok'
-            }, status=status.HTTP_200_OK)
+        return Response({
+            'status': 'ok'
+        }, status=status.HTTP_200_OK)
 
     def get(self, request, user_erp_name, token):
         request_data = self._get_request_data(request, user_erp_name, token)

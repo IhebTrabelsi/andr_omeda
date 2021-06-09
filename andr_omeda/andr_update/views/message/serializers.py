@@ -29,10 +29,13 @@ from andr_omeda.andr_update.views.messageautodeletetimerchanged.serializers impo
 
 from rest_framework import serializers
 from andr_omeda.andr_update.models import Chat
+from andr_omeda.andr_bot.models.bot import Bot
+from andr_omeda.andr_record.models import FlowQueue
 from andr_omeda.andr_update.views.chatlocation.serializers import ChatLocationSerializer
 from andr_omeda.andr_update.views.chatpermissions.serializers import ChatPermissionsSerializer
 from andr_omeda.andr_update.views.chatphoto.serializers import ChatPhotoSerializer
 from andr_omeda.andr_update.views.animation.serializers import AnimationSerializer
+from andr_omeda.andr_moderation.models import ModerationCategory, ModeratedObject
 
 
 class ChatSerializer(serializers.ModelSerializer):
@@ -74,6 +77,8 @@ class ChatSerializer(serializers.ModelSerializer):
         if _chat:
             return _chat
 
+        related_to_bot = self.context['related_to_bot']
+
         loc_ser = self.fields['location']
         perm_ser = self.fields['permissions']
         photo_ser = self.fields['photo']
@@ -96,8 +101,27 @@ class ChatSerializer(serializers.ModelSerializer):
             photo = photo.save()
             validated_data['photo'] = photo
 
-        chat = Chat(**validated_data)
-        chat.save()
+        bot = Bot.objects.get(token=related_to_bot)
+        chat = Chat.objects.create(**validated_data)
+        chat.bots.set([bot])
+
+        fq = FlowQueue(chat=chat)
+        fq.save()
+
+        print("/////////////////////////////////////////////////////\n"*3)
+        print(chat.flow_queue)
+        print("/////////////////////////////////////////////////////\n"*3)
+
+        if ModerationCategory.objects.all().count() == 0:
+            category = ModerationCategory.make_moderation_category()
+        else:
+            category = ModerationCategory.objects.first()
+
+        moderated_object = ModeratedObject.get_or_create_moderated_object_for_chat(
+            chat,
+            category.id
+        )
+
         return chat
 
     def validate_chat_id(self, value):
@@ -163,6 +187,7 @@ class MessageSerializer(serializers.ModelSerializer):
         _lists = self.context.get('lists')
         _specials = self.context.get('specials')
         _prefix = self.context.get('unicity_prefix')
+        related_to_bot = self.context.get('related_to_bot')
         if self.context.get(_prefix + '__' + 'reply_to_message', None):
             reply_to_message_data = self.context.get(_prefix + '__' + 'reply_to_message')
         else:
@@ -228,7 +253,7 @@ class MessageSerializer(serializers.ModelSerializer):
             __sender_chat = Chat.objects.get(pk=_unicity[_prefix + '__' + 'sender_chat'])
         else:
             if sender_chat_data:
-                sender_chat = ChatSerializer(data=sender_chat_data)
+                sender_chat = ChatSerializer(data=sender_chat_data, context={'related_to_bot': related_to_bot})
                 sender_chat_is_valid = sender_chat.is_valid(raise_exception=True)
 
                 sender_chat = sender_chat.save()
@@ -238,7 +263,7 @@ class MessageSerializer(serializers.ModelSerializer):
             __chat = Chat.objects.get(pk=_unicity[_prefix + '__' + 'chat'])
         else:
             if chat_data:
-                chat = ChatSerializer(data=chat_data)
+                chat = ChatSerializer(data=chat_data, context={'related_to_bot': related_to_bot})
                 chat_is_valid = chat.is_valid(raise_exception=True)
                 chat = chat.save()
                 validated_data['chat'] = chat
@@ -247,7 +272,8 @@ class MessageSerializer(serializers.ModelSerializer):
             __forward_from_chat = Chat.objects.get(pk=_unicity[_prefix + '__' + 'forward_from_chat'])
         else:
             if forward_from_chat_data:
-                forward_from_chat = ChatSerializer(data=forward_from_chat_data)
+                forward_from_chat = ChatSerializer(data=forward_from_chat_data, context={
+                                                   'related_to_bot': related_to_bot})
                 forward_from_chat_is_valid = forward_from_chat.is_valid(raise_exception=True)
                 forward_from_chat = forward_from_chat.save()
                 validated_data['forward_from_chat'] = forward_from_chat

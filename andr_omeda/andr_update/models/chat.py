@@ -2,9 +2,13 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from andr_omeda.andr_update.models import Message
+from andr_omeda.andr_record.models import FlowQueue
+from django.contrib.contenttypes.fields import GenericRelation
 
 
 class Chat(models.Model):
+    moderated_object = GenericRelation('andr_moderation.ModeratedObject', related_query_name='chats')
+
     chat_id = models.BigIntegerField(_("chat_id"), blank=False, primary_key=True, default=0)
     type = models.TextField(_("type"), blank=False)
     title = models.TextField(_("type"), blank=True)
@@ -23,7 +27,7 @@ class Chat(models.Model):
 
     def geet_message(self):
         return self.message
-    
+
     def __str__(self):
         if self.chat_id:
             return "Chat with pgId: %i" % self.chat_id
@@ -43,14 +47,14 @@ class Chat(models.Model):
 
     @classmethod
     def get_chat_with_id(cls, chat_id=None):
-        
+
         if not chat_id:
             return None
         if cls.chat_with_id_exists(chat_id):
             return cls.objects.get(pk=chat_id)
         else:
             return None
-    
+
     @classmethod
     def context_chat_unicity_check(cls, data):
         if not data.get('chat', None):
@@ -64,7 +68,7 @@ class Chat(models.Model):
             context = {'validated_data': data, 'chat': chat.chat_id}
         else:
             context = {'validated_data': data}
-        
+
         return context
 
     @classmethod
@@ -80,7 +84,7 @@ class Chat(models.Model):
             context = {'validated_data': data, 'chat': chat.chat_id}
         else:
             context = {'validated_data': data}
-        
+
         return context
 
     @classmethod
@@ -96,7 +100,7 @@ class Chat(models.Model):
         _id = data[field].get('id', None)
         if not _id:
             raise Exception("KeyError something wrong with chat_id")
-        
+
         chat = cls.get_chat_with_id(chat_id=_id)
         if chat:
             del data[field]
@@ -104,7 +108,5 @@ class Chat(models.Model):
         else:
             data[field]['chat_id'] = data[field]['id']
             del data[field]['id']
-        
+
         return unicity
-    
-    

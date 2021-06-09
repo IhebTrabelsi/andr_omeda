@@ -8,7 +8,7 @@ from django.utils import timezone
 
 
 class Andruser(models.Model):
-    
+
     new_to_message = models.ForeignKey(
         "Message",
         on_delete=models.CASCADE,
@@ -24,7 +24,6 @@ class Andruser(models.Model):
         null=True
     )
 
-
     user_id = models.BigIntegerField(_("user_id"), blank=False, primary_key=True)
     is_bot = models.BooleanField(_("is_bot"), blank=False)
     first_name = models.TextField(_("first_name"), blank=False)
@@ -34,6 +33,8 @@ class Andruser(models.Model):
     can_join_groups = models.BooleanField(_("can_join_groups"), blank=True, null=True)
     can_read_all_group_messages = models.BooleanField(_("can_read_all_group_messages"), blank=True, null=True)
     supports_inline_queries = models.BooleanField(_("supports_inline_queries"), blank=True, null=True)
+
+    is_terms_of_use_accepted = models.BooleanField(_("supports_inline_queries"), default=False)
 
     @classmethod
     def get_user_with_id_and_first_name(cls, user_id, first_name):
@@ -68,7 +69,7 @@ class Andruser(models.Model):
         _id = data[field].get('id', None)
         if not _id:
             raise Exception("KeyError something wrong with user_id")
-        
+
         user = cls.get_user_with_id(user_id=_id)
         if user:
             del data[field]
@@ -76,14 +77,16 @@ class Andruser(models.Model):
         else:
             data[field]['user_id'] = data[field]['id']
             del data[field]['id']
-        
+
         return unicity
-    
+
     @classmethod
     def from_user_sanitize(cls, data, *args, **kwargs):
         if data.get('from', None):
             data['from_user'] = data['from']
             del data['from']
         return data
-    
 
+    def accept_terms_of_use(self):
+        self.is_terms_of_use_accepted = True
+        self.save()

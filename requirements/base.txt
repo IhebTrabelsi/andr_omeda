@@ -7,6 +7,8 @@ redis==3.5.3  # https://github.com/andymccurdy/redis-py
 hiredis==1.1.0  # https://github.com/redis/hiredis-py
 uvicorn[standard]==0.13.4  # https://github.com/encode/uvicorn
 celery==5.0.5
+pyTelegramBotAPI==3.7.7
+mixer==7.1.2 
 
 # Django
 # ------------------------------------------------------------------------------
@@ -20,3 +22,4 @@ django-hstore==1.4.2
 # Django REST Framework
 djangorestframework==3.12.2  # https://github.com/encode/django-rest-framework
 django-cors-headers==3.7.0 # https://github.com/adamchainz/django-cors-headers
+rest-framework-generic-relations==2.0.0
